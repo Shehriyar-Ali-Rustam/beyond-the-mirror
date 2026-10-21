@@ -6,6 +6,7 @@ import { signOut } from "@/actions/auth";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ApprovalWatcher } from "@/components/account/approval-watcher";
 
 export const metadata: Metadata = { title: "Account pending" };
 
@@ -26,14 +27,17 @@ export default async function PendingPage() {
             description={
               suspended
                 ? "An administrator has paused access to this account. Please contact your school if you think this is a mistake."
-                : "A school administrator needs to approve counselor accounts before they can see student information. You'll get access as soon as that happens — just log in again."
+                : "A school administrator needs to approve counselor accounts before they can see student information. This page checks automatically and takes you to your dashboard the moment you're approved."
             }
             action={
-              <form action={signOut}>
-                <Button variant="secondary" type="submit">
-                  Log out
-                </Button>
-              </form>
+              <div className="flex flex-wrap justify-center gap-2">
+                {!suspended && <ApprovalWatcher />}
+                <form action={signOut}>
+                  <Button variant="secondary" type="submit">
+                    Log out
+                  </Button>
+                </form>
+              </div>
             }
           />
         </div>

@@ -12,10 +12,15 @@ if (!url || !key) {
 }
 const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
+const domain = process.env.AUTH_EMAIL_DOMAIN || "users.beyond-the-mirror.invalid";
+const authEmail = (username) => `${username}@${domain}`;
+const adminUsername = (process.env.ADMIN_USERNAME || "admin").toLowerCase();
+const adminPassword = process.env.ADMIN_PASSWORD;
+
 const PEOPLE = [
-  { email: "admin@demo.school", name: "Sana Malik", role: "admin" },
+  { username: adminUsername, name: process.env.ADMIN_DISPLAY_NAME || "School Administrator", role: "admin" },
   {
-    email: "counselor@demo.school", name: "Amira Hassan", role: "counselor",
+    username: "amira", name: "Amira Hassan", role: "counselor",
     profile: {
       title: "School Counselor", presence: "available", office_hours: "Weekdays, 8:00–15:30",
       bio: "I've been a school counselor for nine years. Nothing is too small to bring to me — exams, friendships, home, or just a week that feels heavy.",
@@ -23,24 +28,33 @@ const PEOPLE = [
     },
   },
   {
-    email: "daniel@demo.school", name: "Daniel Okafor", role: "counselor",
+    username: "daniel", name: "Daniel Okafor", role: "counselor",
     profile: { title: "Student Wellbeing Lead", presence: "busy", office_hours: "Mon–Thu, 9:00–16:00", specialties: ["Bullying", "Family", "Transitions"] },
   },
-  { email: "student@demo.school", name: "Zara Ahmed", role: "student", grade: "Grade 10" },
-  { email: "omar@demo.school", name: "Omar Siddiqui", role: "student", grade: "Grade 11" },
-  { email: "lina@demo.school", name: "Lina Park", role: "student", grade: "Grade 9" },
-  { email: "ethan@demo.school", name: "Ethan Brooks", role: "student", grade: "Grade 12" },
+  { username: "zara", name: "Zara Ahmed", role: "student", grade: "Grade 10", section: "10-B" },
+  { username: "omar", name: "Omar Siddiqui", role: "student", grade: "Grade 11", section: "11-A" },
+  { username: "lina", name: "Lina Park", role: "student", grade: "Grade 9", section: "9-C" },
+  { username: "ethan", name: "Ethan Brooks", role: "student", grade: "Grade 12", section: "12-A" },
 ];
 
 async function ensureUser(p) {
+  const isAdmin = p.role === "admin";
+  const token = isAdmin ? (await db.rpc("create_admin_provision_token")).data : undefined;
   const { data, error } = await db.auth.admin.createUser({
-    email: p.email, password, email_confirm: true,
-    user_metadata: { full_name: p.name, grade: p.grade ?? null },
+    email: authEmail(p.username),
+    password: isAdmin ? adminPassword : password,
+    email_confirm: true,
+    user_metadata: { full_name: p.name, username: p.username, grade: p.grade ?? null, section: p.section ?? null, provision_token: token },
   });
   if (data?.user) return data.user.id;
   if (error && !/already/i.test(error.message)) throw error;
-  const { data: existing } = await db.from("profiles").select("id").eq("email", p.email).single();
+  const { data: existing } = await db.from("profiles").select("id").eq("username", p.username).single();
   return existing.id;
+}
+
+if (!adminPassword || adminPassword.length < 10) {
+  console.error("Set ADMIN_PASSWORD (10+ characters) in .env.local before seeding.");
+  process.exit(1);
 }
 
 const ago = (mins) => new Date(Date.now() - mins * 60_000).toISOString();
@@ -48,11 +62,11 @@ const ago = (mins) => new Date(Date.now() - mins * 60_000).toISOString();
 async function main() {
   const ids = {};
   for (const p of PEOPLE) {
-    ids[p.email] = await ensureUser(p);
-    await db.from("profiles").update({ role: p.role, status: "active", grade: p.grade ?? null, ...(p.profile ?? {}) }).eq("id", ids[p.email]);
+    ids[p.username] = await ensureUser(p);
+    await db.from("profiles").update({ role: p.role, status: "active", grade: p.grade ?? null, ...(p.profile ?? {}) }).eq("id", ids[p.username]);
   }
-  const amira = ids["counselor@demo.school"], daniel = ids["daniel@demo.school"];
-  const [zara, omar, lina, ethan] = ["student@demo.school", "omar@demo.school", "lina@demo.school", "ethan@demo.school"].map((e) => ids[e]);
+  const amira = ids.amira, daniel = ids.daniel;
+  const [zara, omar, lina, ethan] = ["zara", "omar", "lina", "ethan"].map((u) => ids[u]);
   await db.from("profiles").update({ counselor_id: amira }).in("id", [zara, omar, lina]);
   await db.from("profiles").update({ counselor_id: daniel }).eq("id", ethan);
 
@@ -134,7 +148,7 @@ async function main() {
 
   await db.from("announcements").insert([
     { author_id: amira, title: "Exam-week drop-in hours", body: "During mocks I'll be in the counseling room every lunchtime — no appointment needed. Come by even if you just need ten quiet minutes.", audience: "all_students", pinned: true },
-    { author_id: ids["admin@demo.school"], title: "Welcome to Beyond the Mirror", body: "You can now message your counselor privately, book sessions, and use the self-help toolkit any time.", audience: "everyone", pinned: false },
+    { author_id: ids[adminUsername], title: "Welcome to Beyond the Mirror", body: "You can now message your counselor privately, book sessions, and use the self-help toolkit any time.", audience: "everyone", pinned: false },
   ]).then(({ error }) => { if (error) throw error; });
 
   console.log("Seeded sample conversations, slots, a booking and announcements.");
@@ -142,8 +156,8 @@ async function main() {
 }
 
 function printLogins() {
-  console.log(`\nDemo logins (password: ${password})`);
-  for (const p of PEOPLE) console.log(`  ${p.role.padEnd(10)} ${p.email}`);
+  console.log(`\nDemo logins — usernames (password: ${password}; admin uses ADMIN_PASSWORD)`);
+  for (const p of PEOPLE) console.log(`  ${p.role.padEnd(10)} ${p.username}`);
 }
 
 main().catch((e) => {

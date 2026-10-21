@@ -26,17 +26,38 @@ export const passwordSchema = z
   .regex(/[A-Za-z]/, "Include at least one letter.")
   .regex(/[0-9]/, "Include at least one number.");
 
+export const usernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(/^[a-z0-9][a-z0-9._]{2,23}$/, "Use 3–24 letters, numbers, dots or underscores (start with a letter or number).");
+
+const optionalText = (max: number, label: string) =>
+  z.string().trim().max(max, `${label} can be at most ${max} characters.`).optional().transform((v) => v || undefined);
+
+const optionalEmail = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .optional()
+  .transform((v) => v || undefined)
+  .pipe(z.email("Enter a valid email address, or leave it empty.").optional());
+
 export const loginSchema = z.object({
-  email: z.email("Enter a valid email address.").trim().toLowerCase(),
+  username: z.string().trim().toLowerCase().min(1, "Enter your username."),
   password: z.string().min(1, "Enter your password."),
 });
 
 export const registerSchema = z.object({
   role: z.enum(["student", "counselor"]),
   fullName: trimmed(2, 80, "Name"),
-  email: z.email("Enter a valid email address.").trim().toLowerCase(),
+  username: usernameSchema,
   password: passwordSchema,
-  grade: z.string().trim().max(40).optional(),
+  grade: optionalText(40, "Year / grade"),
+  section: optionalText(40, "Class / section"),
+  studentNumber: optionalText(40, "Student ID"),
+  title: optionalText(80, "Title"),
+  contactEmail: optionalEmail,
   agree: z.literal("on", { message: "Please confirm you've read how privacy works here." }),
 });
 
@@ -61,11 +82,15 @@ export const conversationUpdateSchema = z.object({
 
 export const studentProfileSchema = z.object({
   fullName: trimmed(2, 80, "Name"),
-  grade: z.string().trim().max(40, "Keep it under 40 characters.").optional(),
+  grade: optionalText(40, "Year / grade"),
+  section: optionalText(40, "Class / section"),
+  studentNumber: optionalText(40, "Student ID"),
+  contactEmail: optionalEmail,
 });
 
 export const counselorProfileSchema = z.object({
   fullName: trimmed(2, 80, "Name"),
+  contactEmail: optionalEmail,
   title: z.string().trim().max(80).optional(),
   bio: z.string().trim().max(600, "Keep your bio under 600 characters.").optional(),
   officeHours: z.string().trim().max(120).optional(),

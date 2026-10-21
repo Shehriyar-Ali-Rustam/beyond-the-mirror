@@ -18,6 +18,12 @@ export function StaffProfileForm({ profile }: { profile: Profile }) {
         <Field label="Full name" htmlFor="fullName" error={fe?.fullName}>
           <Input id="fullName" name="fullName" defaultValue={profile.full_name} maxLength={80} />
         </Field>
+        <Field label="Username" hint="Used to log in.">
+          <Input value={`@${profile.username}`} disabled readOnly />
+        </Field>
+        <Field label="Contact email" htmlFor="contactEmail" optional error={fe?.contactEmail}>
+          <Input id="contactEmail" name="contactEmail" type="email" defaultValue={profile.email ?? ""} />
+        </Field>
         <Field label="Title" htmlFor="title" optional error={fe?.title}>
           <Input id="title" name="title" defaultValue={profile.title ?? ""} maxLength={80} placeholder={counselor ? "e.g. Senior School Counselor" : "e.g. Head of Pastoral Care"} />
         </Field>

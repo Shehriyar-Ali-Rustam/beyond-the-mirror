@@ -26,11 +26,11 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
   const supabase = await createClient();
   const tz = await getTz();
 
-  let query = supabase.from("profiles").select("id, full_name, email, role, status, grade, avatar_hue, created_at, counselor_id").order("created_at", { ascending: false }).limit(300);
+  let query = supabase.from("profiles").select("id, full_name, username, email, role, status, grade, section, avatar_hue, created_at, counselor_id").order("created_at", { ascending: false }).limit(300);
   if (status !== "all") query = query.eq("status", status);
   if (role) query = query.eq("role", role);
   const term = ilikeTerm(q);
-  if (term) query = query.or(`full_name.ilike.${term},email.ilike.${term}`);
+  if (term) query = query.or(`full_name.ilike.${term},username.ilike.${term},email.ilike.${term}`);
 
   const [{ data: users }, { data: all }] = await Promise.all([query, supabase.from("profiles").select("status")]);
   const counts = {
@@ -51,7 +51,7 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
             { value: "active", label: "Active", count: counts.active },
             { value: "suspended", label: "Paused", count: counts.suspended },
           ]}
-          searchPlaceholder="Search name or email"
+          searchPlaceholder="Search name or username"
           extra={<RoleFilter value={role ?? ""} />}
         />
       </Suspense>
@@ -79,13 +79,16 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
                             {u.full_name}
                             {u.id === viewer.id && <span className="font-normal text-ink-3"> (you)</span>}
                           </span>
-                          <span className="block truncate text-xs text-ink-3">{u.email}</span>
+                          <span className="block truncate text-xs text-ink-3">
+                            @{u.username}
+                            {u.email ? ` · ${u.email}` : ""}
+                          </span>
                         </span>
                       </span>
                     </td>
                     <td className="px-3 py-3 text-ink-2">
                       {ROLE_LABEL[u.role]}
-                      {u.role === "student" && u.grade && <span className="text-ink-3"> · {u.grade}</span>}
+                      {u.role === "student" && (u.grade || u.section) && <span className="text-ink-3"> · {[u.grade, u.section].filter(Boolean).join(", ")}</span>}
                     </td>
                     <td className="px-3 py-3">
                       <Badge tone={u.status === "active" ? "resolved" : u.status === "pending" ? "pending" : "neutral"} dot>

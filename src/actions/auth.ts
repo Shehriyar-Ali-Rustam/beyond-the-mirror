@@ -1,20 +1,17 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { createServiceClient, hasServiceKey } from "@/lib/supabase/service";
+import { adminCredentials, isReservedUsername, safeEqual, usernameToAuthEmail } from "@/lib/accounts";
 import { homeFor } from "@/lib/auth";
 import { fieldErrors, loginSchema, passwordSchema, registerSchema } from "@/lib/validation";
 import type { ActionResult } from "@/lib/types";
-import { z } from "zod";
 
-async function siteUrl() {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  return `${proto}://${host}`;
-}
+const NOT_READY = "Accounts aren't available yet — the site's database still needs to be connected.";
+const BAD_LOGIN = "That username and password don't match an account.";
 
 /** Only allow same-site relative redirects after login. */
 function safeNext(next: FormDataEntryValue | null) {
@@ -22,21 +19,78 @@ function safeNext(next: FormDataEntryValue | null) {
   return value.startsWith("/") && !value.startsWith("//") && !value.startsWith("/\\") ? value : null;
 }
 
+/** Finds the auth address for a username (older accounts may use a real email). */
+async function authEmailFor(username: string) {
+  if (username.includes("@")) return username;
+  if (!hasServiceKey()) return usernameToAuthEmail(username);
+  const service = createServiceClient();
+  const { data: profile } = await service.from("profiles").select("id").eq("username", username).maybeSingle();
+  if (!profile) return usernameToAuthEmail(username);
+  const { data } = await service.auth.admin.getUserById(profile.id);
+  return data.user?.email ?? usernameToAuthEmail(username);
+}
+
+/**
+ * The single fixed administrator. Credentials live only in environment
+ * variables; the matching account is created (or re-synced) on login so the
+ * database's admin permissions still apply.
+ */
+async function ensureAdminAccount(admin: NonNullable<ReturnType<typeof adminCredentials>>) {
+  const service = createServiceClient();
+  const email = usernameToAuthEmail(admin.username);
+  const { data: existing } = await service.from("profiles").select("id, role").eq("username", admin.username).maybeSingle();
+
+  let id = existing?.id;
+  if (existing && existing.role !== "admin") {
+    console.error(`[auth] Username "${admin.username}" belongs to a non-admin account; refusing admin login.`);
+    return false;
+  }
+  if (!id) {
+    const { data: token, error: tokenError } = await service.rpc("create_admin_provision_token");
+    if (tokenError || !token) {
+      console.error("[auth] Could not create an admin provisioning token (are the migrations applied?):", tokenError?.message);
+      return false;
+    }
+    const { data, error } = await service.auth.admin.createUser({
+      email,
+      password: admin.password,
+      email_confirm: true,
+      user_metadata: { full_name: admin.name, username: admin.username, provision_token: token },
+    });
+    if (error || !data.user) {
+      console.error("[auth] Could not create admin account:", error?.message);
+      return false;
+    }
+    id = data.user.id;
+  } else {
+    // Keep the stored password in sync with ADMIN_PASSWORD.
+    await service.auth.admin.updateUserById(id, { password: admin.password });
+  }
+  await service.from("profiles").update({ role: "admin", status: "active", counselor_id: null }).eq("id", id);
+  return true;
+}
+
 export async function signIn(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  if (!isSupabaseConfigured()) return { ok: false, error: NOT_READY };
   const parsed = loginSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
+  const { username, password } = parsed.data;
+
+  const admin = adminCredentials();
+  const isAdminLogin = admin !== null && username === admin.username;
+  if (isAdminLogin) {
+    if (!safeEqual(password, admin.password)) return { ok: false, error: BAD_LOGIN };
+    if (!hasServiceKey() || !(await ensureAdminAccount(admin))) {
+      return { ok: false, error: "The admin account couldn't be prepared. Check the server configuration." };
+    }
+  }
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error || !data.user) {
-    const unconfirmed = error?.code === "email_not_confirmed";
-    return {
-      ok: false,
-      error: unconfirmed
-        ? "Please confirm your email first — check your inbox for the link."
-        : "That email and password don't match an account.",
-    };
-  }
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: isAdminLogin ? usernameToAuthEmail(username) : await authEmailFor(username),
+    password,
+  });
+  if (error || !data.user) return { ok: false, error: BAD_LOGIN };
 
   const { data: profile } = await supabase.from("profiles").select("role, status").eq("id", data.user.id).single();
   const next = safeNext(formData.get("next"));
@@ -45,50 +99,50 @@ export async function signIn(_: ActionResult | null, formData: FormData): Promis
 }
 
 export async function signUp(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  if (!isSupabaseConfigured() || !hasServiceKey()) return { ok: false, error: NOT_READY };
   const parsed = registerSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
-  const { email, password, fullName, role, grade } = parsed.data;
+  const v = parsed.data;
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${await siteUrl()}/auth/confirm`,
-      // role_request is only a *request*: the database trigger decides the real role.
-      data: { full_name: fullName, role_request: role, grade: grade || null },
+  const taken = { ok: false as const, error: "Please check the form.", fieldErrors: { username: ["That username is taken — try another."] } };
+  if (isReservedUsername(v.username)) return taken;
+
+  const service = createServiceClient();
+  const { data: existing } = await service.from("profiles").select("id").eq("username", v.username).maybeSingle();
+  if (existing) return taken;
+
+  const { error } = await service.auth.admin.createUser({
+    email: usernameToAuthEmail(v.username),
+    password: v.password,
+    email_confirm: true,
+    // role_request is only a *request*: the database trigger decides the real role.
+    user_metadata: {
+      full_name: v.fullName,
+      username: v.username,
+      role_request: v.role,
+      grade: v.grade ?? null,
+      section: v.section ?? null,
+      student_number: v.studentNumber ?? null,
+      title: v.title ?? null,
+      contact_email: v.contactEmail ?? null,
     },
   });
-
   if (error) {
-    if (error.code === "user_already_exists") return { ok: false, error: "An account with this email already exists." };
-    if (error.code === "weak_password") return { ok: false, error: "Please choose a stronger password." };
+    if (/already/i.test(error.message)) return taken;
+    console.error("[auth] sign-up failed:", error.message);
     return { ok: false, error: "We couldn't create your account right now. Please try again." };
   }
 
-  // Email confirmation enabled → no session yet.
-  if (!data.session) {
-    return { ok: true, message: `We sent a confirmation link to ${email}. Open it to finish setting up.` };
-  }
-  redirect(role === "counselor" ? "/account/pending" : "/student?welcome=1");
+  const supabase = await createClient();
+  const { error: loginError } = await supabase.auth.signInWithPassword({ email: usernameToAuthEmail(v.username), password: v.password });
+  if (loginError) redirect("/login");
+  redirect(v.role === "counselor" ? "/account/pending" : "/student?welcome=1");
 }
 
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
-}
-
-export async function requestPasswordReset(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
-  const parsed = z.object({ email: z.email("Enter a valid email address.") }).safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { ok: false, error: "Enter a valid email address." };
-
-  const supabase = await createClient();
-  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${await siteUrl()}/auth/confirm?next=/reset-password`,
-  });
-  // Same response either way so the form can't be used to discover accounts.
-  return { ok: true, message: "If that email has an account, a reset link is on its way." };
 }
 
 export async function updatePassword(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
@@ -100,7 +154,7 @@ export async function updatePassword(_: ActionResult | null, formData: FormData)
 
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims?.claims) return { ok: false, error: "Your reset link has expired. Please request a new one." };
+  if (!claims?.claims) return { ok: false, error: "Please log in again." };
 
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) {

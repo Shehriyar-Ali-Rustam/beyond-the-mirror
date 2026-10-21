@@ -14,9 +14,9 @@ export default async function StudentSettings() {
     <div className="mx-auto max-w-3xl space-y-5">
       <PageHeader title="Settings" />
       <Card>
-        <CardHeader title="Profile" description="Your counselor sees your name and year." />
+        <CardHeader title="Profile" description="Your counselor sees these details." />
         <CardBody>
-          <StudentProfileForm fullName={viewer.full_name} grade={viewer.grade} email={viewer.email} />
+          <StudentProfileForm profile={viewer} />
         </CardBody>
       </Card>
       <Card>

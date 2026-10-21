@@ -8,19 +8,24 @@ import { Field, Input } from "@/components/ui/input";
 import { PasswordInput } from "./password-input";
 import { FormMessage } from "./form-message";
 
-export function LoginForm({ next, linkError }: { next: string; linkError: boolean }) {
+export function LoginForm({ next }: { next: string }) {
   const [state, onSubmit, pending] = useActionForm(signIn);
   const fe = state && !state.ok ? state.fieldErrors : undefined;
 
   return (
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
-      {linkError && !state && (
-        <FormMessage state={{ ok: false, error: "That link is invalid or has expired. Please try again." }} />
-      )}
       <FormMessage state={state} />
       <input type="hidden" name="next" value={next} />
-      <Field label="Email" htmlFor="email" error={fe?.email}>
-        <Input id="email" name="email" type="email" autoComplete="email" required aria-invalid={!!fe?.email} />
+      <Field label="Username" htmlFor="username" error={fe?.username}>
+        <Input
+          id="username"
+          name="username"
+          autoComplete="username"
+          autoCapitalize="none"
+          spellCheck={false}
+          required
+          aria-invalid={!!fe?.username}
+        />
       </Field>
       <Field label="Password" htmlFor="password" error={fe?.password}>
         <PasswordInput id="password" name="password" autoComplete="current-password" required aria-invalid={!!fe?.password} />

@@ -9,7 +9,7 @@ import type { Role } from "@/lib/types";
 import { ROLE_LABEL } from "./nav-config";
 import { ThemeToggle } from "./theme-toggle";
 
-export function UserMenu({ name, email, hue, role }: { name: string; email: string; hue: number; role: Role }) {
+export function UserMenu({ name, username, hue, role }: { name: string; username: string; hue: number; role: Role }) {
   return (
     <Dropdown>
       <DropdownTrigger
@@ -25,7 +25,7 @@ export function UserMenu({ name, email, hue, role }: { name: string; email: stri
       <DropdownContent className="w-64">
         <div className="px-3 pb-2 pt-1.5">
           <p className="truncate text-sm font-medium text-ink">{name}</p>
-          <p className="truncate text-xs text-ink-3">{email}</p>
+          <p className="truncate text-xs text-ink-3">@{username}</p>
         </div>
         <DropdownSeparator />
         <DropdownItem asChild>

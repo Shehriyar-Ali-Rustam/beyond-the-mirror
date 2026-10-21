@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionForm } from "@/hooks/use-action-form";
 import { useState } from "react";
 import Link from "next/link";
 import { GraduationCap, HeartHandshake } from "lucide-react";
+import { useActionForm } from "@/hooks/use-action-form";
 import { signUp } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
@@ -15,15 +15,6 @@ export function RegisterForm({ initialRole }: { initialRole: "student" | "counse
   const [role, setRole] = useState(initialRole);
   const [state, onSubmit, pending] = useActionForm(signUp);
   const fe = state && !state.ok ? state.fieldErrors : undefined;
-
-  if (state?.ok && state.message) {
-    return (
-      <div className="space-y-4">
-        <FormMessage state={state} />
-        <p className="text-sm text-ink-2">You can close this tab — the link will bring you straight back.</p>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
@@ -45,14 +36,7 @@ export function RegisterForm({ initialRole }: { initialRole: "student" | "counse
                   : "border-line-strong bg-surface text-ink-2 hover:border-ink-3",
               )}
             >
-              <input
-                type="radio"
-                name="role"
-                value={r.value}
-                checked={role === r.value}
-                onChange={() => setRole(r.value)}
-                className="sr-only"
-              />
+              <input type="radio" name="role" value={r.value} checked={role === r.value} onChange={() => setRole(r.value)} className="sr-only" />
               <r.icon className="size-5" />
               {r.label}
             </label>
@@ -60,8 +44,7 @@ export function RegisterForm({ initialRole }: { initialRole: "student" | "counse
         </div>
         {role === "counselor" && (
           <p className="mt-2.5 rounded-xl bg-lilac-soft px-3.5 py-2.5 text-[13px] leading-relaxed text-ink-2">
-            Counselor accounts are reviewed by a school administrator before they can see any student
-            messages.
+            Counselor accounts are reviewed by the school administrator before they can see any student messages.
           </p>
         )}
       </fieldset>
@@ -71,21 +54,43 @@ export function RegisterForm({ initialRole }: { initialRole: "student" | "counse
       <Field label="Full name" htmlFor="fullName" error={fe?.fullName}>
         <Input id="fullName" name="fullName" autoComplete="name" required aria-invalid={!!fe?.fullName} />
       </Field>
-      <Field label="School email" htmlFor="email" error={fe?.email}>
-        <Input id="email" name="email" type="email" autoComplete="email" required aria-invalid={!!fe?.email} />
+      <Field label="Username" htmlFor="username" error={fe?.username} hint="You'll use this to log in. Letters, numbers, dots or underscores.">
+        <Input
+          id="username"
+          name="username"
+          autoComplete="username"
+          autoCapitalize="none"
+          spellCheck={false}
+          maxLength={24}
+          placeholder="e.g. zara.ahmed"
+          required
+          aria-invalid={!!fe?.username}
+        />
       </Field>
-      {role === "student" && (
-        <Field label="Year / grade" htmlFor="grade" optional error={fe?.grade}>
-          <Input id="grade" name="grade" placeholder="e.g. Grade 10" />
+      <Field label="Password" htmlFor="password" error={fe?.password} hint="At least 8 characters, with a letter and a number.">
+        <PasswordInput id="password" name="password" autoComplete="new-password" required aria-invalid={!!fe?.password} />
+      </Field>
+
+      {role === "student" ? (
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Year / grade" htmlFor="grade" optional error={fe?.grade}>
+            <Input id="grade" name="grade" placeholder="Grade 10" maxLength={40} />
+          </Field>
+          <Field label="Class / section" htmlFor="section" optional error={fe?.section}>
+            <Input id="section" name="section" placeholder="10-B" maxLength={40} />
+          </Field>
+          <Field label="Student ID" htmlFor="studentNumber" optional error={fe?.studentNumber} className="col-span-2">
+            <Input id="studentNumber" name="studentNumber" placeholder="Roll / admission number" maxLength={40} />
+          </Field>
+        </div>
+      ) : (
+        <Field label="Title" htmlFor="title" optional error={fe?.title}>
+          <Input id="title" name="title" placeholder="e.g. School Counselor" maxLength={80} />
         </Field>
       )}
-      <Field
-        label="Password"
-        htmlFor="password"
-        error={fe?.password}
-        hint="At least 8 characters, with a letter and a number."
-      >
-        <PasswordInput id="password" name="password" autoComplete="new-password" required aria-invalid={!!fe?.password} />
+
+      <Field label="Contact email" htmlFor="contactEmail" optional error={fe?.contactEmail} hint="Not needed to sign up. Only shared with your counselor if you add it.">
+        <Input id="contactEmail" name="contactEmail" type="email" autoComplete="email" aria-invalid={!!fe?.contactEmail} />
       </Field>
 
       <Field error={fe?.agree}>

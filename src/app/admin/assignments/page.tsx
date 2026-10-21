@@ -20,7 +20,7 @@ export default async function AdminAssignments({ searchParams }: PageProps<"/adm
   const supabase = await createClient();
 
   const [{ data: students }, { data: counselors }] = await Promise.all([
-    supabase.from("profiles").select("id, full_name, email, grade, avatar_hue, counselor_id").eq("role", "student").eq("status", "active").order("full_name").limit(1000),
+    supabase.from("profiles").select("id, full_name, username, grade, section, avatar_hue, counselor_id").eq("role", "student").eq("status", "active").order("full_name").limit(1000),
     supabase.from("profiles").select("id, full_name").eq("role", "counselor").eq("status", "active").order("full_name"),
   ]);
   const load = new Map<string, number>();
@@ -29,7 +29,7 @@ export default async function AdminAssignments({ searchParams }: PageProps<"/adm
   const unassigned = (students ?? []).filter((s) => !s.counselor_id).length;
   const rows = (students ?? [])
     .filter((s) => view === "all" || !s.counselor_id)
-    .filter((s) => !q || s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q) || (s.grade ?? "").toLowerCase().includes(q))
+    .filter((s) => !q || s.full_name.toLowerCase().includes(q) || s.username.includes(q) || (s.grade ?? "").toLowerCase().includes(q))
     .sort((a, b) => Number(!!a.counselor_id) - Number(!!b.counselor_id));
 
   return (
@@ -57,8 +57,8 @@ export default async function AdminAssignments({ searchParams }: PageProps<"/adm
                   <span className="min-w-0">
                     <span className="block truncate font-medium text-ink">{s.full_name}</span>
                     <span className="block truncate text-xs text-ink-3">
-                      {s.grade ? `${s.grade} · ` : ""}
-                      {s.email}
+                      @{s.username}
+                      {s.grade || s.section ? ` · ${[s.grade, s.section].filter(Boolean).join(", ")}` : ""}
                     </span>
                   </span>
                 </span>

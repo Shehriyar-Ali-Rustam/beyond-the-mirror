@@ -12,7 +12,7 @@ export async function StudentPanel({ studentId, currentConversationId, tz }: { s
   const supabase = await createClient();
   const now = new Date().toISOString();
   const [{ data: student }, { data: conversations }, { data: sessions }, { data: notes }] = await Promise.all([
-    supabase.from("profiles").select("id, full_name, email, grade, avatar_hue, created_at").eq("id", studentId).maybeSingle(),
+    supabase.from("profiles").select("id, full_name, username, email, grade, section, student_number, avatar_hue, created_at").eq("id", studentId).maybeSingle(),
     supabase.from("conversations").select("id, subject, status, last_message_at").eq("student_id", studentId).order("last_message_at", { ascending: false }).limit(20),
     supabase
       .from("appointments")
@@ -31,10 +31,17 @@ export async function StudentPanel({ studentId, currentConversationId, tz }: { s
       <div className="flex flex-col items-center pt-4 text-center">
         <Avatar name={student.full_name} hue={student.avatar_hue} size="xl" />
         <p className="mt-3 font-display text-xl text-ink">{student.full_name}</p>
-        {student.grade && <p className="text-sm text-ink-2">{student.grade}</p>}
-        <a href={`mailto:${student.email}`} className="mt-2 inline-flex items-center gap-1.5 text-xs text-ink-3 hover:text-primary">
-          <Mail className="size-3" /> {student.email}
-        </a>
+        <p className="text-sm text-ink-2">@{student.username}</p>
+        {(student.grade || student.section || student.student_number) && (
+          <p className="mt-1 text-xs text-ink-3">
+            {[student.grade, student.section, student.student_number && `ID ${student.student_number}`].filter(Boolean).join(" · ")}
+          </p>
+        )}
+        {student.email && (
+          <a href={`mailto:${student.email}`} className="mt-2 inline-flex items-center gap-1.5 text-xs text-ink-3 hover:text-primary">
+            <Mail className="size-3" /> {student.email}
+          </a>
+        )}
         <Link href={`/counselor/students/${student.id}`} className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
           Full profile <ExternalLink className="size-3" />
         </Link>

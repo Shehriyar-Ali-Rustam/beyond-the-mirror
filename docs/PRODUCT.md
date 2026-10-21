@@ -25,11 +25,11 @@ Anonymous messaging feels safer, but in a school it can block the duty of care. 
 
 ## 2. Roles and journeys
 
-**Student:** *Land → sign up (30 sec) → write a first message (auto-matched to a counselor) → notified of the reply → continue the thread or book a session → resolve → rate.* The toolkit is available throughout and can hand a reflection (e.g. "Untangle a thought") straight into a new message.
+**Student:** *Land → sign up with a username, no email (30 sec) → write a first message (auto-matched to a counselor) → notified of the reply → continue the thread or book a session → resolve → rate.* The toolkit is available throughout and can hand a reflection (e.g. "Untangle a thought") straight into a new message.
 
-**Counselor:** *Sign up → wait for admin approval → open the Overview (who's waiting, what's urgent) → Inbox: reply, set status/urgency/topic, add private notes → Schedule: open slots, manage bookings, mark sessions complete → read feedback and statistics.*
+**Counselor:** *Sign up with a username → wait for admin approval → open the Overview (who's waiting, what's urgent) → Inbox: reply, set status/urgency/topic, add private notes → Schedule: open slots, manage bookings, mark sessions complete → read feedback and statistics.*
 
-**Admin:** *Approve counselors → assign students and balance caseloads → monitor aggregate usage → publish announcements.* Admins never see message content.
+**Admin:** *Log in with the fixed admin credentials → approve counselors → assign students and balance caseloads → monitor aggregate usage → publish announcements.* Admins never see message content.
 
 ## 3. Information architecture
 
@@ -42,6 +42,8 @@ Admin:     Overview · People · Assignments · Announcements · Settings
 
 ## 4. Feature decisions
 
+- **No email required.** Many students don't have (or don't want to use) a personal email. Accounts use a username + password plus general profile details. Contact email is optional. Forgotten passwords are reset by the admin, who sees a one-time temporary password.
+- **One fixed admin.** The administrator logs in with credentials set in environment variables. No admin sign-up, no SQL bootstrap.
 - **Request = conversation.** Each request has a subject, topic, urgency and status, so it works both as a chat and as a case. Students can resolve or reopen. Counselors control triage fields.
 - **Auto-matching.** A student without a counselor is matched to the lightest active caseload on their first message, so nobody hits a dead end. Admins can reassign at any time, and open requests move with the student.
 - **Real-time where it matters.** Messages, inbox updates, read receipts and notifications use Supabase Realtime. Everything else is server-rendered.

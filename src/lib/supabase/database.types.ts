@@ -239,14 +239,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "avatar_hue": number,"bio": string | null,"counselor_id": string | null,"created_at": string,"email": string,"full_name": string,"grade": string | null,"id": string,"office_hours": string | null,"presence": Database["public"]['Enums']["counselor_presence"],"role": Database["public"]['Enums']["user_role"],"specialties": (string)[],"status": Database["public"]['Enums']["account_status"],"title": string | null,"updated_at": string,"whatsapp": string | null
+                    "avatar_hue": number,"bio": string | null,"counselor_id": string | null,"created_at": string,"email": string | null,"full_name": string,"grade": string | null,"id": string,"office_hours": string | null,"presence": Database["public"]['Enums']["counselor_presence"],"role": Database["public"]['Enums']["user_role"],"section": string | null,"specialties": (string)[],"status": Database["public"]['Enums']["account_status"],"student_number": string | null,"title": string | null,"updated_at": string,"username": string,"whatsapp": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "avatar_hue"?: number,"bio"?: string | null,"counselor_id"?: string | null,"created_at"?: string,"email": string,"full_name": string,"grade"?: string | null,"id": string,"office_hours"?: string | null,"presence"?: Database["public"]['Enums']["counselor_presence"],"role"?: Database["public"]['Enums']["user_role"],"specialties"?: (string)[],"status"?: Database["public"]['Enums']["account_status"],"title"?: string | null,"updated_at"?: string,"whatsapp"?: string | null
+                    "avatar_hue"?: number,"bio"?: string | null,"counselor_id"?: string | null,"created_at"?: string,"email"?: string | null,"full_name": string,"grade"?: string | null,"id": string,"office_hours"?: string | null,"presence"?: Database["public"]['Enums']["counselor_presence"],"role"?: Database["public"]['Enums']["user_role"],"section"?: string | null,"specialties"?: (string)[],"status"?: Database["public"]['Enums']["account_status"],"student_number"?: string | null,"title"?: string | null,"updated_at"?: string,"username": string,"whatsapp"?: string | null
                   }
                   Update: {
-                    "avatar_hue"?: number,"bio"?: string | null,"counselor_id"?: string | null,"created_at"?: string,"email"?: string,"full_name"?: string,"grade"?: string | null,"id"?: string,"office_hours"?: string | null,"presence"?: Database["public"]['Enums']["counselor_presence"],"role"?: Database["public"]['Enums']["user_role"],"specialties"?: (string)[],"status"?: Database["public"]['Enums']["account_status"],"title"?: string | null,"updated_at"?: string,"whatsapp"?: string | null
+                    "avatar_hue"?: number,"bio"?: string | null,"counselor_id"?: string | null,"created_at"?: string,"email"?: string | null,"full_name"?: string,"grade"?: string | null,"id"?: string,"office_hours"?: string | null,"presence"?: Database["public"]['Enums']["counselor_presence"],"role"?: Database["public"]['Enums']["user_role"],"section"?: string | null,"specialties"?: (string)[],"status"?: Database["public"]['Enums']["account_status"],"student_number"?: string | null,"title"?: string | null,"updated_at"?: string,"username"?: string,"whatsapp"?: string | null
                   }
                   Relationships: [
                     {
@@ -283,6 +283,9 @@ isOneToOne: false
                            },
 "counselor_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"create_admin_provision_token":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "current_role_active":
 { Args: Record<PropertyKey, never>; Returns: Database["public"]['Enums']["user_role"]

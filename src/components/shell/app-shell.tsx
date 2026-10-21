@@ -36,7 +36,7 @@ export function AppShell({
           </div>
           <div className="ml-auto flex items-center gap-1.5">
             <NotificationBell userId={viewer.id} initialUnread={unreadNotifications} />
-            <UserMenu name={viewer.full_name} email={viewer.email} hue={viewer.avatar_hue} role={viewer.role} />
+            <UserMenu name={viewer.full_name} username={viewer.username} hue={viewer.avatar_hue} role={viewer.role} />
           </div>
         </header>
         <TimezoneSync serverTz={tz} />

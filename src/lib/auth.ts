@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { Profile, Role } from "@/lib/types";
 
 /**
@@ -9,6 +10,7 @@ import type { Profile, Role } from "@/lib/types";
  * trusted, server-verified profile. Memoised per request.
  */
 export const getViewer = cache(async (): Promise<Profile | null> => {
+  if (!isSupabaseConfigured()) return null;
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;

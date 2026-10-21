@@ -12,11 +12,14 @@ if (!/127\.0\.0\.1|localhost/.test(url ?? "")) {
   process.exit(1);
 }
 
+const domain = process.env.AUTH_EMAIL_DOMAIN || "users.beyond-the-mirror.invalid";
+const adminUsername = (process.env.ADMIN_USERNAME || "admin").toLowerCase();
 const client = () => createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
-async function as(email) {
+async function as(username) {
   const c = client();
-  const { data, error } = await c.auth.signInWithPassword({ email, password });
-  if (error) throw new Error(`login ${email}: ${error.message}`);
+  const pw = username === adminUsername ? process.env.ADMIN_PASSWORD : password;
+  const { data, error } = await c.auth.signInWithPassword({ email: `${username}@${domain}`, password: pw });
+  if (error) throw new Error(`login ${username}: ${error.message}`);
   return { c, id: data.user.id };
 }
 
@@ -32,11 +35,11 @@ async function test(name, fn) {
   }
 }
 
-const zara = await as("student@demo.school");
-const omar = await as("omar@demo.school");
-const amira = await as("counselor@demo.school");
-const daniel = await as("daniel@demo.school");
-const admin = await as("admin@demo.school");
+const zara = await as("zara");
+const omar = await as("omar");
+const amira = await as("amira");
+const daniel = await as("daniel");
+const admin = await as(adminUsername);
 const anon = client();
 
 const { data: omarConvs } = await omar.c.from("conversations").select("id").eq("student_id", omar.id);
@@ -212,6 +215,7 @@ await test("can read all profiles and aggregate stats", async () => {
   const { data: stats, error } = await admin.c.rpc("admin_stats");
   assert.ifError(error);
   assert.ok(stats.students >= 4 && !JSON.stringify(stats).includes("mock exams"));
+  assert.equal(admin.id, data.find((p) => p.id === admin.id)?.id);
 });
 await test("cannot change their own role", async () => {
   assert.ok((await admin.c.rpc("admin_update_user", { p_user: admin.id, p_role: "student", p_status: null })).error);
@@ -224,23 +228,41 @@ await test("can assign a counselor and open requests follow", async () => {
 });
 
 console.log("\nPending counselor sign-ups");
-await test("start pending with no access until approved", async () => {
+const service = createClient(url, secret, { auth: { persistSession: false } });
+async function provision(username, metadata, appMetadata) {
+  const email = `${username}@${domain}`;
+  const { data, error } = await service.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { username, ...metadata }, ...(appMetadata ? { app_metadata: appMetadata } : {}) });
+  if (error) return { error };
   const c = client();
-  const email = `pending-${Date.now()}@demo.school`;
-  const { data, error } = await c.auth.signUp({ email, password, options: { data: { full_name: "Pending Person", role_request: "counselor" } } });
+  await c.auth.signInWithPassword({ email, password });
+  return { c, id: data.user.id };
+}
+await test("start pending with no access until approved", async () => {
+  const { c, id, error } = await provision(`pending${Date.now() % 100000}`, { full_name: "Pending Person", role_request: "counselor" });
   assert.ifError(error);
-  const { data: me } = await c.from("profiles").select("role, status").eq("id", data.user.id).single();
+  const { data: me } = await c.from("profiles").select("role, status").eq("id", id).single();
   assert.equal(me.status, "pending");
   assert.ok((await c.rpc("counselor_stats")).error);
   assert.equal((await c.from("conversations").select("id")).data.length, 0);
-  if (secret) await createClient(url, secret).auth.admin.deleteUser(data.user.id);
+  await service.auth.admin.deleteUser(id);
 });
-await test("cannot self-assign admin through sign-up metadata", async () => {
-  const c = client();
-  const { data } = await c.auth.signUp({ email: `sneaky-${Date.now()}@demo.school`, password, options: { data: { full_name: "Sneaky", role_request: "admin", role: "admin" } } });
-  const { data: me } = await c.from("profiles").select("role, status").eq("id", data.user.id).single();
+await test("user metadata cannot grant admin", async () => {
+  const { c, id } = await provision(`sneaky${Date.now() % 100000}`, { full_name: "Sneaky", role_request: "admin", role: "admin", provision_token: "guess" });
+  const { data: me } = await c.from("profiles").select("role").eq("id", id).single();
   assert.equal(me.role, "student");
-  if (secret) await createClient(url, secret).auth.admin.deleteUser(data.user.id);
+  await service.auth.admin.deleteUser(id);
+});
+await test("reserved usernames are refused (even via the auth API)", async () => {
+  const { error } = await provision("administrator", { full_name: "Fake admin" });
+  assert.ok(error, "reserved username must be rejected by the database");
+});
+await test("users cannot mint admin provisioning tokens", async () => {
+  assert.ok((await zara.c.rpc("create_admin_provision_token")).error);
+  assert.ok((await anon.rpc("create_admin_provision_token")).error);
+});
+await test("public sign-up endpoint is disabled", async () => {
+  const { error } = await client().auth.signUp({ email: `drive-by${Date.now()}@${domain}`, password, options: { data: { username: `driveby${Date.now() % 10000}` } } });
+  assert.ok(error);
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer, homeFor } from "@/lib/auth";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { SetupNotice } from "@/components/auth/setup-notice";
 import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = { title: "Create an account" };
@@ -15,9 +17,9 @@ export default async function RegisterPage({ searchParams }: PageProps<"/registe
   return (
     <div className="animate-fade-up">
       <h1 className="font-display text-[2rem] leading-tight text-ink">Create your account</h1>
-      <p className="mt-2 text-[15px] text-ink-2">It takes a minute. Your messages stay between you and your counselor.</p>
+      <p className="mt-2 text-[15px] text-ink-2">No email needed — just a username and a few details. Your messages stay between you and your counselor.</p>
       <div className="mt-8">
-        <RegisterForm initialRole={role} />
+        {isSupabaseConfigured() ? <RegisterForm initialRole={role} /> : <SetupNotice />}
       </div>
       <p className="mt-8 text-sm text-ink-2">
         Already have an account?{" "}

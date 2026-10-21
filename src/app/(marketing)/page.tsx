@@ -38,7 +38,7 @@ const FAQ = [
   ...STUDENT_FAQ.slice(0, 4),
   {
     q: "How do counselors get access?",
-    a: "Counselors sign up with their school email and an administrator approves the account. Until then, they can't see any student information.",
+    a: "Counselors create an account and the school administrator approves it. Until then, they can't see any student information.",
   },
   {
     q: "What can school administrators see?",
@@ -391,7 +391,7 @@ export default function LandingPage() {
                   {[
                     { what: "Messages in a conversation", v: [true, true, false] },
                     { what: "Request subject & topic", v: [true, true, false] },
-                    { what: "Name, year & email", v: [true, true, true] },
+                    { what: "Name, username & year", v: [true, true, true] },
                     { what: "Counselor's private notes", v: [false, true, false] },
                     { what: "Toolkit activities & letters", v: [true, false, false] },
                     { what: "Overall usage numbers", v: [false, "own", true] },

@@ -24,7 +24,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
   const tz = await getTz();
 
   const [{ data: students }, { data: convs }] = await Promise.all([
-    supabase.from("profiles").select("id, full_name, grade, avatar_hue, email").eq("counselor_id", viewer.id).order("full_name").limit(500),
+    supabase.from("profiles").select("id, full_name, username, grade, section, avatar_hue").eq("counselor_id", viewer.id).order("full_name").limit(500),
     supabase.from("conversations").select("student_id, status, last_message_at").eq("counselor_id", viewer.id).limit(2000),
   ]);
 
@@ -39,7 +39,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
   const rows = (students ?? [])
     .map((s) => ({ ...s, ...(byStudent.get(s.id) ?? { open: 0, total: 0, last: null }) }))
     .filter((s) => (filter === "open" ? s.open > 0 : filter === "quiet" ? s.total === 0 : true))
-    .filter((s) => !q || s.full_name.toLowerCase().includes(q) || (s.grade ?? "").toLowerCase().includes(q));
+    .filter((s) => !q || s.full_name.toLowerCase().includes(q) || s.username.includes(q) || (s.grade ?? "").toLowerCase().includes(q));
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -51,7 +51,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
             { value: "open", label: "With open requests" },
             { value: "quiet", label: "Haven't reached out" },
           ]}
-          searchPlaceholder="Search by name or year"
+          searchPlaceholder="Search name, username or year"
         />
       </Suspense>
       <Card className="mt-5 overflow-hidden">
@@ -63,7 +63,10 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
                   <Avatar name={s.full_name} hue={s.avatar_hue} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-ink">{s.full_name}</p>
-                    <p className="truncate text-sm text-ink-3">{s.grade ?? "Year not set"}</p>
+                    <p className="truncate text-sm text-ink-3">
+                      @{s.username}
+                      {s.grade || s.section ? ` · ${[s.grade, s.section].filter(Boolean).join(", ")}` : ""}
+                    </p>
                   </div>
                   <div className="hidden items-center gap-3 sm:flex">
                     {s.open > 0 ? <Badge tone="pending">{s.open} open</Badge> : s.total > 0 ? <Badge>{s.total} resolved</Badge> : <Badge tone="outline">No requests</Badge>}

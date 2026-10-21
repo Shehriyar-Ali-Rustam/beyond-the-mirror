@@ -25,7 +25,7 @@ export default async function CounselorConversation({ params }: PageProps<"/coun
 
   const { data: c } = await supabase
     .from("conversations")
-    .select("*, student:profiles!conversations_student_id_fkey(id, full_name, avatar_hue, grade, email, created_at)")
+    .select("*, student:profiles!conversations_student_id_fkey(id, full_name, avatar_hue, grade, created_at)")
     .eq("id", id)
     .maybeSingle();
   if (!c || c.counselor_id !== viewer.id || !c.student) notFound();

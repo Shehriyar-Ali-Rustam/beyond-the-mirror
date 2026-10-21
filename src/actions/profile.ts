@@ -15,7 +15,13 @@ export async function updateStudentProfile(_: ActionResult | null, formData: For
   const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
-    .update({ full_name: parsed.data.fullName, grade: parsed.data.grade || null })
+    .update({
+      full_name: parsed.data.fullName,
+      grade: parsed.data.grade ?? null,
+      section: parsed.data.section ?? null,
+      student_number: parsed.data.studentNumber ?? null,
+      email: parsed.data.contactEmail ?? null,
+    })
     .eq("id", viewer.id);
   if (error) return { ok: false, error: friendlyError(error) };
   revalidatePath("/student", "layout");
@@ -26,6 +32,7 @@ export async function updateStaffProfile(_: ActionResult | null, formData: FormD
   const viewer = await assertRole("counselor", "admin");
   const parsed = counselorProfileSchema.safeParse({
     fullName: formData.get("fullName"),
+    contactEmail: formData.get("contactEmail") ?? undefined,
     title: formData.get("title") ?? undefined,
     bio: formData.get("bio") ?? undefined,
     officeHours: formData.get("officeHours") ?? undefined,
@@ -43,6 +50,7 @@ export async function updateStaffProfile(_: ActionResult | null, formData: FormD
     .from("profiles")
     .update({
       full_name: v.fullName,
+      email: v.contactEmail ?? null,
       title: v.title || null,
       bio: v.bio || null,
       office_hours: v.officeHours || null,

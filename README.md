@@ -16,6 +16,8 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 
 ## Features
 
+**Accounts:** no email needed. Students and counselors sign up with a **username, password and a few profile details** (name, year, class, student ID; contact email is optional). There's one **fixed administrator login** set in environment variables, so there's no admin sign-up and no SQL step.
+
 **Students**
 - Private, real-time conversations with their assigned counselor (topic, urgency, status, "Seen" receipts)
 - Guided "new request" flow with draft saving and a safety prompt for urgent requests
@@ -35,6 +37,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 
 **Administrators**
 - Approve or decline counselor sign-ups, change roles, pause/restore access
+- Reset a student's or counselor's password (shows a one-time temporary password, since accounts have no email)
 - Assign students to counselors (open requests move with them); auto-matching to lightest caseload
 - Aggregate-only statistics: requests per day, by status and topic, caseloads, response times
 - Announcements to everyone / students / staff
@@ -49,12 +52,14 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 
 - **Row Level Security on every table.** Students read only their own conversations; counselors only conversations assigned to them; admins have *no* policy that reaches messages, subjects, notes or feedback text.
 - **Column-level grants.** Users can update only harmless profile fields — `role`, `status` and `counselor_id` are not writable by users. Role/assignment changes go through admin-only `SECURITY DEFINER` RPCs that re-check the caller.
-- **Counselor accounts start `pending`** and have no access until an admin approves them. Sign-up metadata can't grant a role.
+- **Counselor accounts start `pending`** and have no access until an admin approves them. Sign-up details can't grant a role.
+- **Username accounts.** Supabase Auth needs an email-shaped identifier, so each username maps to an internal address on the reserved `.invalid` domain. Nothing is ever emailed. Reserved usernames (`admin`, `support`, …) are blocked in the database itself.
+- **Fixed admin.** The admin username/password live only in environment variables and are compared in constant time. On first login the server creates the admin account using a one-time token that only the server can mint, so nobody can claim the admin role through the public auth API.
 - **Server actions** re-verify the session and role, validate input with Zod, and call the database as the user (so RLS still applies).
 - **Rate limits** on messages and new requests; length limits on all text fields; safe redirects; security headers.
-- **No service-role key in the app.** It's only used by the optional local seed/test scripts.
+- **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords — never to read conversations, and never sent to the browser.
 
-`scripts/test-rls.mjs` contains **35 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, double booking, pending accounts, …).
+`scripts/test-rls.mjs` contains **38 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, reserved usernames, double booking, pending accounts, …).
 
 ---
 
@@ -67,19 +72,20 @@ npm install
 cp .env.example .env.local
 
 npx supabase start          # starts Postgres/Auth/Realtime locally and applies migrations
-npx supabase status         # copy API URL + publishable key (+ secret key for seeding) into .env.local
+npx supabase status         # copy API URL, publishable key and secret key into .env.local
+                            # and set ADMIN_PASSWORD (10+ characters)
 
 npm run seed                # optional: demo accounts and sample data
 npm run dev                 # http://localhost:3000
 ```
 
-Demo accounts after seeding (password `Mirror-demo-2026`):
+Demo accounts after seeding (usernames; password `Mirror-demo-2026`):
 
-| Role | Email |
+| Role | Username |
 | --- | --- |
-| Student | `student@demo.school` (also `omar@`, `lina@`, `ethan@`) |
-| Counselor | `counselor@demo.school`, `daniel@demo.school` |
-| Admin | `admin@demo.school` |
+| Student | `zara`, `omar`, `lina`, `ethan` |
+| Counselor | `amira`, `daniel` |
+| Admin | your `ADMIN_USERNAME` / `ADMIN_PASSWORD` |
 
 Useful scripts:
 
@@ -89,56 +95,54 @@ Useful scripts:
 | `npm run typecheck` | Route types + `tsc` |
 | `npm run lint` | ESLint |
 | `npm run db:reset` | Recreate the local DB from migrations |
+| `npm run db:migrate` | Apply pending migrations to the database in `DATABASE_URL` |
 | `npm run db:types` | Regenerate `src/lib/supabase/database.types.ts` |
 | `npm run seed` | Demo data (local or a dev project) |
 | `npm run test:rls` | Security tests — **local DB only** (run after `db:reset` + `seed`) |
 
 ---
 
-## Deploying
+## Deploying to Vercel
 
-### 1. Supabase
+Until a database is connected, the site still works: the landing page and toolkit load, and the login page shows a "we're almost ready" notice.
 
-1. Create a project at [supabase.com](https://supabase.com).
-2. Apply the schema — either:
-   - `npx supabase link --project-ref <ref>` then `npx supabase db push`, **or**
-   - paste `supabase/migrations/20261021000000_init.sql` into **SQL Editor → Run**.
-3. **Authentication → URL Configuration**
-   - *Site URL*: `https://your-app.vercel.app`
-   - *Redirect URLs*: `https://your-app.vercel.app/**` (add preview URLs if you use them)
-4. **Authentication → Providers → Email**: keep *Confirm email* on for production. Set minimum password length to 8.
-5. *(Recommended)* **Authentication → Email Templates** — so links work even when opened on a different device, point them at the confirm route using the token hash:
-   - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`
-   - Reset password: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
-6. Configure custom SMTP for real email volume (Supabase's built-in sender is rate-limited).
+### 1. Connect a Supabase database (one click)
 
-### 2. Vercel
+In Vercel, open your project → **Storage** → **Create / Connect Database** → **Supabase** → connect it to this project for **Production and Preview** (leave the environment-variable prefix empty).
 
-1. Import the GitHub repository in Vercel (framework preset: **Next.js**).
-2. Add environment variables (Production + Preview):
+This adds the database variables automatically (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, …). On the next deploy, `npm run build` creates all the tables automatically (`scripts/migrate.mjs`).
+
+> **Using an existing Supabase project instead?** Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` yourself (Supabase → Project Settings → API). Then either add `DATABASE_URL` (Settings → Database → connection string) so builds apply migrations, or run both files in `supabase/migrations/` in order in the SQL Editor.
+
+### 2. Add the remaining environment variables
+
+Vercel → Settings → **Environment Variables**:
 
 | Variable | Value |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key (or use `NEXT_PUBLIC_SUPABASE_ANON_KEY`) |
+| `ADMIN_USERNAME` | The admin login name, e.g. `admin` |
+| `ADMIN_PASSWORD` | A strong password (10+ characters) — this **is** the admin login |
+| `ADMIN_DISPLAY_NAME` | Optional, e.g. `Ms. Sana Malik` |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` |
-| `NEXT_PUBLIC_DEFAULT_TIMEZONE` | e.g. `Asia/Karachi` — used until the browser reports its own |
+| `NEXT_PUBLIC_DEFAULT_TIMEZONE` | e.g. `Asia/Karachi` |
 | `NEXT_PUBLIC_CRISIS_LINE_NAME` / `_NUMBER` | Your local emergency line, shown in safety notices |
 
-Do **not** add `SUPABASE_SECRET_KEY` to Vercel — the app doesn't need it.
+Then **Deployments → ⋯ → Redeploy**.
 
-3. Deploy.
+### 3. Recommended Supabase settings
 
-### 3. Create the first administrator
+- **Authentication → Sign In / Providers → "Allow new users to sign up": OFF.** The app creates accounts itself through the server, so the public sign-up endpoint isn't needed. Turning it off closes it to scripts.
+- **Authentication → Rate limits:** keep the defaults or tighten them.
 
-Register normally on the deployed site, then run in the Supabase SQL editor:
+### 4. Log in as admin
 
-```sql
-update public.profiles set role = 'admin', status = 'active'
-where email = 'you@your-school.edu';
-```
+Go to `/login` and enter `ADMIN_USERNAME` / `ADMIN_PASSWORD`. The admin account is created on first login. To change the admin password later, update `ADMIN_PASSWORD` in Vercel and redeploy.
 
-From then on, approve counselors and assign students from **Admin → People / Assignments**.
+### Troubleshooting
+
+- **"Accounts aren't available yet"** → the Supabase variables (including the secret/service-role key) aren't set for this environment, or you haven't redeployed since adding them.
+- **"Database error creating new user"** → the tables weren't created. Check the build log for `[migrate]` lines, or run the SQL files manually.
+- **Admin login says the account couldn't be prepared** → a non-admin account already uses that username. Pick a different `ADMIN_USERNAME`.
 
 ---
 
@@ -146,7 +150,7 @@ From then on, approve counselors and assign students from **Admin → People / A
 
 ```
 supabase/migrations/       Schema, RLS policies, grants, triggers, RPCs, realtime publication
-scripts/                   seed.mjs (demo data), test-rls.mjs (security tests)
+scripts/                   migrate.mjs (build-time migrations), seed.mjs (demo data), test-rls.mjs (security tests)
 src/proxy.ts               Session refresh + optimistic auth redirect (Next 16 "proxy")
 src/actions/               Server actions — validated, role-checked mutations
 src/lib/                   auth (DAL), supabase clients, validation, constants, time/tz, queries

@@ -1,3 +1,4 @@
+-- skip-if: select to_regclass('public.profiles') is not null
 -- =============================================================================
 -- Beyond the Mirror — core schema
 --

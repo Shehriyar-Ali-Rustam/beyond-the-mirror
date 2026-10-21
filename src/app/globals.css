@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* -----------------------------------------------------------------------------
+   Beyond the Mirror — design tokens
+   Paper & ink base, an evergreen primary for trust, clay for warmth,
+   and a quiet lilac "reflection" used only for the mirror motif.
+----------------------------------------------------------------------------- */
+:root {
+  --bg: #f6f3ec;
+  --bg-deep: #efeadf;
+  --surface: #fffdf9;
+  --surface-2: #f3efe6;
+  --surface-3: #e9e3d6;
+  --ink: #1a1f26;
+  --ink-2: #4c5562;
+  --ink-3: #808894;
+  --line: #e4ded1;
+  --line-strong: #d3cbba;
+
+  --primary: #1f4e49;
+  --primary-hover: #183f3b;
+  --primary-ink: #f6f3ec;
+  --primary-soft: #dfeae5;
+  --primary-soft-ink: #1f4e49;
+
+  --clay: #c8704a;
+  --clay-soft: #f6e3d7;
+  --lilac: #8a7fc4;
+  --lilac-soft: #ebe7f7;
+
+  --ok: #2f7a50;
+  --ok-soft: #e0efe5;
+  --warn: #b7791f;
+  --warn-soft: #f8ecd3;
+  --info: #2e6aa8;
+  --info-soft: #e0eaf6;
+  --danger: #b4402c;
+  --danger-soft: #f7e1db;
+
+  --shadow-sm: 0 1px 2px rgb(26 31 38 / 0.04), 0 1px 1px rgb(26 31 38 / 0.03);
+  --shadow-md: 0 4px 16px -6px rgb(26 31 38 / 0.1), 0 2px 4px -2px rgb(26 31 38 / 0.05);
+  --shadow-lg: 0 24px 48px -20px rgb(26 31 38 / 0.22), 0 8px 16px -8px rgb(26 31 38 / 0.08);
+  --ring: rgb(31 78 73 / 0.35);
+
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0f1416;
+  --bg-deep: #0b0f11;
+  --surface: #151b1e;
+  --surface-2: #1b2327;
+  --surface-3: #243035;
+  --ink: #ece8df;
+  --ink-2: #a8b0b5;
+  --ink-3: #737d83;
+  --line: #262f33;
+  --line-strong: #344045;
+
+  --primary: #84c5b8;
+  --primary-hover: #9bd3c7;
+  --primary-ink: #0d1517;
+  --primary-soft: #1a3330;
+  --primary-soft-ink: #a8dbd0;
+
+  --clay: #e39572;
+  --clay-soft: #3a261d;
+  --lilac: #b0a6e6;
+  --lilac-soft: #262338;
+
+  --ok: #6cc293;
+  --ok-soft: #173126;
+  --warn: #e3b460;
+  --warn-soft: #352a16;
+  --info: #7fb0e6;
+  --info-soft: #172739;
+  --danger: #ec8a77;
+  --danger-soft: #3a1d18;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 6px 18px -6px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.6);
+  --ring: rgb(132 197 184 / 0.4);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-ink: var(--primary-soft-ink);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
+  --color-lilac: var(--lilac);
+  --color-lilac-soft: var(--lilac-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), ui-serif, Georgia, serif;
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-breathe: breathe 16s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--primary-soft);
+    color: var(--primary-soft-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  input, textarea, select, button {
+    font: inherit;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 60, "WONK" 0;
+    letter-spacing: -0.015em;
+  }
+  /* The arch: our recurring "mirror" silhouette. */
+  .arch {
+    border-radius: 999px 999px 1.25rem 1.25rem;
+  }
+  .arch-sm {
+    border-radius: 999px 999px 0.6rem 0.6rem;
+  }
+  .glass-sheen {
+    background-image: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.45) 42%,
+      transparent 52%,
+      transparent 60%,
+      rgb(255 255 255 / 0.25) 64%,
+      transparent 70%
+    );
+  }
+  .dark .glass-sheen {
+    background-image: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.06) 42%,
+      transparent 52%,
+      transparent 60%,
+      rgb(255 255 255 / 0.04) 64%,
+      transparent 70%
+    );
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  .paper-grain {
+    background-image: radial-gradient(rgb(26 31 38 / 0.035) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+  .dark .paper-grain {
+    background-image: radial-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hue-tinted chips (avatars, tool icons): one formula per theme for legible contrast. */
+.tint {
+  background: color-mix(in oklab, hsl(var(--h) 50% 58%) 20%, var(--surface));
+  color: color-mix(in oklab, hsl(var(--h) 55% 30%) 88%, var(--ink));
+}
+.dark .tint {
+  background: color-mix(in oklab, hsl(var(--h) 45% 50%) 24%, var(--surface));
+  color: hsl(var(--h) 55% 80%);
+}

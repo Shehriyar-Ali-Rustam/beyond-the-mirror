@@ -17,8 +17,9 @@ const authEmail = (username) => `${username}@${domain}`;
 const adminUsername = (process.env.ADMIN_USERNAME || "admin").toLowerCase();
 const adminPassword = process.env.ADMIN_PASSWORD;
 
+// The admin is normally created on first login. It's only seeded when ADMIN_PASSWORD is set.
 const PEOPLE = [
-  { username: adminUsername, name: process.env.ADMIN_DISPLAY_NAME || "School Administrator", role: "admin" },
+  ...(adminPassword ? [{ username: adminUsername, name: process.env.ADMIN_DISPLAY_NAME || "School Administrator", role: "admin" }] : []),
   {
     username: "amira", name: "Amira Hassan", role: "counselor",
     profile: {
@@ -50,11 +51,6 @@ async function ensureUser(p) {
   if (error && !/already/i.test(error.message)) throw error;
   const { data: existing } = await db.from("profiles").select("id").eq("username", p.username).single();
   return existing.id;
-}
-
-if (!adminPassword || adminPassword.length < 10) {
-  console.error("Set ADMIN_PASSWORD (10+ characters) in .env.local before seeding.");
-  process.exit(1);
 }
 
 const ago = (mins) => new Date(Date.now() - mins * 60_000).toISOString();
@@ -148,7 +144,7 @@ async function main() {
 
   await db.from("announcements").insert([
     { author_id: amira, title: "Exam-week drop-in hours", body: "During mocks I'll be in the counseling room every lunchtime — no appointment needed. Come by even if you just need ten quiet minutes.", audience: "all_students", pinned: true },
-    { author_id: ids[adminUsername], title: "Welcome to Beyond the Mirror", body: "You can now message your counselor privately, book sessions, and use the self-help toolkit any time.", audience: "everyone", pinned: false },
+    { author_id: ids[adminUsername] ?? ids.amira, title: "Welcome to Beyond the Mirror", body: "You can now message your counselor privately, book sessions, and use the self-help toolkit any time.", audience: "everyone", pinned: false },
   ]).then(({ error }) => { if (error) throw error; });
 
   console.log("Seeded sample conversations, slots, a booking and announcements.");
@@ -156,7 +152,7 @@ async function main() {
 }
 
 function printLogins() {
-  console.log(`\nDemo logins — usernames (password: ${password}; admin uses ADMIN_PASSWORD)`);
+  console.log(`\nDemo logins — usernames (password: ${password}; the admin uses the built-in admin login)`);
   for (const p of PEOPLE) console.log(`  ${p.role.padEnd(10)} ${p.username}`);
 }
 

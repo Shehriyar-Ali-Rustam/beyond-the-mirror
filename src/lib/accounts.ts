@@ -1,5 +1,5 @@
 import "server-only";
-import { timingSafeEqual } from "node:crypto";
+import { scryptSync, timingSafeEqual } from "node:crypto";
 
 /**
  * Accounts are username-based. Supabase Auth still needs an email-shaped
@@ -15,20 +15,29 @@ const RESERVED = ["admin", "administrator", "root", "system", "support", "counse
 
 export function isReservedUsername(username: string) {
   const u = username.toLowerCase();
-  const admin = adminUsername();
-  return RESERVED.includes(u) || (admin !== null && u === admin);
+  return RESERVED.includes(u) || u === adminUsername();
 }
+
+// Built-in admin password, stored only as a salted scrypt hash.
+// Setting ADMIN_PASSWORD in the environment overrides it.
+const BUILT_IN_ADMIN_HASH =
+  "scrypt$b3b61cf9691bcd4e9ff7eac3f24f6eb6$0527b65bb08c58fc9f41860583d33e60d59a7b46432a50fc65504af61f32b3c9";
 
 export function adminUsername() {
-  return (process.env.ADMIN_USERNAME || "admin").trim().toLowerCase() || null;
+  return (process.env.ADMIN_USERNAME || "admin").trim().toLowerCase();
 }
 
-/** The fixed admin login, configured only through environment variables. */
-export function adminCredentials() {
-  const username = adminUsername();
-  const password = process.env.ADMIN_PASSWORD ?? "";
-  if (!username || password.length < 10) return null;
-  return { username, password, name: process.env.ADMIN_DISPLAY_NAME || "School Administrator" };
+/** The single fixed administrator. There is no admin sign-up. */
+export function adminAccount() {
+  return { username: adminUsername(), name: process.env.ADMIN_DISPLAY_NAME || "School Administrator" };
+}
+
+export function verifyAdminPassword(input: string) {
+  const configured = process.env.ADMIN_PASSWORD;
+  if (configured) return safeEqual(input, configured);
+  const [, salt, expected] = BUILT_IN_ADMIN_HASH.split("$");
+  const derived = scryptSync(input, Buffer.from(salt, "hex"), 32);
+  return timingSafeEqual(derived, Buffer.from(expected, "hex"));
 }
 
 export function safeEqual(a: string, b: string) {

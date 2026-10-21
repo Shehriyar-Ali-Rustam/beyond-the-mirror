@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createServiceClient, hasServiceKey } from "@/lib/supabase/service";
-import { adminCredentials, isReservedUsername, safeEqual, usernameToAuthEmail } from "@/lib/accounts";
+import { adminAccount, isReservedUsername, usernameToAuthEmail, verifyAdminPassword } from "@/lib/accounts";
 import { homeFor } from "@/lib/auth";
 import { fieldErrors, loginSchema, passwordSchema, registerSchema } from "@/lib/validation";
 import type { ActionResult } from "@/lib/types";
@@ -31,11 +31,10 @@ async function authEmailFor(username: string) {
 }
 
 /**
- * The single fixed administrator. Credentials live only in environment
- * variables; the matching account is created (or re-synced) on login so the
- * database's admin permissions still apply.
+ * The single fixed administrator. After the password is verified, the matching
+ * account is created (or re-synced) so the database's admin permissions apply.
  */
-async function ensureAdminAccount(admin: NonNullable<ReturnType<typeof adminCredentials>>) {
+async function ensureAdminAccount(admin: ReturnType<typeof adminAccount>, password: string) {
   const service = createServiceClient();
   const email = usernameToAuthEmail(admin.username);
   const { data: existing } = await service.from("profiles").select("id, role").eq("username", admin.username).maybeSingle();
@@ -53,7 +52,7 @@ async function ensureAdminAccount(admin: NonNullable<ReturnType<typeof adminCred
     }
     const { data, error } = await service.auth.admin.createUser({
       email,
-      password: admin.password,
+      password,
       email_confirm: true,
       user_metadata: { full_name: admin.name, username: admin.username, provision_token: token },
     });
@@ -63,8 +62,8 @@ async function ensureAdminAccount(admin: NonNullable<ReturnType<typeof adminCred
     }
     id = data.user.id;
   } else {
-    // Keep the stored password in sync with ADMIN_PASSWORD.
-    await service.auth.admin.updateUserById(id, { password: admin.password });
+    // Keep the stored password in sync with the admin login.
+    await service.auth.admin.updateUserById(id, { password });
   }
   await service.from("profiles").update({ role: "admin", status: "active", counselor_id: null }).eq("id", id);
   return true;
@@ -76,11 +75,11 @@ export async function signIn(_: ActionResult | null, formData: FormData): Promis
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
   const { username, password } = parsed.data;
 
-  const admin = adminCredentials();
-  const isAdminLogin = admin !== null && username === admin.username;
+  const admin = adminAccount();
+  const isAdminLogin = username === admin.username;
   if (isAdminLogin) {
-    if (!safeEqual(password, admin.password)) return { ok: false, error: BAD_LOGIN };
-    if (!hasServiceKey() || !(await ensureAdminAccount(admin))) {
+    if (!verifyAdminPassword(password)) return { ok: false, error: BAD_LOGIN };
+    if (!hasServiceKey() || !(await ensureAdminAccount(admin, password))) {
       return { ok: false, error: "The admin account couldn't be prepared. Check the server configuration." };
     }
   }

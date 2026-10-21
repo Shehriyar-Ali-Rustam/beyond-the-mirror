@@ -13,8 +13,8 @@ export function SetupNotice() {
         toolkit works in the meantime — no account needed.
       </p>
       <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-xs leading-relaxed text-ink-3">
-        <span className="font-medium text-ink-2">Site owner:</span> connect Supabase to this project (Vercel → Storage)
-        and set <code>ADMIN_PASSWORD</code>, then redeploy. See the README.
+        <span className="font-medium text-ink-2">Site owner:</span> connect a Supabase database to this project (Vercel →
+        Storage), then redeploy. See the README.
       </p>
     </div>
   );

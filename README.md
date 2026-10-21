@@ -16,7 +16,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 
 ## Features
 
-**Accounts:** no email needed. Students and counselors sign up with a **username, password and a few profile details** (name, year, class, student ID; contact email is optional). There's one **fixed administrator login** set in environment variables, so there's no admin sign-up and no SQL step.
+**Accounts:** no email needed. Students and counselors sign up with a **username, password and a few profile details** (name, year, class, student ID; contact email is optional). There's one **built-in administrator login** (overridable with environment variables), so there's no admin sign-up and no SQL step.
 
 **Students**
 - Private, real-time conversations with their assigned counselor (topic, urgency, status, "Seen" receipts)
@@ -54,7 +54,7 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 - **Column-level grants.** Users can update only harmless profile fields — `role`, `status` and `counselor_id` are not writable by users. Role/assignment changes go through admin-only `SECURITY DEFINER` RPCs that re-check the caller.
 - **Counselor accounts start `pending`** and have no access until an admin approves them. Sign-up details can't grant a role.
 - **Username accounts.** Supabase Auth needs an email-shaped identifier, so each username maps to an internal address on the reserved `.invalid` domain. Nothing is ever emailed. Reserved usernames (`admin`, `support`, …) are blocked in the database itself.
-- **Fixed admin.** The admin username/password live only in environment variables and are compared in constant time. On first login the server creates the admin account using a one-time token that only the server can mint, so nobody can claim the admin role through the public auth API.
+- **Built-in admin.** The admin password is stored only as a salted scrypt hash (or taken from `ADMIN_PASSWORD` if set) and checked in constant time. On first login the server creates the admin account using a one-time token that only the server can mint, so nobody can claim the admin role through the public auth API.
 - **Server actions** re-verify the session and role, validate input with Zod, and call the database as the user (so RLS still applies).
 - **Rate limits** on messages and new requests; length limits on all text fields; safe redirects; security headers.
 - **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords — never to read conversations, and never sent to the browser.
@@ -73,7 +73,7 @@ cp .env.example .env.local
 
 npx supabase start          # starts Postgres/Auth/Realtime locally and applies migrations
 npx supabase status         # copy API URL, publishable key and secret key into .env.local
-                            # and set ADMIN_PASSWORD (10+ characters)
+
 
 npm run seed                # optional: demo accounts and sample data
 npm run dev                 # http://localhost:3000
@@ -85,7 +85,7 @@ Demo accounts after seeding (usernames; password `Mirror-demo-2026`):
 | --- | --- |
 | Student | `zara`, `omar`, `lina`, `ethan` |
 | Counselor | `amira`, `daniel` |
-| Admin | your `ADMIN_USERNAME` / `ADMIN_PASSWORD` |
+| Admin | the built-in admin login |
 
 Useful scripts:
 
@@ -114,14 +114,13 @@ This adds the database variables automatically (`NEXT_PUBLIC_SUPABASE_URL`, `NEX
 
 > **Using an existing Supabase project instead?** Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` yourself (Supabase → Project Settings → API). Then either add `DATABASE_URL` (Settings → Database → connection string) so builds apply migrations, or run both files in `supabase/migrations/` in order in the SQL Editor.
 
-### 2. Add the remaining environment variables
+### 2. Optional environment variables
 
 Vercel → Settings → **Environment Variables**:
 
 | Variable | Value |
 | --- | --- |
-| `ADMIN_USERNAME` | The admin login name, e.g. `admin` |
-| `ADMIN_PASSWORD` | A strong password (10+ characters) — this **is** the admin login |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Optional — override the built-in admin login |
 | `ADMIN_DISPLAY_NAME` | Optional, e.g. `Ms. Sana Malik` |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` |
 | `NEXT_PUBLIC_DEFAULT_TIMEZONE` | e.g. `Asia/Karachi` |
@@ -136,7 +135,7 @@ Then **Deployments → ⋯ → Redeploy**.
 
 ### 4. Log in as admin
 
-Go to `/login` and enter `ADMIN_USERNAME` / `ADMIN_PASSWORD`. The admin account is created on first login. To change the admin password later, update `ADMIN_PASSWORD` in Vercel and redeploy.
+Go to `/login` and use the admin login. The admin account is created on first login. To change it later, set `ADMIN_USERNAME` / `ADMIN_PASSWORD` in Vercel and redeploy.
 
 ### Troubleshooting
 

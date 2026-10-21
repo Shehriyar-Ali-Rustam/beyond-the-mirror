@@ -47,7 +47,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Aggregate-only statistics: requests per day, by status and topic, caseloads, response times
 - Announcements to everyone / students / staff
 
-Also: a warm \"through the window\" visual theme (photos framed in the brand's arch shape, illustrated page banners and empty states, a sunrise colour palette), a clean white base, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
+Also: a warm "through the window" visual theme (photos framed in the brand's arch shape, illustrated page banners and empty states, a sunrise colour palette), a clean white base, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
 
 ---
 

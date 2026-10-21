@@ -222,7 +222,7 @@ function NextSteps() {
                   on ? "border-ok/40 bg-ok-soft text-ink" : "border-line bg-surface text-ink-2 hover:border-line-strong",
                 )}
               >
-                <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-md border transition", on ? "border-ok bg-ok text-white dark:text-bg" : "border-line-strong")}>
+                <span className={cn("flex size-5 shrink-0 items-center justify-center rounded-md border transition", on ? "border-ok bg-ok text-white" : "border-line-strong")}>
                   {on && <Check className="size-3.5" />}
                 </span>
                 <span className={cn(on && "line-through decoration-ok/40")}>{s}</span>

@@ -35,6 +35,27 @@ async function test(name, fn) {
   }
 }
 
+// The admin is normally created on first login; create it the same way if missing.
+if (!process.env.ADMIN_PASSWORD) {
+  console.error("Set ADMIN_PASSWORD to the admin login password to run these tests.");
+  process.exit(1);
+}
+{
+  const svc = createClient(url, secret, { auth: { persistSession: false } });
+  const { data: existing } = await svc.from("profiles").select("id").eq("username", adminUsername).maybeSingle();
+  if (existing) {
+    await svc.auth.admin.updateUserById(existing.id, { password: process.env.ADMIN_PASSWORD });
+  } else {
+    const { data: token } = await svc.rpc("create_admin_provision_token");
+    await svc.auth.admin.createUser({
+      email: `${adminUsername}@${domain}`,
+      password: process.env.ADMIN_PASSWORD,
+      email_confirm: true,
+      user_metadata: { username: adminUsername, full_name: "School Administrator", provision_token: token },
+    });
+  }
+}
+
 const zara = await as("zara");
 const omar = await as("omar");
 const amira = await as("amira");
@@ -259,6 +280,11 @@ await test("reserved usernames are refused (even via the auth API)", async () =>
 await test("users cannot mint admin provisioning tokens", async () => {
   assert.ok((await zara.c.rpc("create_admin_provision_token")).error);
   assert.ok((await anon.rpc("create_admin_provision_token")).error);
+});
+await test("login-attempt records are invisible to users", async () => {
+  assert.equal(((await zara.c.from("auth_attempts").select("id")).data ?? []).length, 0);
+  assert.equal(((await anon.from("auth_attempts").select("id")).data ?? []).length, 0);
+  assert.ok((await zara.c.from("auth_attempts").insert({ kind: "signup", ip: "x" })).error);
 });
 await test("public sign-up endpoint is disabled", async () => {
   const { error } = await client().auth.signUp({ email: `drive-by${Date.now()}@${domain}`, password, options: { data: { username: `driveby${Date.now() % 10000}` } } });

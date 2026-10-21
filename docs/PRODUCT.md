@@ -57,11 +57,11 @@ Admin:     Overview · People · Assignments · Announcements · Settings
 
 **Typography:** *Fraunces* (soft, optical-size serif) for headings and moments of voice. *Instrument Sans* for UI and body text. Numbers on dashboards are set in the sans.
 
-**Colour tokens** (light / dark), defined in `src/app/globals.css`:
+**Colour tokens** (a single white/light theme), defined in `src/app/globals.css`:
 
 | Token | Role |
 | --- | --- |
-| `bg`, `surface`, `surface-2/3`, `line` | Warm paper neutrals. Quiet, not clinical |
+| `bg`, `surface`, `surface-2/3`, `line` | Clean whites with a faint green-grey tint. Calm, not clinical |
 | `ink`, `ink-2`, `ink-3` | Text hierarchy |
 | `primary` (evergreen) | Trust and action; the only saturated colour in most views |
 | `clay` | Warmth: unread dots, highlights |

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer, homeFor } from "@/lib/auth";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getDatabaseStatus } from "@/lib/db-status";
 import { SetupNotice } from "@/components/auth/setup-notice";
 import { RegisterForm } from "@/components/auth/register-form";
 
@@ -12,6 +12,7 @@ export default async function RegisterPage({ searchParams }: PageProps<"/registe
   const viewer = await getViewer();
   if (viewer) redirect(homeFor(viewer));
   const sp = await searchParams;
+  const dbStatus = await getDatabaseStatus();
   const role = sp.role === "counselor" ? "counselor" : "student";
 
   return (
@@ -19,7 +20,7 @@ export default async function RegisterPage({ searchParams }: PageProps<"/registe
       <h1 className="font-display text-[2rem] leading-tight text-ink">Create your account</h1>
       <p className="mt-2 text-[15px] text-ink-2">No email needed — just a username and a few details. Your messages stay between you and your counselor.</p>
       <div className="mt-8">
-        {isSupabaseConfigured() ? <RegisterForm initialRole={role} /> : <SetupNotice />}
+        {dbStatus === "ready" ? <RegisterForm initialRole={role} /> : <SetupNotice status={dbStatus} />}
       </div>
       <p className="mt-8 text-sm text-ink-2">
         Already have an account?{" "}

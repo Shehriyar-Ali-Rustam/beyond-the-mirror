@@ -7,7 +7,6 @@ import { Avatar } from "@/components/ui/avatar";
 import { Dropdown, DropdownContent, DropdownItem, DropdownSeparator, DropdownTrigger } from "@/components/ui/dropdown";
 import type { Role } from "@/lib/types";
 import { ROLE_LABEL } from "./nav-config";
-import { ThemeToggle } from "./theme-toggle";
 
 export function UserMenu({ name, username, hue, role }: { name: string; username: string; hue: number; role: Role }) {
   return (
@@ -33,9 +32,6 @@ export function UserMenu({ name, username, hue, role }: { name: string; username
             <Settings /> Settings
           </Link>
         </DropdownItem>
-        <div className="flex items-center justify-between px-3 py-2 text-sm text-ink">
-          Theme <ThemeToggle />
-        </div>
         <DropdownSeparator />
         <DropdownItem onSelect={() => void signOut()} className="text-danger [&_svg]:!text-danger">
           <LogOut /> Log out

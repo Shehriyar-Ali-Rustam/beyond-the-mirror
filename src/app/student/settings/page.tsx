@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
 import { PageHeader } from "@/components/shell/app-shell";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/shell/theme-toggle";
 import { StudentProfileForm } from "@/components/settings/student-profile-form";
 import { PasswordForm } from "@/components/settings/password-form";
 
@@ -24,10 +23,6 @@ export default async function StudentSettings() {
         <CardBody>
           <PasswordForm />
         </CardBody>
-      </Card>
-      <Card>
-        <CardHeader title="Appearance" description="Choose light, dark, or match your device." action={<ThemeToggle />} />
-        <CardBody className="pt-2" />
       </Card>
     </div>
   );

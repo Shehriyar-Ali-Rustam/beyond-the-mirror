@@ -51,27 +51,27 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
             { value: "active", label: "Active", count: counts.active },
             { value: "suspended", label: "Paused", count: counts.suspended },
           ]}
-          searchPlaceholder="Search name or username"
+          searchPlaceholder="Search people"
           extra={<RoleFilter value={role ?? ""} />}
         />
       </Suspense>
       <Card className="mt-5 overflow-hidden">
         {users?.length ? (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[680px] text-sm">
+            <table className="w-full text-sm">
               <thead className="border-b border-line bg-surface-2/50">
                 <tr className="text-left text-xs text-ink-3">
                   <th className="px-5 py-3 font-medium">Person</th>
-                  <th className="px-3 py-3 font-medium">Role</th>
+                  <th className="hidden px-3 py-3 font-medium md:table-cell">Role</th>
                   <th className="px-3 py-3 font-medium">Status</th>
-                  <th className="px-3 py-3 font-medium">Joined</th>
+                  <th className="hidden px-3 py-3 font-medium lg:table-cell">Joined</th>
                   <th className="px-5 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {users.map((u) => (
                   <tr key={u.id} className="transition hover:bg-surface-2/40">
-                    <td className="px-5 py-3">
+                    <td className="px-4 py-3 sm:px-5">
                       <span className="flex items-center gap-3">
                         <Avatar name={u.full_name} hue={u.avatar_hue} size="sm" />
                         <span className="min-w-0">
@@ -83,20 +83,21 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
                             @{u.username}
                             {u.email ? ` · ${u.email}` : ""}
                           </span>
+                          <span className="block text-xs text-ink-2 md:hidden">{ROLE_LABEL[u.role]}</span>
                         </span>
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-ink-2">
+                    <td className="hidden px-3 py-3 text-ink-2 md:table-cell">
                       {ROLE_LABEL[u.role]}
                       {u.role === "student" && (u.grade || u.section) && <span className="text-ink-3"> · {[u.grade, u.section].filter(Boolean).join(", ")}</span>}
                     </td>
                     <td className="px-3 py-3">
                       <Badge tone={u.status === "active" ? "resolved" : u.status === "pending" ? "pending" : "neutral"} dot>
-                        {u.status === "active" ? "Active" : u.status === "pending" ? "Awaiting approval" : "Paused"}
+                        {u.status === "active" ? "Active" : u.status === "pending" ? "Pending" : "Paused"}
                       </Badge>
                     </td>
-                    <td className="px-3 py-3 text-ink-3">{formatDate(u.created_at, tz, true)}</td>
-                    <td className="px-5 py-3 text-right">{u.id !== viewer.id && <UserActions user={u} />}</td>
+                    <td className="hidden px-3 py-3 text-ink-3 lg:table-cell">{formatDate(u.created_at, tz, true)}</td>
+                    <td className="px-4 py-3 text-right sm:px-5">{u.id !== viewer.id && <UserActions user={u} />}</td>
                   </tr>
                 ))}
               </tbody>

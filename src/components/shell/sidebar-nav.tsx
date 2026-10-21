@@ -45,7 +45,7 @@ export function SidebarNav({
           <item.icon className={cn("relative size-[18px]", active ? "text-primary" : "text-ink-3")} />
           <span className="relative flex-1">{item.label}</span>
           {count > 0 && (
-            <span className="relative min-w-5 rounded-full bg-clay px-1.5 text-center text-[11px] font-semibold leading-5 text-white dark:text-bg">
+            <span className="relative min-w-5 rounded-full bg-clay px-1.5 text-center text-[11px] font-semibold leading-5 text-white">
               {count > 99 ? "99+" : count}
             </span>
           )}

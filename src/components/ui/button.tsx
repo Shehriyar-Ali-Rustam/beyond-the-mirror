@@ -13,10 +13,10 @@ export const buttonVariants = cva(
         secondary: "border border-line-strong bg-surface text-ink shadow-sm hover:border-ink-3 hover:bg-surface-2",
         soft: "bg-primary-soft text-primary-soft-ink hover:brightness-[0.97]",
         ghost: "text-ink-2 hover:bg-surface-2 hover:text-ink",
-        danger: "bg-danger text-white shadow-sm hover:brightness-110 dark:text-bg",
+        danger: "bg-danger text-white shadow-sm hover:brightness-110",
         "danger-soft": "bg-danger-soft text-danger hover:brightness-[0.97]",
         link: "h-auto p-0 text-primary underline-offset-4 hover:underline",
-        clay: "bg-clay text-white shadow-sm hover:brightness-105 dark:text-bg",
+        clay: "bg-clay text-white shadow-sm hover:brightness-105",
       },
       size: {
         sm: "h-8 rounded-lg px-3 text-[13px]",

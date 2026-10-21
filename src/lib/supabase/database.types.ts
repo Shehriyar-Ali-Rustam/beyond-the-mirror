@@ -81,6 +81,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"auth_attempts": {
+                  Row: {
+                    "created_at": string,"id": number,"ip": string | null,"kind": string,"username": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: never,"ip"?: string | null,"kind": string,"username"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: never,"ip"?: string | null,"kind"?: string,"username"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"availability_slots": {
                   Row: {
                     "counselor_id": string,"created_at": string,"ends_at": string,"id": string,"location": string | null,"mode": Database["public"]['Enums']["appointment_mode"],"starts_at": string

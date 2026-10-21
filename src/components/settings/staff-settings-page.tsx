@@ -1,7 +1,6 @@
 import type { Profile } from "@/lib/types";
 import { PageHeader } from "@/components/shell/app-shell";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/shell/theme-toggle";
 import { StaffProfileForm } from "./staff-profile-form";
 import { PasswordForm } from "./password-form";
 
@@ -28,10 +27,6 @@ export function StaffSettingsPage({ viewer }: { viewer: Profile }) {
             <PasswordForm />
           )}
         </CardBody>
-      </Card>
-      <Card>
-        <CardHeader title="Appearance" description="Choose light, dark, or match your device." action={<ThemeToggle />} />
-        <CardBody className="pt-2" />
       </Card>
     </div>
   );

@@ -9,8 +9,8 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 | Student home | Counselor inbox |
 | --- | --- |
 | ![Student home](docs/screenshots/student-home.png) | ![Counselor inbox](docs/screenshots/counselor-inbox.png) |
-| **Admin overview** | **Toolkit (dark mode)** |
-| ![Admin overview](docs/screenshots/admin-overview.png) | ![Toolkit](docs/screenshots/toolkit-dark.png) |
+| **Admin overview** | **Self-help toolkit** |
+| ![Admin overview](docs/screenshots/admin-overview.png) | ![Toolkit](docs/screenshots/toolkit.png) |
 
 ---
 
@@ -42,7 +42,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Aggregate-only statistics: requests per day, by status and topic, caseloads, response times
 - Announcements to everyone / students / staff
 
-Also: light & dark themes, responsive layouts, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
+Also: a clean white theme, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
 
 ---
 
@@ -56,10 +56,12 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 - **Username accounts.** Supabase Auth needs an email-shaped identifier, so each username maps to an internal address on the reserved `.invalid` domain. Nothing is ever emailed. Reserved usernames (`admin`, `support`, …) are blocked in the database itself.
 - **Built-in admin.** The admin password is stored only as a salted scrypt hash (or taken from `ADMIN_PASSWORD` if set) and checked in constant time. On first login the server creates the admin account using a one-time token that only the server can mint, so nobody can claim the admin role through the public auth API.
 - **Server actions** re-verify the session and role, validate input with Zod, and call the database as the user (so RLS still applies).
-- **Rate limits** on messages and new requests; length limits on all text fields; safe redirects; security headers.
+- **Brute-force protection.** After 8 failed logins for a username (or 40 from one IP) in 15 minutes, logins are blocked for that window. Sign-ups are limited per IP. Attempts are stored in a table only the server can access.
+- **Rate limits** on messages and new requests; length limits on all text fields; safe redirects.
+- **Security headers:** a strict Content-Security-Policy (scripts only from this site; network only to your Supabase project), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy and a locked-down permissions policy.
 - **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords — never to read conversations, and never sent to the browser.
 
-`scripts/test-rls.mjs` contains **38 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, reserved usernames, double booking, pending accounts, …).
+`scripts/test-rls.mjs` contains **39 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, reserved usernames, double booking, pending accounts, …).
 
 ---
 
@@ -98,7 +100,7 @@ Useful scripts:
 | `npm run db:migrate` | Apply pending migrations to the database in `DATABASE_URL` |
 | `npm run db:types` | Regenerate `src/lib/supabase/database.types.ts` |
 | `npm run seed` | Demo data (local or a dev project) |
-| `npm run test:rls` | Security tests — **local DB only** (run after `db:reset` + `seed`) |
+| `npm run test:rls` | Security tests — **local DB only** (run after `db:reset` + `seed`, with `ADMIN_PASSWORD` set to the admin password) |
 
 ---
 
@@ -110,7 +112,7 @@ Until a database is connected, the site still works: the landing page and toolki
 
 In Vercel, open your project → **Storage** → **Create / Connect Database** → **Supabase** → connect it to this project for **Production and Preview** (leave the environment-variable prefix empty).
 
-This adds the database variables automatically (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, …). On the next deploy, `npm run build` creates all the tables automatically (`scripts/migrate.mjs`).
+This adds the database variables automatically (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, …). The tables are created automatically: during the build, or, if the build can't reach the database, on the first visit to the login page. Database problems never fail a deploy.
 
 > **Using an existing Supabase project instead?** Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` yourself (Supabase → Project Settings → API). Then either add `DATABASE_URL` (Settings → Database → connection string) so builds apply migrations, or run both files in `supabase/migrations/` in order in the SQL Editor.
 
@@ -139,8 +141,8 @@ Go to `/login` and use the admin login. The admin account is created on first lo
 
 ### Troubleshooting
 
-- **"Accounts aren't available yet"** → the Supabase variables (including the secret/service-role key) aren't set for this environment, or you haven't redeployed since adding them.
-- **"Database error creating new user"** → the tables weren't created. Check the build log for `[migrate]` lines, or run the SQL files manually.
+- **"We're almost ready"** on the login page → the box under it says exactly what's missing (database not connected, server key missing, or tables not created). Supabase variables are read at build time, so **redeploy after connecting**.
+- **Tables not created** → check the build log and the function logs for `[migrate]` lines, or run the files in `supabase/migrations/` in order in Supabase's SQL Editor.
 - **Admin login says the account couldn't be prepared** → a non-admin account already uses that username. Pick a different `ADMIN_USERNAME`.
 
 ---

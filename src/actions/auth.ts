@@ -7,11 +7,13 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { createServiceClient, hasServiceKey } from "@/lib/supabase/service";
 import { adminAccount, isReservedUsername, usernameToAuthEmail, verifyAdminPassword } from "@/lib/accounts";
 import { homeFor } from "@/lib/auth";
+import { clearFailedLogins, clientIp, isRateLimited, recordAttempt } from "@/lib/rate-limit";
 import { fieldErrors, loginSchema, passwordSchema, registerSchema } from "@/lib/validation";
 import type { ActionResult } from "@/lib/types";
 
 const NOT_READY = "Accounts aren't available yet — the site's database still needs to be connected.";
 const BAD_LOGIN = "That username and password don't match an account.";
+const TOO_MANY = "Too many attempts. Please wait a few minutes and try again.";
 
 /** Only allow same-site relative redirects after login. */
 function safeNext(next: FormDataEntryValue | null) {
@@ -75,10 +77,16 @@ export async function signIn(_: ActionResult | null, formData: FormData): Promis
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
   const { username, password } = parsed.data;
 
+  const ip = await clientIp();
+  if (await isRateLimited("login_failed", username, ip)) return { ok: false, error: TOO_MANY };
+
   const admin = adminAccount();
   const isAdminLogin = username === admin.username;
   if (isAdminLogin) {
-    if (!verifyAdminPassword(password)) return { ok: false, error: BAD_LOGIN };
+    if (!verifyAdminPassword(password)) {
+      await recordAttempt("login_failed", username, ip);
+      return { ok: false, error: BAD_LOGIN };
+    }
     if (!hasServiceKey() || !(await ensureAdminAccount(admin, password))) {
       return { ok: false, error: "The admin account couldn't be prepared. Check the server configuration." };
     }
@@ -89,7 +97,11 @@ export async function signIn(_: ActionResult | null, formData: FormData): Promis
     email: isAdminLogin ? usernameToAuthEmail(username) : await authEmailFor(username),
     password,
   });
-  if (error || !data.user) return { ok: false, error: BAD_LOGIN };
+  if (error || !data.user) {
+    await recordAttempt("login_failed", username, ip);
+    return { ok: false, error: BAD_LOGIN };
+  }
+  await clearFailedLogins(username);
 
   const { data: profile } = await supabase.from("profiles").select("role, status").eq("id", data.user.id).single();
   const next = safeNext(formData.get("next"));
@@ -102,6 +114,9 @@ export async function signUp(_: ActionResult | null, formData: FormData): Promis
   const parsed = registerSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
   const v = parsed.data;
+
+  const ip = await clientIp();
+  if (await isRateLimited("signup", null, ip)) return { ok: false, error: TOO_MANY };
 
   const taken = { ok: false as const, error: "Please check the form.", fieldErrors: { username: ["That username is taken — try another."] } };
   if (isReservedUsername(v.username)) return taken;
@@ -131,6 +146,7 @@ export async function signUp(_: ActionResult | null, formData: FormData): Promis
     console.error("[auth] sign-up failed:", error.message);
     return { ok: false, error: "We couldn't create your account right now. Please try again." };
   }
+  await recordAttempt("signup", v.username, ip);
 
   const supabase = await createClient();
   const { error: loginError } = await supabase.auth.signInWithPassword({ email: usernameToAuthEmail(v.username), password: v.password });

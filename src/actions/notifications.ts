@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/auth";
+import { uuid } from "@/lib/validation";
 
 export async function markAllNotificationsRead() {
   const viewer = await getViewer();
@@ -12,7 +13,7 @@ export async function markAllNotificationsRead() {
 
 export async function markNotificationRead(id: string) {
   const viewer = await getViewer();
-  if (!viewer) return;
+  if (!viewer || !uuid.safeParse(id).success) return;
   const supabase = await createClient();
   await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", id).eq("user_id", viewer.id);
 }

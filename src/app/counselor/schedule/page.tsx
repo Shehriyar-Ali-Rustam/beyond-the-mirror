@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { CalendarClock, CalendarDays, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
 import { MODES } from "@/lib/constants";
 import { dayKey, dayLabel, formatDate, formatTime, timeRange } from "@/lib/time";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -46,7 +46,7 @@ export default async function CounselorSchedule() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader title="Schedule" description="Open times students can book, and the sessions they've booked with you." />
+      <PageHero illustration="calendar" tone="sky" title="Schedule" description="Open times students can book, and the sessions they've booked with you." />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-5">
           {toClose.length > 0 && (
@@ -99,7 +99,7 @@ export default async function CounselorSchedule() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState compact icon={<CalendarDays />} title="No sessions booked yet" description="When students book one of your open times, it shows up here and you'll get a notification." />
+                <EmptyState compact illustration="booked" title="No sessions booked yet" description="When students book one of your open times, it shows up here and you'll get a notification." />
               )}
             </CardBody>
           </Card>
@@ -127,7 +127,7 @@ export default async function CounselorSchedule() {
                   ))}
                 </div>
               ) : (
-                <EmptyState compact icon={<CalendarClock />} title="No open times" description="Add a few slots so your students can book a session." />
+                <EmptyState compact illustration="calendar" title="No open times" description="Add a few slots so your students can book a session." />
               )}
             </CardBody>
           </Card>

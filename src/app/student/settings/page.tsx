@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StudentProfileForm } from "@/components/settings/student-profile-form";
 import { PasswordForm } from "@/components/settings/password-form";
@@ -11,7 +11,7 @@ export default async function StudentSettings() {
   const viewer = await requireRole("student");
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <PageHeader title="Settings" />
+      <PageHero illustration="secure-login" tone="mint" title="Settings" />
       <Card>
         <CardHeader title="Profile" description="Your counselor sees these details." />
         <CardBody>

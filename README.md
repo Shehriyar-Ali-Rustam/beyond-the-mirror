@@ -47,7 +47,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Aggregate-only statistics: requests per day, by status and topic, caseloads, response times
 - Announcements to everyone / students / staff
 
-Also: a clean white theme, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
+Also: a warm \"through the window\" visual theme (photos framed in the brand's arch shape, illustrated page banners and empty states, a sunrise colour palette), a clean white base, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
 
 ---
 
@@ -179,3 +179,10 @@ See [`docs/PRODUCT.md`](docs/PRODUCT.md) for the product analysis, user journeys
 
 - **Not an emergency service.** The UI says so throughout. Configure `NEXT_PUBLIC_CRISIS_LINE_*` for your region, and agree a safeguarding process with your counseling team before launch.
 - Review your local data-protection requirements (e.g. parental consent, retention) before using with real students.
+
+---
+
+## Credits
+
+- **Photography:** public-domain (CC0) photos from [StockSnap](https://stocksnap.io), found through [Openverse](https://openverse.org). Stored in `src/assets/photos/` with metadata stripped.
+- **Illustrations:** [unDraw](https://undraw.co) by Katerina Limpitsouni (free for commercial use, no attribution required), via the MIT-licensed `undraw-svg` compilation. Recoloured to the brand palette in `public/illustrations/`.

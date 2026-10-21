@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ChevronRight, SearchX, Users } from "lucide-react";
+import { ChevronRight, SearchX } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
 import { shortStamp } from "@/lib/time";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +44,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
 
   return (
     <div className="mx-auto max-w-5xl">
-      <PageHeader title="Students" description="Students assigned to you. Open a profile for their history, sessions and your private notes." />
+      <PageHero illustration="studying" tone="peach" title="Students" description="Students assigned to you. Open a profile for their history, sessions and your private notes." />
       <Suspense>
         <ListFilters
           tabs={[
@@ -81,7 +81,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
         ) : q ? (
           <EmptyState icon={<SearchX />} title="No matches" description="Try a different name." />
         ) : (
-          <EmptyState icon={<Users />} title="No students here yet" description="Students are assigned by an administrator, or automatically when they send their first message." />
+          <EmptyState illustration="studying" title="No students here yet" description="Students are assigned by an administrator, or automatically when they send their first message." />
         )}
       </Card>
     </div>

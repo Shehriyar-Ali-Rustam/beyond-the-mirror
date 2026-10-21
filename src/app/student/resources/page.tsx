@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, BookHeart, Megaphone, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, BookHeart, ShieldCheck } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
 import { STUDENT_FAQ } from "@/lib/content";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Accordion } from "@/components/ui/accordion";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -37,7 +37,7 @@ export default async function StudentResources() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <PageHeader title="Resources" description="Announcements from your school's support team, guides, and answers to common questions." />
+      <PageHero illustration="book-reading" tone="lavender" title="Resources" description="Announcements from your school's support team, guides, and answers to common questions." />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-5">
           <Card>
@@ -46,7 +46,7 @@ export default async function StudentResources() {
               {announcements && announcements.length > 0 ? (
                 <AnnouncementList items={announcements} authors={authorMap} tz={tz} />
               ) : (
-                <EmptyState compact icon={<Megaphone />} title="No announcements yet" description="Workshops, drop-in hours and updates from counselors will appear here." />
+                <EmptyState compact illustration="happy-news" title="No announcements yet" description="Workshops, drop-in hours and updates from counselors will appear here." />
               )}
             </CardBody>
           </Card>

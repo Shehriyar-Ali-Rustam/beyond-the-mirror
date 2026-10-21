@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, MessagesSquare } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
@@ -65,7 +65,7 @@ export default async function CounselorStudent({ params }: PageProps<"/counselor
                   ))}
                 </div>
               ) : (
-                <EmptyState compact icon={<MessagesSquare />} title="No conversations yet" description={`${student.full_name.split(" ")[0]} hasn't opened a request with you.`} />
+                <EmptyState compact illustration="chatting" title="No conversations yet" description={`${student.full_name.split(" ")[0]} hasn't opened a request with you.`} />
               )}
             </CardBody>
           </Card>

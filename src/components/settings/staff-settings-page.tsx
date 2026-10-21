@@ -1,5 +1,5 @@
 import type { Profile } from "@/lib/types";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StaffProfileForm } from "./staff-profile-form";
 import { PasswordForm } from "./password-form";
@@ -7,7 +7,7 @@ import { PasswordForm } from "./password-form";
 export function StaffSettingsPage({ viewer }: { viewer: Profile }) {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <PageHeader title={viewer.role === "counselor" ? "Profile & settings" : "Settings"} />
+      <PageHero illustration="secure-login" tone="mint" title={viewer.role === "counselor" ? "Profile & settings" : "Settings"} />
       <Card>
         <CardHeader title="Profile" description={viewer.role === "counselor" ? "How students see you." : undefined} />
         <CardBody>

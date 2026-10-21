@@ -1,7 +1,8 @@
 import { HeartHandshake, ImageOff, LifeBuoy, ShieldCheck, Sparkles, VenetianMask } from "lucide-react";
 import { getFeed } from "@/lib/community";
 import type { Profile } from "@/lib/types";
-import { CommunityArt, FloatingShapes } from "@/components/illustrations/scenes";
+import { FloatingShapes } from "@/components/illustrations/scenes";
+import { ArchPhoto } from "@/components/visual/arch-photo";
 import { Composer } from "./composer";
 import { Feed } from "./feed";
 
@@ -31,7 +32,10 @@ export async function CommunityPage({ viewer }: { viewer: Profile }) {
               helps tell the story.
             </p>
           </div>
-          <CommunityArt className="hidden h-40 w-52 sm:block" />
+          <div className="relative hidden h-48 w-56 sm:block">
+            <ArchPhoto name="friendsBench" tone="sun" sizes="140px" className="absolute left-0 top-0 h-44 w-32 -rotate-3" />
+            <ArchPhoto name="heartHands" tone="rose" sizes="110px" className="absolute bottom-0 right-0 h-32 w-24 rotate-6" />
+          </div>
         </div>
       </section>
 

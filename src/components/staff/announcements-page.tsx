@@ -1,9 +1,9 @@
-import { Megaphone } from "lucide-react";
+
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
 import { AUDIENCES } from "@/lib/constants";
 import type { Audience, Profile } from "@/lib/types";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -27,7 +27,7 @@ export async function AnnouncementsPage({ viewer }: { viewer: Profile }) {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader title="Announcements" description="Share drop-in hours, workshops and reminders. Students see them on their home page and under Resources." />
+      <PageHero illustration="happy-news" tone="sun" title="Announcements" description="Share drop-in hours, workshops and reminders. Students see them on their home page and under Resources." />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
         <Card>
           <CardHeader title="Published" />
@@ -45,7 +45,7 @@ export async function AnnouncementsPage({ viewer }: { viewer: Profile }) {
                 )}
               />
             ) : (
-              <EmptyState compact icon={<Megaphone />} title="Nothing published yet" description="Your first announcement will appear here." />
+              <EmptyState compact illustration="happy-news" title="Nothing published yet" description="Your first announcement will appear here." />
             )}
           </CardBody>
         </Card>

@@ -5,7 +5,7 @@ import { AnimatePresence } from "motion/react";
 import { Loader2 } from "lucide-react";
 import { loadMorePosts } from "@/actions/community";
 import { Button } from "@/components/ui/button";
-import { EmptyBoardArt } from "@/components/illustrations/scenes";
+import { Illustration } from "@/components/visual/illustration";
 import type { Post } from "@/lib/community";
 import { cn } from "@/lib/utils";
 import { PostCard, type Viewer } from "./post-card";
@@ -61,7 +61,7 @@ function FeedList({ initialPosts, viewer }: { initialPosts: Post[]; viewer: View
 
       {shown.length === 0 ? (
         <div className="flex flex-col items-center rounded-3xl border border-dashed border-line-strong bg-surface px-6 py-14 text-center">
-          <EmptyBoardArt className="h-28 w-36" />
+          <Illustration name="online-community" className="w-44" />
           <p className="mt-4 font-display text-xl text-ink">It&apos;s quiet here</p>
           <p className="mt-1 max-w-sm text-sm leading-relaxed text-ink-2">
             Ask for advice, share a small win, or post something that might help someone else.

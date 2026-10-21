@@ -21,7 +21,6 @@ import {
   NotebookPen,
   ShieldCheck,
   Sparkles,
-  UserCog,
   VenetianMask,
   X,
   Zap,
@@ -29,7 +28,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
 import { HeroMirror } from "@/components/marketing/hero-mirror";
-import { ToolArt } from "@/components/illustrations/tool-art";
+import { ArchPhoto, Photo } from "@/components/visual/arch-photo";
+import { Illustration } from "@/components/visual/illustration";
 import { FloatingShapes } from "@/components/illustrations/scenes";
 import { Reveal } from "@/components/marketing/reveal";
 import { CATEGORIES } from "@/lib/constants";
@@ -112,32 +112,46 @@ export default function LandingPage() {
       </section>
 
       {/* ------------------------------------------------------ The gap */}
-      <section className="border-y border-line bg-surface">
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
-          <Reveal>
-            <p className="max-w-4xl font-display text-[1.9rem] leading-snug text-ink sm:text-[2.6rem] sm:leading-[1.2]">
-              Lots of students who are struggling never ask for help. Not because they don&apos;t want it, but because the
-              first step feels too big. <span className="text-ink-3">We made that first step smaller.</span>
-            </p>
-          </Reveal>
-          <div className="mt-14 grid gap-8 sm:grid-cols-3">
-            {[
-              { n: "01", title: "Write, don't walk in", body: "Typing it out is easier than knocking on a door. Students reach out when it's on their mind, not only when they're brave enough." },
-              { n: "02", title: "Never left on read", body: "Every request has a clear status. Students see when it's been read; counselors see what's waiting and what's urgent." },
-              { n: "03", title: "Support between sessions", body: "Practical tools for overthinking, exam stress and hard conversations, so help doesn't stop when the office closes." },
-            ].map((p, i) => (
-              <Reveal key={p.n} delay={i * 0.08}>
-                <p className="font-display text-sm text-clay">{p.n}</p>
-                <h3 className="mt-2 text-lg font-semibold text-ink">{p.title}</h3>
-                <p className="mt-2 leading-relaxed text-ink-2">{p.body}</p>
-              </Reveal>
-            ))}
+      <section className="relative overflow-hidden border-y border-line bg-gradient-to-br from-sun-soft/70 via-surface to-coral-soft/50">
+        <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1.25fr_1fr]">
+          <div>
+            <Reveal>
+              <p className="max-w-3xl font-display text-[1.9rem] leading-snug text-ink sm:text-[2.5rem] sm:leading-[1.2]">
+                Lots of students who are struggling never ask for help. Not because they don&apos;t want it, but because the
+                first step feels too big. <span className="text-coral">We made that first step smaller.</span>
+              </p>
+            </Reveal>
+            <div className="mt-12 grid gap-6 sm:grid-cols-3">
+              {[
+                { n: "01", title: "Write, don't walk in", body: "Typing it out is easier than knocking on a door. Students reach out when it's on their mind, not only when they're brave enough.", tone: "bg-coral-soft text-coral" },
+                { n: "02", title: "Never left on read", body: "Every request has a clear status. Students see when it's been read; counselors see what's waiting and what's urgent.", tone: "bg-sky-soft text-sky" },
+                { n: "03", title: "Support between sessions", body: "Practical tools for overthinking, exam stress and hard conversations, so help doesn't stop when the office closes.", tone: "bg-mint-soft text-[#1f8a6b]" },
+              ].map((p, i) => (
+                <Reveal key={p.n} delay={i * 0.08}>
+                  <span className={`inline-flex size-9 items-center justify-center rounded-xl font-display text-sm font-semibold ${p.tone}`}>{p.n}</span>
+                  <h3 className="mt-3 text-lg font-semibold text-ink">{p.title}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-ink-2">{p.body}</p>
+                </Reveal>
+              ))}
+            </div>
           </div>
+          <Reveal delay={0.1} className="relative mx-auto h-[440px] w-full max-w-[420px]">
+            <ArchPhoto name="sunrisePerson" tone="sun" sizes="300px" className="absolute left-0 top-0 h-[380px] w-[260px]" />
+            <ArchPhoto name="writing" tone="sky" sizes="200px" className="absolute bottom-0 right-0 h-[230px] w-[170px] rotate-3" />
+            <div className="absolute bottom-16 left-6 flex items-center gap-2 rounded-2xl border border-line bg-surface/95 px-3.5 py-2.5 text-xs font-medium text-ink shadow-md backdrop-blur">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-coral-soft text-coral">
+                <Heart className="size-3.5" />
+              </span>
+              The first step,
+              <br />
+              made smaller
+            </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ------------------------------------------------- How it works */}
-      <section id="how" className="scroll-mt-16">
+      <section id="how" className="scroll-mt-16 bg-gradient-to-b from-surface via-sky-soft/40 to-surface">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
           <Reveal className="max-w-2xl">
             <p className="text-sm font-medium text-primary">How it works</p>
@@ -228,10 +242,13 @@ export default function LandingPage() {
 
           <div className="mt-14 grid gap-5 lg:grid-cols-2">
             <Reveal className="rounded-3xl border border-line bg-surface p-7 shadow-sm sm:p-9">
-              <span className="arch-sm flex h-12 w-11 items-center justify-center bg-primary-soft text-primary-soft-ink">
-                <GraduationCap className="size-5" />
-              </span>
-              <h3 className="mt-6 font-display text-3xl text-ink">For students</h3>
+              <div className="flex items-start justify-between gap-4">
+                <span className="arch-sm flex h-12 w-11 items-center justify-center bg-primary-soft text-primary-soft-ink">
+                  <GraduationCap className="size-5" />
+                </span>
+                <Illustration name="studying" className="-mt-2 w-36 sm:w-44" />
+              </div>
+              <h3 className="mt-2 font-display text-3xl text-ink">For students</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-ink-2">A quiet, private corner of the school that&apos;s yours.</p>
               <ul className="mt-6 space-y-3.5">
                 {[
@@ -259,10 +276,13 @@ export default function LandingPage() {
             <Reveal delay={0.08} className="relative overflow-hidden rounded-3xl bg-primary p-7 text-primary-ink shadow-md sm:p-9">
               <div className="paper-grain absolute inset-0 opacity-40" aria-hidden />
               <div className="relative">
-                <span className="arch-sm flex h-12 w-11 items-center justify-center bg-white/10">
-                  <HeartHandshake className="size-5" />
-                </span>
-                <h3 className="mt-6 font-display text-3xl">For counselors</h3>
+                <div className="flex items-start justify-between gap-4">
+                  <span className="arch-sm flex h-12 w-11 items-center justify-center bg-white/10">
+                    <HeartHandshake className="size-5" />
+                  </span>
+                  <ArchPhoto name="conversation" tone="teal" offset={false} sizes="150px" className="-mt-2 h-36 w-28 sm:h-40 sm:w-32" />
+                </div>
+                <h3 className="mt-2 font-display text-3xl">For counselors</h3>
                 <p className="mt-2 text-[15px] leading-relaxed opacity-75">Less chasing, more counseling.</p>
                 <ul className="mt-6 space-y-3.5">
                   {[
@@ -290,9 +310,7 @@ export default function LandingPage() {
           </div>
 
           <Reveal delay={0.1} className="mt-5 flex flex-col gap-5 rounded-3xl border border-line bg-surface p-7 shadow-sm sm:flex-row sm:items-center sm:p-8">
-            <span className="arch-sm flex h-12 w-11 shrink-0 items-center justify-center bg-clay-soft text-clay">
-              <UserCog className="size-5" />
-            </span>
+            <Illustration name="safe" className="w-24 shrink-0 sm:w-28" />
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-ink">For school administrators</h3>
               <p className="mt-1 text-[15px] leading-relaxed text-ink-2">
@@ -309,7 +327,7 @@ export default function LandingPage() {
       </section>
 
       {/* ------------------------------------------------------ Toolkit */}
-      <section id="toolkit" className="scroll-mt-16">
+      <section id="toolkit" className="scroll-mt-16 bg-gradient-to-b from-surface via-grape-soft/40 to-surface">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <Reveal className="max-w-2xl">
@@ -332,7 +350,13 @@ export default function LandingPage() {
                   href={`/toolkit/${t.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg"
                 >
-                  <ToolArt slug={t.slug} className={cn("w-full transition-transform duration-500 group-hover:scale-[1.04]", i === 0 ? "h-56 lg:h-72" : "h-32")} />
+                  <div className={cn("relative w-full overflow-hidden", i === 0 ? "h-56 lg:h-80" : "h-36")}>
+                    <Photo name={t.slug} className="h-full w-full" imgClassName="transition-transform duration-700 group-hover:scale-105" sizes={i === 0 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"} />
+                    <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent" />
+                    <span className={`absolute bottom-3 left-3 inline-flex size-9 items-center justify-center rounded-xl shadow-sm ${t.tone}`}>
+                      <t.icon className="size-4" />
+                    </span>
+                  </div>
                   <div className={cn("flex flex-1 flex-col", i === 0 ? "p-6 lg:p-8" : "p-5")}>
                     <div className="flex items-start justify-between gap-3">
                       <h3 className={cn("font-display text-ink", i === 0 ? "text-3xl" : "text-lg")}>{t.title}</h3>
@@ -374,10 +398,15 @@ export default function LandingPage() {
                 </li>
               ))}
             </ul>
+            <div className="relative mt-8 hidden h-40 sm:block">
+              <ArchPhoto name="friendsBench" tone="sun" sizes="120px" className="absolute left-0 top-0 h-40 w-28 -rotate-3" />
+              <ArchPhoto name="heartHands" tone="rose" sizes="110px" className="absolute left-36 top-4 h-36 w-24 rotate-3" />
+              <ArchPhoto name="situations" tone="sky" sizes="110px" className="absolute left-[17rem] top-0 h-40 w-28 -rotate-2" />
+            </div>
           </div>
           <div className="relative mx-auto w-full max-w-md space-y-3">
             {[
-              { name: "Anonymous", text: "How do you stay calm the night before an exam?", tag: "Asking for advice", tagTone: "bg-sun-soft text-[#8a5a00]", replies: "6 suggestions", rotate: "-rotate-1" },
+              { name: "Anonymous", text: "Made my study corner a bit calmer this week. Any other tips?", photo: true, tag: "Asking for advice", tagTone: "bg-sun-soft text-[#8a5a00]", replies: "6 suggestions", rotate: "-rotate-1" },
               { name: "Ms. Hassan", counselor: true, text: "Lay out everything you need the evening before, then do something unrelated for an hour. Your brain needs the break.", tag: "Reply", tagTone: "bg-primary-soft text-primary", replies: "24 support", rotate: "rotate-1 translate-x-6" },
             ].map((c, i) => (
               <div key={i} className={cn("rounded-3xl border border-line bg-surface p-4 shadow-md transition-transform duration-500 hover:rotate-0", c.rotate)}>
@@ -396,6 +425,7 @@ export default function LandingPage() {
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${c.tagTone}`}>{c.tag}</span>
                 </div>
                 <p className="mt-2.5 text-sm leading-relaxed text-ink">{c.text}</p>
+                {c.photo && <Photo name="plantsWindow" className="mt-3 h-40 w-full rounded-2xl" sizes="420px" />}
                 <p className="mt-3 flex items-center gap-1.5 text-xs text-ink-3">
                   <Heart className="size-3.5 fill-rose text-rose" /> {c.replies}
                 </p>
@@ -409,6 +439,7 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-7xl gap-14 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_1.2fr]">
           <Reveal>
             <p className="text-sm font-medium text-primary">Privacy &amp; confidentiality</p>
+            <Illustration name="secure-login" className="mb-6 w-44" />
             <h2 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Private by design. Honest about the limits.</h2>
             <p className="mt-5 text-[17px] leading-relaxed text-ink-2">
               Access rules live in the database itself, not just the interface, so a student can only ever see their own
@@ -503,18 +534,20 @@ export default function LandingPage() {
 
       {/* ---------------------------------------------------------- CTA */}
       <section className="px-5 pb-20 sm:px-8 sm:pb-28">
-        <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-ink px-6 py-16 text-center text-bg sm:px-12 sm:py-24">
+        <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-ink px-6 py-16 text-center text-white sm:px-12 sm:py-24">
+          <Photo name="friendsLaughing" className="absolute inset-0" sizes="100vw" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#102e2a]/95 via-[#1d5b51]/80 to-[#1d5b51]/40" />
           <div aria-hidden className="arch absolute -bottom-24 left-1/2 h-72 w-56 -translate-x-1/2 border border-white/10 bg-white/[0.03]">
             <div className="glass-sheen arch absolute inset-0 opacity-30" />
           </div>
           <div className="relative">
             <h2 className="mx-auto max-w-2xl font-display text-4xl leading-tight sm:text-5xl">The reflection isn&apos;t the whole story.</h2>
-            <p className="mx-auto mt-4 max-w-lg text-[17px] leading-relaxed opacity-70">Whatever&apos;s behind it, there&apos;s someone here whose job is to listen.</p>
+            <p className="mx-auto mt-4 max-w-lg text-[17px] leading-relaxed text-white/85">Whatever&apos;s behind it, there&apos;s someone here whose job is to listen.</p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="bg-bg text-ink hover:bg-surface-2">
                 <Link href="/register">Get started, it&apos;s free</Link>
               </Button>
-              <Button asChild size="lg" variant="ghost" className="text-bg hover:bg-white/10 hover:text-bg">
+              <Button asChild size="lg" variant="ghost" className="text-white hover:bg-white/15 hover:text-white">
                 <Link href="/toolkit">Try the toolkit first</Link>
               </Button>
             </div>

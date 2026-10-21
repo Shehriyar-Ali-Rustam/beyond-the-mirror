@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { MessagesSquare, Plus, SearchX } from "lucide-react";
+import { Plus, SearchX } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isUnreadFor, sentLastBy } from "@/lib/queries";
 import { getTz } from "@/lib/tz";
 import { ilikeTerm } from "@/lib/search";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -48,7 +48,7 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
   return (
     <div className="mx-auto max-w-4xl">
       <LiveRefresh channel={`student-convs:${viewer.id}`} table="conversations" />
-      <PageHeader
+      <PageHero illustration="chatting" tone="sky"
         title="Messages"
         description="Every conversation with your counselor, in one place."
         actions={
@@ -88,7 +88,7 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
           <EmptyState icon={<SearchX />} title="No matches" description={`Nothing matches "${q}". Try a different word.`} />
         ) : (
           <EmptyState
-            icon={<MessagesSquare />}
+            illustration="empty-mailbox"
             title={status === "resolved" ? "No resolved conversations yet" : "Your inbox is empty"}
             description="Write to your counselor about anything: school, friends, home, or how you're feeling."
             action={

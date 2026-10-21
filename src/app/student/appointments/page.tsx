@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, CalendarX2, MapPin, UserRoundSearch } from "lucide-react";
+import { CalendarDays, MapPin } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getCounselor } from "@/lib/queries";
 import { getTz } from "@/lib/tz";
 import { MODES } from "@/lib/constants";
 import { dayLabel, formatDate, formatWeekday, timeRange } from "@/lib/time";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ export default async function StudentAppointments() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <PageHeader
+      <PageHero illustration="booked" tone="sun"
         title="Sessions"
         description={
           counselor
@@ -56,7 +56,7 @@ export default async function StudentAppointments() {
       {!counselor ? (
         <Card>
           <EmptyState
-            icon={<UserRoundSearch />}
+            illustration="in-thought"
             title="You don't have a counselor yet"
             description="Send a message first and we'll connect you with a counselor. Then you can book sessions here."
             action={
@@ -104,7 +104,7 @@ export default async function StudentAppointments() {
               ) : (
                 <EmptyState
                   compact
-                  icon={<CalendarX2 />}
+                  illustration="booking"
                   title="No open times right now"
                   description={`${counselor.full_name.split(" ")[0]} hasn't opened any slots yet. Send a message and ask for a time that works for you.`}
                   action={

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { SearchX } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -34,7 +34,7 @@ export default async function AdminAssignments({ searchParams }: PageProps<"/adm
 
   return (
     <div className="mx-auto max-w-5xl">
-      <PageHeader
+      <PageHero illustration="conversation" tone="mint"
         title="Assignments"
         description="Match each student with a counselor. Open requests move to the new counselor so nothing is dropped. Students without one are auto-matched to the lightest caseload when they first write in."
       />

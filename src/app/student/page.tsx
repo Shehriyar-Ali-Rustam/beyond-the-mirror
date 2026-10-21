@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, CalendarDays, MapPin, MessageSquarePlus, MessagesSquare, Sparkles, UserRoundSearch } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, MapPin, MessageSquarePlus, Sparkles } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getCounselor, isUnreadFor, sentLastBy } from "@/lib/queries";
@@ -17,7 +17,7 @@ import { CounselorCard } from "@/components/shared/counselor-card";
 import { ConversationRow } from "@/components/shared/conversation-row";
 import { AnnouncementList } from "@/components/shared/announcement-list";
 import { SafetyNote } from "@/components/shared/safety-note";
-import { CommunityArt, FloatingShapes, WelcomeArt } from "@/components/illustrations/scenes";
+import { ArchPhoto } from "@/components/visual/arch-photo";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -78,8 +78,13 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
           className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-[#2c7a6c] p-6 text-primary-ink shadow-md transition-transform duration-300 hover:-translate-y-0.5 sm:p-8 lg:col-span-2"
         >
           <div className="paper-grain absolute inset-0 opacity-40" aria-hidden />
-          <FloatingShapes variant="dark" className="absolute -top-10 right-44 hidden size-64 opacity-50 sm:block" />
-          <WelcomeArt className="absolute -bottom-3 right-2 hidden h-60 w-64 transition-transform duration-500 group-hover:-translate-y-1 sm:block" />
+          <ArchPhoto
+            name="plantsWindow"
+            tone="sun"
+            sizes="200px"
+            priority
+            className="absolute bottom-7 right-10 hidden h-56 w-44 transition-transform duration-500 group-hover:-translate-y-1 group-hover:rotate-1 sm:block"
+          />
           <div className="relative max-w-md">
             <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-white/10">
               <MessageSquarePlus className="size-5" />
@@ -100,7 +105,7 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
           <Card>
             <EmptyState
               compact
-              icon={<UserRoundSearch />}
+              illustration="in-thought"
               title="No counselor yet"
               description="Send your first message and we'll connect you with an available counselor straight away."
             />
@@ -139,7 +144,7 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
             ) : (
               <EmptyState
                 compact
-                icon={<MessagesSquare />}
+                illustration="message-sent"
                 title="Nothing here yet"
                 description="When you message your counselor, the conversation and their replies will live here."
               />
@@ -224,7 +229,10 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
         href="/student/community"
         className="group relative mt-5 flex flex-col gap-4 overflow-hidden rounded-3xl bg-gradient-to-r from-sun-soft via-rose-soft to-sky-soft p-5 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:p-6"
       >
-        <CommunityArt className="h-24 w-32 shrink-0 transition-transform duration-500 group-hover:-rotate-2 group-hover:scale-105" />
+        <div className="relative h-28 w-40 shrink-0">
+          <ArchPhoto name="friendsBench" tone="peach" offset={false} sizes="96px" className="absolute left-0 top-0 h-28 w-24 -rotate-6 transition-transform duration-500 group-hover:-rotate-12" />
+          <ArchPhoto name="heartHands" tone="rose" offset={false} sizes="80px" className="absolute bottom-0 right-2 h-20 w-16 rotate-6 transition-transform duration-500 group-hover:rotate-12" />
+        </div>
         <div className="flex-1">
           <p className="font-display text-xl text-ink">Community board</p>
           <p className="mt-1 text-sm leading-relaxed text-ink-2">

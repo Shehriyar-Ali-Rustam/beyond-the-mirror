@@ -31,18 +31,26 @@ export function SidebarNav({
           onClick={onNavigate}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+            "group relative flex items-center gap-3 rounded-2xl px-2.5 py-2 text-sm font-medium transition-colors",
             active ? "text-ink" : "text-ink-2 hover:text-ink",
           )}
         >
           {active && (
             <motion.span
               layoutId={layoutId}
-              className="absolute inset-0 rounded-xl border border-line bg-surface shadow-sm"
+              className="absolute inset-0 rounded-2xl border border-line bg-surface shadow-sm"
               transition={{ type: "spring", stiffness: 500, damping: 40 }}
             />
           )}
-          <item.icon className={cn("relative size-[18px]", active ? "text-primary" : "text-ink-3")} />
+          <span
+            className={cn(
+              "relative flex size-8 items-center justify-center rounded-xl transition-transform duration-300",
+              item.tone,
+              active ? "scale-105 shadow-sm" : "opacity-80 group-hover:opacity-100",
+            )}
+          >
+            <item.icon className="size-[17px]" />
+          </span>
           <span className="relative flex-1">{item.label}</span>
           {count > 0 && (
             <span className="relative min-w-5 rounded-full bg-clay px-1.5 text-center text-[11px] font-semibold leading-5 text-white">

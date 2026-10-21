@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
 import { formatDate } from "@/lib/time";
 import { ilikeTerm } from "@/lib/search";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +42,7 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader title="People" description="Approve counselor accounts, change roles, and pause access when needed." />
+      <PageHero illustration="showing-support" tone="rose" title="People" description="Approve counselor accounts, change roles, and pause access when needed." />
       <Suspense>
         <ListFilters
           tabs={[

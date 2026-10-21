@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, CalendarDays, CheckCheck, Clock, Inbox, MessageCircleReply, Star, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, CalendarDays, Clock, Inbox, MessageCircleReply, Star, Users } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
@@ -8,7 +8,7 @@ import { CATEGORIES, MODES } from "@/lib/constants";
 import { dayLabel, timeRange, shortStamp, formatDate } from "@/lib/time";
 import { firstName, greeting, minutesLabel } from "@/lib/utils";
 import type { Category, Urgency } from "@/lib/types";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -77,7 +77,7 @@ export default async function CounselorOverview() {
   return (
     <div className="mx-auto max-w-7xl">
       <LiveRefresh channel={`counselor-overview:${viewer.id}`} table="conversations" filter={`counselor_id=eq.${viewer.id}`} />
-      <PageHeader
+      <PageHero illustration="active-support" tone="mint"
         eyebrow={`${greeting()}, ${firstName(viewer.full_name)}`}
         title={stats.awaiting_reply ? `${stats.awaiting_reply} ${stats.awaiting_reply === 1 ? "student is" : "students are"} waiting to hear from you` : "You're all caught up"}
         description="Here's what needs you today."
@@ -133,7 +133,7 @@ export default async function CounselorOverview() {
                 ))}
               </ul>
             ) : (
-              <EmptyState compact icon={<CheckCheck />} title="Nobody is waiting on you" description="New messages and replies from students will appear here, most urgent first." />
+              <EmptyState compact illustration="feeling-happy" title="Nobody is waiting on you" description="New messages and replies from students will appear here, most urgent first." />
             )}
           </CardBody>
         </Card>
@@ -170,7 +170,7 @@ export default async function CounselorOverview() {
             ) : (
               <EmptyState
                 compact
-                icon={<CalendarDays />}
+                illustration="calendar"
                 title="No sessions booked"
                 description="Open some times so students can book you."
                 action={

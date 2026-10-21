@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Clock, ShieldOff } from "lucide-react";
+
 import { getViewer } from "@/lib/auth";
 import { signOut } from "@/actions/auth";
 import { Logo } from "@/components/ui/logo";
@@ -22,7 +22,7 @@ export default async function PendingPage() {
       <main className="flex flex-1 items-center justify-center">
         <div className="w-full max-w-md rounded-3xl border border-line bg-surface shadow-sm">
           <EmptyState
-            icon={suspended ? <ShieldOff /> : <Clock />}
+            illustration={suspended ? "safe" : "in-thought"}
             title={suspended ? "This account is paused" : `Thanks, ${viewer.full_name.split(" ")[0]}, you're almost in`}
             description={
               suspended

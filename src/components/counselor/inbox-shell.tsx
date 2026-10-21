@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Inbox, SearchX, SlidersHorizontal } from "lucide-react";
+import { SearchX, SlidersHorizontal } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtime } from "@/hooks/use-realtime";
 import { CATEGORIES, CATEGORY_ORDER, URGENCIES } from "@/lib/constants";
@@ -198,7 +198,7 @@ export function InboxShell({ counselorId, tz, children }: { counselorId: string;
             q || filtersOn ? (
               <EmptyState compact icon={<SearchX />} title="No matches" description="Try a different search or clear the filters." />
             ) : (
-              <EmptyState compact icon={<Inbox />} title={view === "unread" ? "No unread messages" : "Nothing here"} description="New requests from your students will appear here in real time." />
+              <EmptyState compact illustration="empty-mailbox" title={view === "unread" ? "No unread messages" : "Nothing here"} description="New requests from your students will appear here in real time." />
             )
           ) : (
             <div className="space-y-0.5">

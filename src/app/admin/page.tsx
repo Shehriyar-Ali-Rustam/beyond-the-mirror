@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES, PRESENCE } from "@/lib/constants";
 import type { Category, Presence, RequestStatus } from "@/lib/types";
 import { firstName, greeting, minutesLabel } from "@/lib/utils";
-import { PageHeader } from "@/components/shell/app-shell";
+import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ export default async function AdminOverview() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <PageHeader
+      <PageHero illustration="sorting-thoughts" tone="lavender"
         eyebrow={`${greeting()}, ${firstName(viewer.full_name)}`}
         title="Platform overview"
         description="Accounts, assignments and how the service is being used, in aggregate only."

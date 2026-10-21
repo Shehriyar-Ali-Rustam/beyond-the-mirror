@@ -45,7 +45,7 @@ export function CancelAppointmentButton({ appointmentId, who }: { appointmentId:
           maxLength={300}
           rows={3}
           className="mt-1.5 min-h-20"
-          placeholder={who === "student" ? "e.g. I have a test that period" : "e.g. I'm away for training — please book Thursday instead"}
+          placeholder={who === "student" ? "e.g. I have a test that period" : "e.g. I'm away for training, please book Thursday instead"}
         />
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="secondary" onClick={() => setOpen(false)}>

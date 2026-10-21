@@ -30,6 +30,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
 
   const byStudent = new Map<string, { open: number; total: number; last: string | null }>();
   for (const c of convs ?? []) {
+    if (!c.student_id) continue; // anonymous conversations aren't linked to a student
     const s = byStudent.get(c.student_id) ?? { open: 0, total: 0, last: null };
     s.total++;
     if (c.status !== "resolved") s.open++;
@@ -70,7 +71,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
                   </div>
                   <div className="hidden items-center gap-3 sm:flex">
                     {s.open > 0 ? <Badge tone="pending">{s.open} open</Badge> : s.total > 0 ? <Badge>{s.total} resolved</Badge> : <Badge tone="outline">No requests</Badge>}
-                    <span className="w-24 text-right text-xs text-ink-3">{s.last ? shortStamp(s.last, tz) : "—"}</span>
+                    <span className="w-24 text-right text-xs text-ink-3">{s.last ? shortStamp(s.last, tz) : "-"}</span>
                   </div>
                   <ChevronRight className="size-4 text-ink-3" />
                 </Link>

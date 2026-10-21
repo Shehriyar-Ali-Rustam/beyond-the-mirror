@@ -20,6 +20,8 @@ const MAX = 4000;
 export function ChatThread({
   conversationId,
   viewerId,
+  side,
+  anonymousStudent,
   tz,
   initialMessages,
   people,
@@ -32,6 +34,10 @@ export function ChatThread({
 }: {
   conversationId: string;
   viewerId: string;
+  /** Which side of the conversation the viewer is on. */
+  side: "student" | "counselor";
+  /** Shown for student messages when the conversation is anonymous. */
+  anonymousStudent?: Person;
   tz: string;
   initialMessages: Message[];
   people: Record<string, Person>;
@@ -81,7 +87,7 @@ export function ChatThread({
     (payload) => {
       const m = payload.new as Message;
       setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
-      if (m.sender_id !== viewerId) markRead();
+      if (m.from_student !== (side === "student")) markRead();
     },
   );
 
@@ -130,6 +136,7 @@ export function ChatThread({
       id: `temp-${crypto.randomUUID()}`,
       conversation_id: conversationId,
       sender_id: viewerId,
+      from_student: side === "student",
       body,
       created_at: new Date().toISOString(),
       pending: true,
@@ -146,7 +153,9 @@ export function ChatThread({
     void deliver(m);
   };
 
-  const lastOwn = [...messages].reverse().find((m) => m.sender_id === viewerId && !m.pending && !m.failed);
+  const isMine = (m: Message) => m.from_student === (side === "student");
+  const personFor = (m: Message) => (m.sender_id ? people[m.sender_id] : m.from_student ? anonymousStudent : undefined);
+  const lastOwn = [...messages].reverse().find((m) => isMine(m) && !m.pending && !m.failed);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -162,18 +171,18 @@ export function ChatThread({
           {messages.map((m, i) => {
             const prev = messages[i - 1];
             const next = messages[i + 1];
-            const mine = m.sender_id === viewerId;
+            const mine = isMine(m);
             const newDay = !prev || dayKey(prev.created_at, tz) !== dayKey(m.created_at, tz);
             const startsGroup =
               newDay ||
-              prev.sender_id !== m.sender_id ||
+              prev.from_student !== m.from_student ||
               Date.parse(m.created_at) - Date.parse(prev.created_at) > GROUP_GAP_MS;
             const endsGroup =
               !next ||
-              next.sender_id !== m.sender_id ||
+              next.from_student !== m.from_student ||
               Date.parse(next.created_at) - Date.parse(m.created_at) > GROUP_GAP_MS ||
               dayKey(next.created_at, tz) !== dayKey(m.created_at, tz);
-            const person = m.sender_id ? people[m.sender_id] : undefined;
+            const person = personFor(m);
 
             return (
               <li key={m.id}>
@@ -263,7 +272,7 @@ export function ChatThread({
                 <Zap className="size-[18px]" />
               </PopoverTrigger>
               <PopoverContent align="start" className="w-[min(360px,calc(100vw-24px))] p-1.5">
-                <p className="px-3 pb-1 pt-2 text-xs font-medium text-ink-3">Quick replies — edit before sending</p>
+                <p className="px-3 pb-1 pt-2 text-xs font-medium text-ink-3">Quick replies (edit before sending)</p>
                 {quickReplies.map((q) => (
                   <PopoverClose asChild key={q}>
                     <button
@@ -311,7 +320,7 @@ export function ChatThread({
         </form>
         <div className="mt-2 flex items-center justify-between px-2 text-[11px] text-ink-3">
           <span className="inline-flex items-center gap-1">
-            <Lock className="size-3" /> Only you and your {viewerIsCounselorHint(otherReadField)} can see this conversation
+            <Lock className="size-3" /> Only you and your {side === "student" ? "counselor" : "student"} can see this conversation
           </span>
           <AnimatePresence>
             {draft.length > MAX * 0.8 && (
@@ -325,8 +334,4 @@ export function ChatThread({
       </div>
     </div>
   );
-}
-
-function viewerIsCounselorHint(otherReadField: string) {
-  return otherReadField === "counselor_last_read_at" ? "counselor" : "student";
 }

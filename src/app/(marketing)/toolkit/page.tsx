@@ -14,7 +14,7 @@ export default function PublicToolkit() {
         <p className="text-sm font-medium text-primary">The toolkit</p>
         <h1 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Help for the moments in between.</h1>
         <p className="mt-4 text-[17px] leading-relaxed text-ink-2">
-          Short, practical activities you can do on your own — whenever you need them. No account needed.
+          Short, practical activities you can do on your own, whenever you need them. No account needed.
         </p>
         <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-soft px-3.5 py-1.5 text-sm text-primary-soft-ink">
           <ShieldCheck className="size-4" /> Nothing you type here is saved or sent anywhere.

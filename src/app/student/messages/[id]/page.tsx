@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Circle, Lock } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, Lock, VenetianMask } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getCounselor } from "@/lib/queries";
@@ -16,6 +16,7 @@ import { CounselorCard } from "@/components/shared/counselor-card";
 import { StudentConversationActions } from "@/components/student/conversation-actions";
 import { FeedbackForm } from "@/components/student/feedback-form";
 import { SentToast } from "@/components/student/sent-toast";
+import { RevealIdentityButton } from "@/components/student/reveal-identity";
 
 export const metadata: Metadata = { title: "Conversation" };
 
@@ -28,7 +29,8 @@ export default async function StudentConversation({ params, searchParams }: Page
   const supabase = await createClient();
   const tz = await getTz();
   const { data: conversation } = await supabase.from("conversations").select("*").eq("id", id).maybeSingle();
-  if (!conversation || conversation.student_id !== viewer.id) notFound();
+  // RLS only returns this student's own conversations (named or anonymous).
+  if (!conversation) notFound();
 
   const [{ data: messages }, counselor, { data: feedback }] = await Promise.all([
     supabase.from("messages").select("*").eq("conversation_id", id).order("created_at", { ascending: true }).limit(1000),
@@ -69,12 +71,18 @@ export default async function StudentConversation({ params, searchParams }: Page
               {CATEGORIES[conversation.category].label} · {counselor ? `with ${counselor.full_name}` : "Awaiting counselor"}
             </p>
           </div>
+          {conversation.is_anonymous && (
+            <span className="hidden items-center gap-1 rounded-full bg-lilac-soft px-2.5 py-0.5 text-xs font-medium text-lilac sm:inline-flex">
+              <VenetianMask className="size-3" /> Anonymous
+            </span>
+          )}
           <StatusBadge status={conversation.status} audience="student" />
         </header>
 
         <ChatThread
           conversationId={conversation.id}
           viewerId={viewer.id}
+          side="student"
           tz={tz}
           initialMessages={messages ?? []}
           people={people}
@@ -119,6 +127,21 @@ export default async function StudentConversation({ params, searchParams }: Page
             <StudentConversationActions conversationId={conversation.id} status={conversation.status} />
           </div>
         </div>
+
+        {conversation.is_anonymous && (
+          <div className="rounded-3xl border border-lilac/30 bg-lilac-soft p-5">
+            <p className="flex items-center gap-2 font-medium text-ink">
+              <VenetianMask className="size-4 text-lilac" /> You&apos;re anonymous here
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
+              Your counselor can&apos;t see your name. If you&apos;d like them to know it&apos;s you, you can share it at any
+              time. This can&apos;t be undone.
+            </p>
+            <div className="mt-4">
+              <RevealIdentityButton conversationId={conversation.id} />
+            </div>
+          </div>
+        )}
 
         {conversation.status === "resolved" && !feedback && counselor && (
           <div className="rounded-3xl border border-line bg-surface p-5 shadow-sm">

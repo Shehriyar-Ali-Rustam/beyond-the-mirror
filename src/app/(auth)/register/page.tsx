@@ -18,7 +18,7 @@ export default async function RegisterPage({ searchParams }: PageProps<"/registe
   return (
     <div className="animate-fade-up">
       <h1 className="font-display text-[2rem] leading-tight text-ink">Create your account</h1>
-      <p className="mt-2 text-[15px] text-ink-2">No email needed — just a username and a few details. Your messages stay between you and your counselor.</p>
+      <p className="mt-2 text-[15px] text-ink-2">No email needed, just a username and a few details. Your messages stay between you and your counselor.</p>
       <div className="mt-8">
         {dbStatus === "ready" ? <RegisterForm initialRole={role} /> : <SetupNotice status={dbStatus} />}
       </div>

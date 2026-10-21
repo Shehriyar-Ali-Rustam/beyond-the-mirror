@@ -19,7 +19,7 @@ export function SetupNotice({ status }: { status: Exclude<DbStatus, "ready"> }) 
       <p className="mt-4 font-display text-xl text-ink">We&apos;re almost ready</p>
       <p className="mt-2 text-sm leading-relaxed text-ink-2">
         Accounts aren&apos;t available yet because this site&apos;s database isn&apos;t set up. The self-help toolkit works
-        in the meantime — no account needed.
+        in the meantime, no account needed.
       </p>
       <p className="mt-4 rounded-2xl bg-surface-2 px-4 py-3 text-xs leading-relaxed text-ink-3">
         <span className="font-medium text-ink-2">Site owner:</span> {OWNER_HELP[status]}

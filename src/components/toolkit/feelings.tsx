@@ -24,7 +24,7 @@ const CLUSTERS: Cluster[] = [
     name: "Heavy",
     hue: 220,
     words: ["empty", "numb", "drained", "flat", "hopeless", "low"],
-    meaning: "This often sounds like sadness, exhaustion or low mood — the kind that builds after a long stretch of pressure or loss.",
+    meaning: "This often sounds like sadness, exhaustion or low mood, the kind that builds after a long stretch of pressure or loss.",
     underneath: ["sadness", "burnout", "grief", "disappointment"],
     tryThis: { text: "Lower the bar for today. Rest counts. A short reset can take the edge off.", tool: "reset", toolLabel: "Bad-day reset" },
   },
@@ -33,7 +33,7 @@ const CLUSTERS: Cluster[] = [
     name: "Restless",
     hue: 35,
     words: ["overwhelmed", "anxious", "on edge", "scared", "panicky", "can't switch off"],
-    meaning: "This sounds like worry or anxiety — your body getting ready for a threat, even if the threat is a deadline or a conversation.",
+    meaning: "This sounds like worry or anxiety: your body getting ready for a threat, even if the threat is a deadline or a conversation.",
     underneath: ["fear", "worry", "pressure", "uncertainty"],
     tryThis: { text: "Slow your breathing first, then write the worry down and look at what you actually know.", tool: "untangle", toolLabel: "Untangle a thought" },
   },
@@ -53,7 +53,7 @@ const CLUSTERS: Cluster[] = [
     words: ["lonely", "left out", "misunderstood", "invisible", "ignored", "different"],
     meaning: "This sounds like loneliness or not belonging. It can happen even when you're surrounded by people.",
     underneath: ["loneliness", "rejection", "longing to be understood"],
-    tryThis: { text: "Reach out to one person — even a small message. Or explore what's going on with friends.", tool: "situations", toolLabel: "Friends, family & bullying" },
+    tryThis: { text: "Reach out to one person, even with a small message. Or explore what's going on with friends.", tool: "situations", toolLabel: "Friends, family & bullying" },
   },
   {
     key: "tangled",
@@ -69,7 +69,7 @@ const CLUSTERS: Cluster[] = [
     name: "Lighter",
     hue: 150,
     words: ["okay", "calm", "hopeful", "relieved", "proud", "grateful"],
-    meaning: "There's some lightness here too — worth noticing. Feelings can be mixed, and that's normal.",
+    meaning: "There's some lightness here too, and it's worth noticing. Feelings can be mixed, and that's normal.",
     underneath: ["relief", "hope", "connection"],
     tryThis: { text: "Notice what helped you feel this way, so you can come back to it on harder days." },
   },
@@ -93,7 +93,7 @@ export function FeelingsTool() {
       {!show ? (
         <>
           <p className="text-[15px] leading-relaxed text-ink-2">
-            Tap every word that fits, even a little. Don&apos;t overthink it — there are no wrong answers.
+            Tap every word that fits, even a little. Don&apos;t overthink it. There are no wrong answers.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {CLUSTERS.map((c) => (
@@ -140,7 +140,7 @@ export function FeelingsTool() {
               <p className="text-sm text-ink-3">You said you feel</p>
               <p className="mt-1 font-display text-2xl leading-snug text-ink sm:text-3xl">{picked.join(", ")}.</p>
               <p className="mt-4 text-[15px] leading-relaxed text-ink-2">
-                Naming a feeling is genuinely useful — it makes it a little smaller and easier to deal with. Here&apos;s
+                Naming a feeling is genuinely useful. It makes it a little smaller and easier to deal with. Here&apos;s
                 what might be going on.
               </p>
             </div>

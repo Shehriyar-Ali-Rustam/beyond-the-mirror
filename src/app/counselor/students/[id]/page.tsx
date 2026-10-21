@@ -5,6 +5,7 @@ import { ArrowLeft, MessagesSquare } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
+import { isUnreadFor, sentLastBy } from "@/lib/queries";
 import { formatDate, timeRange } from "@/lib/time";
 import { MODES } from "@/lib/constants";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
@@ -56,10 +57,10 @@ export default async function CounselorStudent({ params }: PageProps<"/counselor
                       key={c.id}
                       conversation={c}
                       href={`/counselor/inbox/${c.id}`}
-                      unread={c.last_message_sender === c.student_id && (!c.counselor_last_read_at || c.last_message_at > c.counselor_last_read_at)}
+                      unread={isUnreadFor(viewer, c)}
                       tz={tz}
                       audience="counselor"
-                      youSentLast={c.last_message_sender === viewer.id}
+                      youSentLast={sentLastBy(viewer, c)}
                     />
                   ))}
                 </div>

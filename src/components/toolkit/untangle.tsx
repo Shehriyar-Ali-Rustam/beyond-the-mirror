@@ -143,11 +143,11 @@ export function UntangleTool() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl bg-ok-soft p-4">
               <p className="text-xs font-medium uppercase tracking-[0.08em] text-ok">What you know</p>
-              <ul className="mt-2 space-y-1 text-sm text-ink">{facts.length ? facts.map((f, i) => <li key={i}>• {f}</li>) : <li className="text-ink-3">Nothing certain yet — that&apos;s worth noticing.</li>}</ul>
+              <ul className="mt-2 space-y-1 text-sm text-ink">{facts.length ? facts.map((f, i) => <li key={i}>• {f}</li>) : <li className="text-ink-3">Nothing certain yet. That&apos;s worth noticing.</li>}</ul>
             </div>
             <div className="rounded-2xl bg-warn-soft p-4">
               <p className="text-xs font-medium uppercase tracking-[0.08em] text-warn">What you fear</p>
-              <ul className="mt-2 space-y-1 text-sm text-ink">{fears.length ? fears.map((f, i) => <li key={i}>• {f}</li>) : <li className="text-ink-3">—</li>}</ul>
+              <ul className="mt-2 space-y-1 text-sm text-ink">{fears.length ? fears.map((f, i) => <li key={i}>• {f}</li>) : <li className="text-ink-3">Nothing listed</li>}</ul>
             </div>
           </div>
           {friend && (
@@ -202,12 +202,12 @@ export function UntangleTool() {
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="rounded-3xl border border-line bg-surface p-5">
                 <p className="font-medium text-ink">Facts</p>
-                <p className="mb-3 text-sm text-ink-3">Things you could prove — that someone else would agree happened.</p>
+                <p className="mb-3 text-sm text-ink-3">Things you could prove, that someone else would agree happened.</p>
                 <ListBuilder items={facts} setItems={setFacts} placeholder="e.g. She didn't reply yesterday" tone="fact" />
               </div>
               <div className="rounded-3xl border border-line bg-surface p-5">
                 <p className="font-medium text-ink">Fears &amp; assumptions</p>
-                <p className="mb-3 text-sm text-ink-3">The stories your mind is adding — the what-ifs.</p>
+                <p className="mb-3 text-sm text-ink-3">The stories your mind is adding: the what-ifs.</p>
                 <ListBuilder items={fears} setItems={setFears} placeholder="e.g. She hates me now" tone="fear" />
               </div>
             </div>

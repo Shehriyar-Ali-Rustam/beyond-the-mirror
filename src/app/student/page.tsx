@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, CalendarDays, MapPin, MessageSquarePlus, MessagesSquare, Sparkles, UserRoundSearch } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { getCounselor, isUnreadFor } from "@/lib/queries";
+import { getCounselor, isUnreadFor, sentLastBy } from "@/lib/queries";
 import { getTz } from "@/lib/tz";
 import { MODES } from "@/lib/constants";
 import { CHECK_INS, TOOLS } from "@/lib/toolkit";
@@ -17,6 +17,7 @@ import { CounselorCard } from "@/components/shared/counselor-card";
 import { ConversationRow } from "@/components/shared/conversation-row";
 import { AnnouncementList } from "@/components/shared/announcement-list";
 import { SafetyNote } from "@/components/shared/safety-note";
+import { CommunityArt, FloatingShapes, WelcomeArt } from "@/components/illustrations/scenes";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -32,7 +33,6 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
     supabase
       .from("conversations")
       .select("*")
-      .eq("student_id", viewer.id)
       .order("last_message_at", { ascending: false })
       .limit(4),
     supabase
@@ -75,19 +75,18 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
         {/* Primary action */}
         <Link
           href="/student/messages/new"
-          className="group relative overflow-hidden rounded-3xl bg-primary p-6 text-primary-ink shadow-md transition-transform duration-300 hover:-translate-y-0.5 sm:p-8 lg:col-span-2"
+          className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-[#2c7a6c] p-6 text-primary-ink shadow-md transition-transform duration-300 hover:-translate-y-0.5 sm:p-8 lg:col-span-2"
         >
-          <div className="paper-grain absolute inset-0 opacity-50" aria-hidden />
-          <div aria-hidden className="arch absolute -bottom-10 right-8 hidden h-56 w-40 border border-white/15 bg-white/[0.05] sm:block">
-            <div className="glass-sheen arch absolute inset-0 opacity-40" />
-          </div>
+          <div className="paper-grain absolute inset-0 opacity-40" aria-hidden />
+          <FloatingShapes variant="dark" className="absolute -top-10 right-44 hidden size-64 opacity-50 sm:block" />
+          <WelcomeArt className="absolute -bottom-3 right-2 hidden h-60 w-64 transition-transform duration-500 group-hover:-translate-y-1 sm:block" />
           <div className="relative max-w-md">
             <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-white/10">
               <MessageSquarePlus className="size-5" />
             </span>
             <h2 className="mt-5 font-display text-2xl leading-snug sm:text-[1.75rem]">Talk to your counselor</h2>
             <p className="mt-2 text-[15px] leading-relaxed opacity-80">
-              Big or small, school or personal. Write it how it comes — you don&apos;t need the perfect words.
+              Big or small, school or personal. Write it how it comes. You don&apos;t need the perfect words.
             </p>
             <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold">
               Start a conversation <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
@@ -133,7 +132,7 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
                     unread={isUnreadFor(viewer, c)}
                     tz={tz}
                     audience="student"
-                    youSentLast={c.last_message_sender === viewer.id}
+                    youSentLast={sentLastBy(viewer, c)}
                   />
                 ))}
               </div>
@@ -208,9 +207,11 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
               <Link
                 key={c.label}
                 href={`/student/toolkit/${c.tool}`}
-                className="group inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-4 py-2 text-sm text-ink-2 transition hover:border-primary hover:text-ink"
+                className="group inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1.5 pl-1.5 pr-4 text-sm text-ink-2 transition hover:-translate-y-0.5 hover:border-line-strong hover:text-ink hover:shadow-sm"
               >
-                <tool.icon className="size-4 text-ink-3 transition group-hover:text-primary" />
+                <span className={`flex size-7 items-center justify-center rounded-full ${tool.tone}`}>
+                  <tool.icon className="size-3.5" />
+                </span>
                 {c.label}
                 <ArrowUpRight className="size-3.5 opacity-0 transition group-hover:opacity-100" />
               </Link>
@@ -218,6 +219,22 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
           })}
         </div>
       </section>
+
+      <Link
+        href="/student/community"
+        className="group relative mt-5 flex flex-col gap-4 overflow-hidden rounded-3xl bg-gradient-to-r from-sun-soft via-rose-soft to-sky-soft p-5 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:p-6"
+      >
+        <CommunityArt className="h-24 w-32 shrink-0 transition-transform duration-500 group-hover:-rotate-2 group-hover:scale-105" />
+        <div className="flex-1">
+          <p className="font-display text-xl text-ink">Community board</p>
+          <p className="mt-1 text-sm leading-relaxed text-ink-2">
+            Ask other students for advice, share a small win, or add a photo. You can post anonymously.
+          </p>
+        </div>
+        <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-surface px-4 py-2 text-sm font-medium text-ink shadow-sm sm:self-center">
+          Open the board <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </Link>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">

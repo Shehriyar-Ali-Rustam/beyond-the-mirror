@@ -31,7 +31,7 @@ const SITUATIONS: Situation[] = [
     scripts: [
       { tone: "Short", text: "Nah, I'm good." },
       { tone: "Direct", text: "I said no. I'm not doing it." },
-      { tone: "Gentle", text: "Not my thing — but you do you. I'll catch you later." },
+      { tone: "Gentle", text: "Not my thing, but you do you. I'll catch you later." },
       { tone: "Direct", text: "If I have to be pressured into it, it's a no." },
     ],
     tips: ["Have an exit: “I've got to head home.”", "Stand near someone who shares your view.", "It's okay to leave a situation that feels wrong."],
@@ -44,10 +44,10 @@ const SITUATIONS: Situation[] = [
     scripts: [
       { tone: "Gentle", text: "I really value our friendship, so I want to be honest: when you joke about that, it hurts. Can you stop?" },
       { tone: "Direct", text: "Please don't read my messages or go through my phone." },
-      { tone: "Gentle", text: "I need some time to myself after school. It's not about you — I just need to recharge." },
+      { tone: "Gentle", text: "I need some time to myself after school. It's not about you, I just need to recharge." },
       { tone: "Direct", text: "If the yelling starts again, I'm going to leave the conversation and we can try later." },
     ],
-    tips: ["Use “I” statements: “I feel… when… I need…”.", "Expect some pushback — it doesn't mean you were wrong.", "Follow through, kindly but consistently."],
+    tips: ["Use “I” statements: “I feel… when… I need…”.", "Expect some pushback. It doesn't mean you were wrong.", "Follow through, kindly but consistently."],
   },
   {
     key: "apology",
@@ -57,9 +57,9 @@ const SITUATIONS: Situation[] = [
     scripts: [
       { tone: "Gentle", text: "I'm really sorry about what I said yesterday. It was unfair and I know it hurt you. I'll be more careful." },
       { tone: "Short", text: "I was wrong earlier, and I'm sorry." },
-      { tone: "Gentle", text: "I've been thinking about what happened. I'm sorry I ignored you — I was dealing with my own stuff, but that's not an excuse. Can we talk?" },
+      { tone: "Gentle", text: "I've been thinking about what happened. I'm sorry I ignored you. I was dealing with my own stuff, but that's not an excuse. Can we talk?" },
     ],
-    tips: ["Avoid “sorry if you were upset” — it shifts blame.", "Don't add “but…”.", "Give them time to respond. Forgiveness isn't instant."],
+    tips: ["Avoid “sorry if you were upset”, it shifts blame.", "Don't add “but…”.", "Give them time to respond. Forgiveness isn't instant."],
   },
   {
     key: "help",
@@ -77,13 +77,13 @@ const SITUATIONS: Situation[] = [
     key: "argument",
     label: "Fixing an argument",
     icon: Handshake,
-    intro: "Once things have cooled down, reaching out first is a strength — not losing.",
+    intro: "Once things have cooled down, reaching out first is a strength, not losing.",
     scripts: [
       { tone: "Gentle", text: "I hate that we fell out. Can we talk about what happened? I want to understand how you see it." },
-      { tone: "Gentle", text: "I think we both said things we didn't mean. I miss hanging out — can we reset?" },
+      { tone: "Gentle", text: "I think we both said things we didn't mean. I miss hanging out. Can we reset?" },
       { tone: "Direct", text: "I'm still upset about what happened, but I don't want it to ruin our friendship. Can we sort it out face to face?" },
     ],
-    tips: ["Talk in person if you can — text loses tone.", "Listen to understand, not to win.", "It's okay to agree to disagree."],
+    tips: ["Talk in person if you can, text loses tone.", "Listen to understand, not to win.", "It's okay to agree to disagree."],
   },
   {
     key: "teacher",
@@ -95,7 +95,7 @@ const SITUATIONS: Situation[] = [
       { tone: "Gentle", text: "Things are a bit difficult at home at the moment, which is why my work has slipped. Could I have a short extension?" },
       { tone: "Short", text: "Could I talk to you after class about my grade?" },
     ],
-    tips: ["You don't have to share private details — “things are difficult” is enough.", "Ask for something specific: extra time, a recap, a check-in.", "Email is fine if speaking up in class is hard."],
+    tips: ["You don't have to share private details. “Things are difficult” is enough.", "Ask for something specific: extra time, a recap, a check-in.", "Email is fine if speaking up in class is hard."],
   },
 ];
 
@@ -145,7 +145,7 @@ export function SayItTool() {
           </div>
         </motion.div>
       </AnimatePresence>
-      <TalkCta title="Want help with the exact words?" body="Your counselor can help you plan a difficult conversation — or practise it with you." />
+      <TalkCta title="Want help with the exact words?" body="Your counselor can help you plan a difficult conversation, or practise it with you." />
     </div>
   );
 }

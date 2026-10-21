@@ -162,7 +162,7 @@ export function LettersTool() {
             )}
             {ready && letters.length === 0 && (
               <div className="flex items-center gap-3 text-sm text-ink-3">
-                <Feather className="size-4" /> Writing to someone — even someone who&apos;ll never read it — can make a feeling easier to carry.
+                <Feather className="size-4" /> Writing to someone, even someone who&apos;ll never read it, can make a feeling easier to carry.
               </div>
             )}
           </motion.div>

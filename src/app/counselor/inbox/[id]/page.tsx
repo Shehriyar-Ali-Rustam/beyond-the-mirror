@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, VenetianMask } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
@@ -13,6 +13,7 @@ import { LiveRefresh } from "@/components/shared/live-refresh";
 import { ConversationControls } from "@/components/counselor/conversation-controls";
 import { StudentPanel } from "@/components/counselor/student-panel";
 import { DetailsDrawer } from "@/components/counselor/details-drawer";
+import { AnonymousPanel } from "@/components/counselor/anonymous-panel";
 
 export const metadata: Metadata = { title: "Conversation" };
 
@@ -28,7 +29,7 @@ export default async function CounselorConversation({ params }: PageProps<"/coun
     .select("*, student:profiles!conversations_student_id_fkey(id, full_name, avatar_hue, grade, created_at)")
     .eq("id", id)
     .maybeSingle();
-  if (!c || c.counselor_id !== viewer.id || !c.student) notFound();
+  if (!c || c.counselor_id !== viewer.id) notFound();
 
   const { data: messages } = await supabase
     .from("messages")
@@ -38,11 +39,16 @@ export default async function CounselorConversation({ params }: PageProps<"/coun
     .limit(1000);
 
   const student = c.student;
-  const people = {
+  const anonymousStudent = { name: "Anonymous student", hue: 265 };
+  const people: Record<string, { name: string; hue: number }> = {
     [viewer.id]: { name: viewer.full_name, hue: viewer.avatar_hue },
-    [student.id]: { name: student.full_name, hue: student.avatar_hue },
   };
-  const panel = <StudentPanel studentId={student.id} currentConversationId={c.id} tz={tz} />;
+  if (student) people[student.id] = { name: student.full_name, hue: student.avatar_hue };
+  const panel = student ? (
+    <StudentPanel studentId={student.id} currentConversationId={c.id} tz={tz} />
+  ) : (
+    <AnonymousPanel />
+  );
 
   return (
     <div className="flex min-h-0 flex-1">
@@ -53,12 +59,22 @@ export default async function CounselorConversation({ params }: PageProps<"/coun
             <Link href="/counselor/inbox" className="-ml-1 rounded-lg p-1.5 text-ink-2 hover:bg-surface-2 lg:hidden" aria-label="Back to inbox">
               <ArrowLeft className="size-5" />
             </Link>
-            <Avatar name={student.full_name} hue={student.avatar_hue} />
+            {student ? (
+              <Avatar name={student.full_name} hue={student.avatar_hue} />
+            ) : (
+              <span className="arch-sm flex size-10 shrink-0 items-center justify-center bg-lilac-soft text-lilac">
+                <VenetianMask className="size-5" />
+              </span>
+            )}
             <div className="min-w-0 flex-1">
-              <Link href={`/counselor/students/${student.id}`} className="block truncate font-medium text-ink hover:text-primary">
-                {student.full_name}
-                {student.grade && <span className="font-normal text-ink-3"> · {student.grade}</span>}
-              </Link>
+              {student ? (
+                <Link href={`/counselor/students/${student.id}`} className="block truncate font-medium text-ink hover:text-primary">
+                  {student.full_name}
+                  {student.grade && <span className="font-normal text-ink-3"> · {student.grade}</span>}
+                </Link>
+              ) : (
+                <p className="truncate font-medium text-ink">Anonymous student</p>
+              )}
               <h1 className="truncate text-sm text-ink-2">{c.subject}</h1>
             </div>
             <DetailsDrawer>{panel}</DetailsDrawer>
@@ -68,17 +84,19 @@ export default async function CounselorConversation({ params }: PageProps<"/coun
         <ChatThread
           conversationId={c.id}
           viewerId={viewer.id}
+          side="counselor"
+          anonymousStudent={anonymousStudent}
           tz={tz}
           initialMessages={messages ?? []}
           people={people}
           otherLastReadAt={c.student_last_read_at}
           otherReadField="student_last_read_at"
-          placeholder={`Reply to ${student.full_name.split(" ")[0]}…`}
+          placeholder={student ? `Reply to ${student.full_name.split(" ")[0]}…` : "Reply…"}
           quickReplies={COUNSELOR_QUICK_REPLIES}
           intro={
             <div className="mb-4 flex justify-center">
               <span className="flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-xs text-ink-3">
-                <Lock className="size-3" /> Opened {formatLongDate(c.created_at, tz)} · visible only to you and {student.full_name.split(" ")[0]}
+                <Lock className="size-3" /> Opened {formatLongDate(c.created_at, tz)} · visible only to you and {student ? student.full_name.split(" ")[0] : "the student"}
               </span>
             </div>
           }

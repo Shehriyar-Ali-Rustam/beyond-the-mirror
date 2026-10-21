@@ -1,3 +1,5 @@
+import { FloatingShapes } from "@/components/illustrations/scenes";
+
 const LINES = [
   { outer: "I'm fine.", inner: "I haven't slept properly since results came out." },
   { outer: "It's nothing.", inner: "My friends stopped talking to me and I don't know why." },
@@ -7,8 +9,9 @@ const LINES = [
 /** Decorative brand panel: the mirror, showing what's behind "I'm fine". */
 export function AuthAside() {
   return (
-    <aside className="relative hidden overflow-hidden bg-primary lg:flex lg:items-center lg:justify-center" aria-hidden>
-      <div className="paper-grain absolute inset-0 opacity-60" />
+    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-primary via-primary to-[#2c7a6c] lg:flex lg:items-center lg:justify-center" aria-hidden>
+      <div className="paper-grain absolute inset-0 opacity-50" />
+      <FloatingShapes variant="dark" className="absolute inset-0 h-full w-full opacity-80" />
       <div className="relative flex flex-col items-center px-12">
         <div className="relative h-[420px] w-[300px]">
           <div className="arch absolute inset-0 border border-white/15 bg-white/[0.04]" />

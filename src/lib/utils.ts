@@ -24,7 +24,7 @@ export function relativeTime(date: string | Date) {
 }
 
 export function minutesLabel(mins: number | null | undefined) {
-  if (mins == null) return "—";
+  if (mins == null) return "-";
   if (mins < 60) return `${Math.round(mins)}m`;
   const h = mins / 60;
   if (h < 48) return `${h.toFixed(h < 10 ? 1 : 0)}h`;

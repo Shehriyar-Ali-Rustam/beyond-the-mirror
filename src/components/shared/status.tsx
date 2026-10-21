@@ -26,7 +26,8 @@ export function CategoryIcon({ category, className }: { category: Category; clas
   return (
     <span
       className={cn(
-        "arch-sm flex size-10 shrink-0 items-center justify-center bg-surface-2 text-ink-2 [&_svg]:size-[18px]",
+        "arch-sm flex size-10 shrink-0 items-center justify-center [&_svg]:size-[18px]",
+        CATEGORIES[category].tone,
         className,
       )}
       aria-hidden

@@ -14,14 +14,14 @@ export function StudentConversationActions({ conversationId, status }: { convers
     start(async () => {
       const res = await updateConversation({ conversationId, status: resolved ? "pending" : "resolved" });
       if (!res.ok) toast.error(res.error);
-      else toast.success(resolved ? "Conversation reopened" : "Marked as resolved — glad things are sorted.");
+      else toast.success(resolved ? "Conversation reopened" : "Marked as resolved. Glad things are sorted!");
     });
 
   return (
     <div>
       <Button variant={resolved ? "secondary" : "soft"} size="sm" className="w-full" onClick={run} loading={pending}>
         {resolved ? <RotateCcw /> : <CheckCheck />}
-        {resolved ? "Reopen conversation" : "This is sorted — mark resolved"}
+        {resolved ? "Reopen conversation" : "This is sorted, mark resolved"}
       </Button>
       <p className="mt-2 text-center text-xs text-ink-3">
         {resolved ? "Reopening lets your counselor know you still need help." : "You can always reopen it later."}

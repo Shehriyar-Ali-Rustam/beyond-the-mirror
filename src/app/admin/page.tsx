@@ -57,7 +57,7 @@ export default async function AdminOverview() {
       <PageHeader
         eyebrow={`${greeting()}, ${firstName(viewer.full_name)}`}
         title="Platform overview"
-        description="Accounts, assignments and how the service is being used — in aggregate only."
+        description="Accounts, assignments and how the service is being used, in aggregate only."
       />
 
       <div className="mb-5 flex items-start gap-3 rounded-2xl border border-line bg-surface-2/60 px-4 py-3 text-sm text-ink-2">
@@ -128,7 +128,7 @@ export default async function AdminOverview() {
                 <p className="flex items-center gap-1.5 text-xs text-ink-2">
                   <Star className="size-3.5 text-ink-3" /> Avg. rating
                 </p>
-                <p className="mt-0.5 text-lg font-semibold text-ink">{s.avg_rating ? Number(s.avg_rating).toFixed(1) : "—"}</p>
+                <p className="mt-0.5 text-lg font-semibold text-ink">{s.avg_rating ? Number(s.avg_rating).toFixed(1) : "-"}</p>
               </div>
             </div>
           </CardBody>
@@ -137,7 +137,7 @@ export default async function AdminOverview() {
 
       <div className="mt-5 grid gap-5 lg:grid-cols-3">
         <Card>
-          <CardHeader title="Topics students raise" description="Counts only — no content" />
+          <CardHeader title="Topics students raise" description="Counts only, no content" />
           <CardBody>{categories.length ? <BarList items={categories} /> : <p className="text-sm text-ink-2">No requests yet.</p>}</CardBody>
         </Card>
         <Card className="lg:col-span-2">

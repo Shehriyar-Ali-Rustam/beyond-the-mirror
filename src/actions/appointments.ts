@@ -117,5 +117,5 @@ export async function leaveFeedback(_: ActionResult | null, formData: FormData):
   if (error) return { ok: false, error: friendlyError(error) };
 
   revalidatePath("/student", "layout");
-  return { ok: true, message: "Thank you — that genuinely helps." };
+  return { ok: true, message: "Thank you, that genuinely helps." };
 }

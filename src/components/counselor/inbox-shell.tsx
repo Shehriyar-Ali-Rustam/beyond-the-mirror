@@ -27,7 +27,7 @@ const VIEWS: { value: View; label: string }[] = [
 ];
 
 function isUnread(c: Conversation) {
-  return c.last_message_sender === c.student_id && (!c.counselor_last_read_at || c.last_message_at > c.counselor_last_read_at);
+  return c.last_from_student && (!c.counselor_last_read_at || c.last_message_at > c.counselor_last_read_at);
 }
 
 export function InboxShell({ counselorId, tz, children }: { counselorId: string; tz: string; children: React.ReactNode }) {
@@ -91,7 +91,7 @@ export function InboxShell({ counselorId, tz, children }: { counselorId: string;
         if ((view === "pending" || view === "in_progress" || view === "resolved") && c.status !== view) return false;
         if (category && c.category !== category) return false;
         if (urgency && c.urgency !== urgency) return false;
-        if (term && ![c.subject, c.student?.full_name, c.last_message_preview].some((s) => s?.toLowerCase().includes(term))) return false;
+        if (term && ![c.subject, c.student?.full_name ?? "anonymous student", c.last_message_preview].some((s) => s?.toLowerCase().includes(term))) return false;
         return true;
       })
       .sort((a, b) =>
@@ -210,9 +210,10 @@ export function InboxShell({ counselorId, tz, children }: { counselorId: string;
                   unread={isUnread(c)}
                   tz={tz}
                   audience="counselor"
-                  person={c.student ? { name: c.student.full_name, hue: c.student.avatar_hue } : undefined}
+                  person={c.student ? { name: c.student.full_name, hue: c.student.avatar_hue } : { name: "Anonymous student", hue: 200 }}
+                  anonymous={c.is_anonymous}
                   active={c.id === activeId}
-                  youSentLast={c.last_message_sender === counselorId}
+                  youSentLast={!c.last_from_student}
                 />
               ))}
             </div>

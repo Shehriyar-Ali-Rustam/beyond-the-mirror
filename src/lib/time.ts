@@ -27,7 +27,7 @@ function fmt(tz: string, opts: Intl.DateTimeFormatOptions) {
 
 const toDate = (d: string | Date) => (typeof d === "string" ? new Date(d) : d);
 
-/** "YYYY-MM-DD" in the given timezone — use for grouping by day. */
+/** "YYYY-MM-DD" in the given timezone, used for grouping by day. */
 export function dayKey(d: string | Date, tz: string) {
   const parts = fmt(tz, { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(toDate(d));
   const get = (t: string) => parts.find((p) => p.type === t)?.value;

@@ -24,7 +24,7 @@ const PEOPLE = [
     username: "amira", name: "Amira Hassan", role: "counselor",
     profile: {
       title: "School Counselor", presence: "available", office_hours: "Weekdays, 8:00–15:30",
-      bio: "I've been a school counselor for nine years. Nothing is too small to bring to me — exams, friendships, home, or just a week that feels heavy.",
+      bio: "I've been a school counselor for nine years. Nothing is too small to bring to me: exams, friendships, home, or just a week that feels heavy.",
       specialties: ["Exam stress", "Friendships", "Wellbeing", "Careers"],
     },
   },
@@ -68,7 +68,7 @@ async function main() {
 
   const { count } = await db.from("conversations").select("id", { count: "exact", head: true });
   if (count) {
-    console.log("Sample data already present — accounts refreshed only.");
+    console.log("Sample data already present, accounts refreshed only.");
     return printLogins();
   }
 
@@ -77,9 +77,9 @@ async function main() {
       student: zara, counselor: amira, subject: "Stressed about mock exams", category: "exams", urgency: "high", status: "in_progress",
       msgs: [
         [zara, 300, "Hi Ms Hassan. Mocks start in two weeks and every time I open my notes I just freeze. I've stopped sleeping properly and I feel like I'm already behind in everything."],
-        [amira, 270, "Hi Zara, thank you for reaching out — that took courage. Freezing like that is really common when the pile feels huge. Can I ask which subjects feel the heaviest right now?"],
+        [amira, 270, "Hi Zara, thank you for reaching out. That took courage. Freezing like that is really common when the pile feels huge. Can I ask which subjects feel the heaviest right now?"],
         [zara, 250, "Chemistry and maths mostly. My parents keep asking about predicted grades too."],
-        [amira, 240, "That makes sense. Let's make this smaller: try the revision planner in your toolkit tonight with just those two subjects, and book a session with me on Tuesday so we can look at it together — and talk about how to handle the questions at home."],
+        [amira, 240, "That makes sense. Let's make this smaller: try the revision planner in your toolkit tonight with just those two subjects, and book a session with me on Tuesday so we can look at it together and talk about how to handle the questions at home."],
       ],
     },
     {
@@ -90,7 +90,7 @@ async function main() {
       student: lina, counselor: amira, subject: "Choosing subjects for next year", category: "career", urgency: "low", status: "resolved",
       msgs: [
         [lina, 4000, "I have to pick my subjects soon and I have no idea what I want to do later. Is it bad that I don't know?"],
-        [amira, 3900, "Not at all, Lina — most people your age don't know yet, and that's fine. A good rule is to choose subjects you enjoy and do well in, and keep a couple of options open. Want to go through the list together?"],
+        [amira, 3900, "Not at all, Lina. Most people your age don't know yet, and that's fine. A good rule is to choose subjects you enjoy and do well in, and keep a couple of options open. Want to go through the list together?"],
         [lina, 3800, "Yes please! That helps a lot actually."],
       ],
     },
@@ -143,16 +143,47 @@ async function main() {
   }
 
   await db.from("announcements").insert([
-    { author_id: amira, title: "Exam-week drop-in hours", body: "During mocks I'll be in the counseling room every lunchtime — no appointment needed. Come by even if you just need ten quiet minutes.", audience: "all_students", pinned: true },
+    { author_id: amira, title: "Exam-week drop-in hours", body: "During mocks I'll be in the counseling room every lunchtime, no appointment needed. Come by even if you just need ten quiet minutes.", audience: "all_students", pinned: true },
     { author_id: ids[adminUsername] ?? ids.amira, title: "Welcome to Beyond the Mirror", body: "You can now message your counselor privately, book sessions, and use the self-help toolkit any time.", audience: "everyone", pinned: false },
   ]).then(({ error }) => { if (error) throw error; });
 
-  console.log("Seeded sample conversations, slots, a booking and announcements.");
+  // An anonymous request (created as the student so the database hides who sent it).
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const asStudent = createClient(url, anonKey, { auth: { persistSession: false } });
+  await asStudent.auth.signInWithPassword({ email: authEmail("omar"), password });
+  await asStudent.rpc("start_conversation", {
+    p_subject: "Something I can't say out loud", p_category: "wellbeing", p_urgency: "normal",
+    p_body: "I don't want to say who I am yet, but I've been feeling really low for a few weeks and I don't know why.",
+    p_anonymous: true,
+  });
+
+  // Community board
+  const posts = [
+    { author_id: lina, is_anonymous: true, kind: "advice", body: "How do you stay calm the night before a big exam? I always end up scrolling until 2am and then feel awful.", created_at: ago(240) },
+    { author_id: amira, is_anonymous: false, kind: "share", body: "Reminder for exam week: a 10 minute walk between revision blocks does more for your memory than another coffee. Proud of all of you.", created_at: ago(180) },
+    { author_id: zara, is_anonymous: false, kind: "share", body: "Small win: I finally asked my maths teacher for help after class and it was way less scary than I thought.", created_at: ago(60) },
+  ];
+  const { data: made } = await db.from("posts").insert(posts).select("id, kind");
+  if (made?.length) {
+    await db.from("post_comments").insert([
+      { post_id: made[0].id, author_id: zara, is_anonymous: false, body: "Put your phone in another room and read something light. It honestly helps.", created_at: ago(230) },
+      { post_id: made[0].id, author_id: amira, is_anonymous: false, body: "Lay out everything you need the evening before, then do something unrelated for an hour. Your brain needs the break.", created_at: ago(220) },
+      { post_id: made[2].id, author_id: omar, is_anonymous: true, body: "This is inspiring, I've been putting that off for weeks.", created_at: ago(50) },
+    ]);
+    await db.from("post_reactions").insert([
+      { post_id: made[0].id, user_id: zara }, { post_id: made[0].id, user_id: omar },
+      { post_id: made[1].id, user_id: lina }, { post_id: made[1].id, user_id: zara }, { post_id: made[1].id, user_id: ethan },
+      { post_id: made[2].id, user_id: amira }, { post_id: made[2].id, user_id: lina },
+    ]);
+  }
+  await db.from("notifications").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
+  console.log("Seeded sample conversations, slots, a booking, announcements and community posts.");
   printLogins();
 }
 
 function printLogins() {
-  console.log(`\nDemo logins — usernames (password: ${password}; the admin uses the built-in admin login)`);
+  console.log(`\nDemo logins by username (password: ${password}; the admin uses the built-in admin login)`);
   for (const p of PEOPLE) console.log(`  ${p.role.padEnd(10)} ${p.username}`);
 }
 

@@ -36,7 +36,7 @@ export function NotesPanel({ studentId, initialNotes, tz }: { studentId: string;
     <section>
       <p className="mb-1 text-xs font-medium uppercase tracking-[0.08em] text-ink-3">Private notes</p>
       <p className="mb-3 flex items-center gap-1 text-[11px] text-ink-3">
-        <Lock className="size-3" /> Only you can see these — not the student, not admins.
+        <Lock className="size-3" /> Only you can see these. Not the student, not admins.
       </p>
       <div className="rounded-2xl border border-line-strong bg-surface focus-within:border-primary focus-within:ring-4 focus-within:ring-[var(--ring)]">
         <textarea

@@ -17,7 +17,7 @@ export default function NotFound() {
         <p className="text-sm font-medium text-ink-3">404</p>
         <h1 className="mt-2 font-display text-4xl text-ink">Nothing behind this mirror</h1>
         <p className="mt-3 max-w-md text-ink-2">
-          The page you&apos;re looking for doesn&apos;t exist — or you don&apos;t have access to it.
+          The page you&apos;re looking for doesn&apos;t exist, or you don&apos;t have access to it.
         </p>
         <Button asChild className="mt-8">
           <Link href="/">Back to safety</Link>

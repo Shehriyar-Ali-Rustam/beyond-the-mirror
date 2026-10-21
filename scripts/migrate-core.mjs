@@ -2,7 +2,7 @@
 // (scripts/migrate.mjs) and, as a fallback, by the running site when it finds
 // the tables missing.
 //
-// Connects with a direct Postgres URL — e.g. the variables the Vercel ↔ Supabase
+// Connects with a direct Postgres URL, e.g. the variables the Vercel ↔ Supabase
 // integration adds (POSTGRES_URL_NON_POOLING / POSTGRES_URL).
 //
 // Applied versions are recorded in supabase_migrations.schema_migrations, the
@@ -77,7 +77,7 @@ export async function runMigrations({ migrations, log = console.log }) {
         const skipIf = body.match(/^--\s*skip-if:\s*(.+)$/m)?.[1];
         const [row] = skipIf ? await tx.unsafe(skipIf) : [];
         if (row && Object.values(row)[0] === true) {
-          log(`[migrate] ${file} already present — recorded.`);
+          log(`[migrate] ${file} already present, recorded.`);
         } else {
           await tx.unsafe(body);
           applied.push(file);

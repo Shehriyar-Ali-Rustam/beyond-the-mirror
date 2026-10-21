@@ -1,4 +1,3 @@
-import type React from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -14,6 +13,7 @@ import {
   Flag,
   GraduationCap,
   HeartHandshake,
+  Heart,
   Inbox,
   LifeBuoy,
   Lock,
@@ -22,12 +22,15 @@ import {
   ShieldCheck,
   Sparkles,
   UserCog,
+  VenetianMask,
   X,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
 import { HeroMirror } from "@/components/marketing/hero-mirror";
+import { ToolArt } from "@/components/illustrations/tool-art";
+import { FloatingShapes } from "@/components/illustrations/scenes";
 import { Reveal } from "@/components/marketing/reveal";
 import { CATEGORIES } from "@/lib/constants";
 import { STUDENT_FAQ } from "@/lib/content";
@@ -42,7 +45,7 @@ const FAQ = [
   },
   {
     q: "What can school administrators see?",
-    a: "Admins manage accounts and assignments and see aggregate numbers — how many requests were opened, typical response times, which topics come up most. They can't open conversations, read messages, or see counselors' private notes.",
+    a: "Admins manage accounts and assignments and see aggregate numbers: how many requests were opened, typical response times, which topics come up most. They can't open conversations, read messages, or see counselors' private notes.",
   },
 ];
 
@@ -51,7 +54,7 @@ export default function LandingPage() {
     <>
       {/* ------------------------------------------------------------ Hero */}
       <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[640px] bg-[radial-gradient(60%_50%_at_75%_30%,var(--lilac-soft),transparent_70%)] opacity-70" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[700px] bg-[radial-gradient(45%_45%_at_80%_25%,var(--lilac-soft),transparent_70%),radial-gradient(35%_40%_at_60%_70%,var(--sun-soft),transparent_70%),radial-gradient(30%_35%_at_95%_75%,var(--sky-soft),transparent_70%)]" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-10 sm:px-8 sm:pt-16 lg:grid-cols-[1.1fr_1fr] lg:pb-28">
           <div>
             <Reveal>
@@ -66,7 +69,7 @@ export default function LandingPage() {
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-2">
-                A private, secure space where students reach their school counselor — to ask, to vent, to book time, or
+                A private, secure space where students reach their school counselor to ask, to vent, to book time, or
                 just to be heard. And a calm, organised inbox that helps counselors actually keep up.
               </p>
             </Reveal>
@@ -100,7 +103,10 @@ export default function LandingPage() {
             </Reveal>
           </div>
           <Reveal delay={0.1} y={24}>
-            <HeroMirror />
+            <div className="relative">
+              <FloatingShapes className="absolute -inset-10 h-[calc(100%+5rem)] w-[calc(100%+5rem)]" />
+              <HeroMirror />
+            </div>
           </Reveal>
         </div>
       </section>
@@ -110,15 +116,15 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
           <Reveal>
             <p className="max-w-4xl font-display text-[1.9rem] leading-snug text-ink sm:text-[2.6rem] sm:leading-[1.2]">
-              Lots of students who are struggling never ask for help. Not because they don&apos;t want it — because the
+              Lots of students who are struggling never ask for help. Not because they don&apos;t want it, but because the
               first step feels too big. <span className="text-ink-3">We made that first step smaller.</span>
             </p>
           </Reveal>
           <div className="mt-14 grid gap-8 sm:grid-cols-3">
             {[
-              { n: "01", title: "Write, don't walk in", body: "Typing it out is easier than knocking on a door. Students reach out when it's on their mind — not only when they're brave enough." },
+              { n: "01", title: "Write, don't walk in", body: "Typing it out is easier than knocking on a door. Students reach out when it's on their mind, not only when they're brave enough." },
               { n: "02", title: "Never left on read", body: "Every request has a clear status. Students see when it's been read; counselors see what's waiting and what's urgent." },
-              { n: "03", title: "Support between sessions", body: "Practical tools for overthinking, exam stress and hard conversations — so help doesn't stop when the office closes." },
+              { n: "03", title: "Support between sessions", body: "Practical tools for overthinking, exam stress and hard conversations, so help doesn't stop when the office closes." },
             ].map((p, i) => (
               <Reveal key={p.n} delay={i * 0.08}>
                 <p className="font-display text-sm text-clay">{p.n}</p>
@@ -140,7 +146,8 @@ export default function LandingPage() {
 
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
             {/* Step 1 */}
-            <Reveal className="flex flex-col rounded-3xl border border-line bg-surface p-6 shadow-sm">
+            <Reveal className="relative flex flex-col overflow-hidden rounded-3xl border border-line bg-surface p-6 pt-7 shadow-sm transition-transform duration-300 hover:-translate-y-1">
+              <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-sun to-coral" />
               <div className="flex-1 rounded-2xl bg-surface-2 p-4" aria-hidden>
                 <div className="flex flex-wrap gap-1.5">
                   {(["wellbeing", "exams", "friendship", "family", "bullying"] as const).map((c, i) => {
@@ -163,7 +170,8 @@ export default function LandingPage() {
             </Reveal>
 
             {/* Step 2 */}
-            <Reveal delay={0.08} className="flex flex-col rounded-3xl border border-line bg-surface p-6 shadow-sm">
+            <Reveal delay={0.08} className="relative flex flex-col overflow-hidden rounded-3xl border border-line bg-surface p-6 pt-7 shadow-sm transition-transform duration-300 hover:-translate-y-1">
+              <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-sky to-grape" />
               <div className="flex-1 rounded-2xl bg-surface-2 p-4" aria-hidden>
                 <ol className="space-y-3">
                   {[
@@ -187,7 +195,8 @@ export default function LandingPage() {
             </Reveal>
 
             {/* Step 3 */}
-            <Reveal delay={0.16} className="flex flex-col rounded-3xl border border-line bg-surface p-6 shadow-sm">
+            <Reveal delay={0.16} className="relative flex flex-col overflow-hidden rounded-3xl border border-line bg-surface p-6 pt-7 shadow-sm transition-transform duration-300 hover:-translate-y-1">
+              <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-mint to-sky" />
               <div className="flex-1 rounded-2xl bg-surface-2 p-4" aria-hidden>
                 <p className="text-[11px] font-medium uppercase tracking-wide text-ink-3">Tuesday</p>
                 <div className="mt-2 grid grid-cols-3 gap-1.5">
@@ -227,8 +236,8 @@ export default function LandingPage() {
               <ul className="mt-6 space-y-3.5">
                 {[
                   { icon: MessagesSquare, t: "Private conversations with your counselor", d: "Every request in one place, with replies in real time." },
-                  { icon: Bell, t: "Know where things stand", d: "Sent, seen, in progress, resolved — plus a notification when they reply." },
-                  { icon: CalendarDays, t: "Book a session in two taps", d: "In person, online, or by phone — from their open times." },
+                  { icon: Bell, t: "Know where things stand", d: "Sent, seen, in progress, resolved, plus a notification when they reply." },
+                  { icon: CalendarDays, t: "Book a session in two taps", d: "In person, online, or by phone, from their open times." },
                   { icon: Sparkles, t: "A toolkit for in between", d: "Name a feeling, untangle a worry, plan revision, find the right words." },
                 ].map((f) => (
                   <li key={f.t} className="flex gap-3.5">
@@ -258,7 +267,7 @@ export default function LandingPage() {
                 <ul className="mt-6 space-y-3.5">
                   {[
                     { icon: Inbox, t: "One inbox, sorted by what matters", d: "Filter by status, topic and urgency. Urgent requests rise to the top." },
-                    { icon: Flag, t: "Status on everything", d: "Pending, in progress, resolved — so nothing slips through the cracks." },
+                    { icon: Flag, t: "Status on everything", d: "Pending, in progress, resolved, so nothing slips through the cracks." },
                     { icon: NotebookPen, t: "Private case notes", d: "Notes only you can see. Not the student, not admins." },
                     { icon: Zap, t: "Quick replies, availability & insights", d: "Open booking slots, reuse thoughtful replies, track response times and feedback." },
                   ].map((f) => (
@@ -287,7 +296,7 @@ export default function LandingPage() {
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-ink">For school administrators</h3>
               <p className="mt-1 text-[15px] leading-relaxed text-ink-2">
-                Approve counselor accounts, balance caseloads, and see how the service is used — response times, topics,
+                Approve counselor accounts, balance caseloads, and see how the service is used: response times, topics,
                 session numbers. All in aggregate. Never a single message.
               </p>
             </div>
@@ -306,7 +315,7 @@ export default function LandingPage() {
             <Reveal className="max-w-2xl">
               <p className="text-sm font-medium text-primary">The toolkit</p>
               <h2 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Help for the moments in between.</h2>
-              <p className="mt-4 text-[17px] leading-relaxed text-ink-2">Seven short activities anyone can use — no account needed. Nothing you type is stored.</p>
+              <p className="mt-4 text-[17px] leading-relaxed text-ink-2">Seven short activities anyone can use. No account needed. Nothing you type is stored.</p>
             </Reveal>
             <Reveal>
               <Button asChild variant="secondary">
@@ -316,27 +325,21 @@ export default function LandingPage() {
               </Button>
             </Reveal>
           </div>
-          <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {TOOLS.map((t, i) => (
-              <Reveal key={t.slug} delay={i * 0.04} className={cn(i === 0 && "lg:col-span-2 lg:row-span-2", i >= 5 && "lg:col-span-2")}>
+              <Reveal key={t.slug} delay={i * 0.05} className={cn(i === 0 && "lg:col-span-2 lg:row-span-2", i >= 5 && "lg:col-span-2")}>
                 <Link
                   href={`/toolkit/${t.slug}`}
-                  className={cn(
-                    "group flex h-full flex-col rounded-3xl border border-line bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
-                    i === 0 && "lg:p-8",
-                  )}
+                  className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg"
                 >
-                  <div className="flex items-start justify-between">
-                    <span
-                      className={cn("tint arch-sm flex items-center justify-center", i === 0 ? "h-16 w-14" : "h-11 w-10")}
-                      style={{ "--h": t.hue } as React.CSSProperties}
-                    >
-                      <t.icon className={i === 0 ? "size-6" : "size-[18px]"} />
-                    </span>
-                    <ArrowUpRight className="size-4 text-ink-3 transition group-hover:text-primary" />
+                  <ToolArt slug={t.slug} className={cn("w-full transition-transform duration-500 group-hover:scale-[1.04]", i === 0 ? "h-56 lg:h-72" : "h-32")} />
+                  <div className={cn("flex flex-1 flex-col", i === 0 ? "p-6 lg:p-8" : "p-5")}>
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className={cn("font-display text-ink", i === 0 ? "text-3xl" : "text-lg")}>{t.title}</h3>
+                      <ArrowUpRight className="size-4 shrink-0 text-ink-3 transition group-hover:text-primary" />
+                    </div>
+                    <p className={cn("mt-1 text-ink-2", i === 0 ? "max-w-sm text-[15px] leading-relaxed" : "text-sm")}>{i === 0 ? t.description : t.tagline}</p>
                   </div>
-                  <h3 className={cn("mt-auto pt-6 font-display text-ink", i === 0 ? "text-3xl" : "text-lg")}>{t.title}</h3>
-                  <p className={cn("mt-1 text-ink-2", i === 0 ? "max-w-sm text-[15px] leading-relaxed" : "text-sm")}>{i === 0 ? t.description : t.tagline}</p>
                 </Link>
               </Reveal>
             ))}
@@ -345,13 +348,70 @@ export default function LandingPage() {
       </section>
 
       {/* ------------------------------------------------------ Privacy */}
+      <section id="community" className="scroll-mt-16 px-5 pb-20 sm:px-8 sm:pb-28">
+        <Reveal className="relative mx-auto grid max-w-7xl items-center gap-10 overflow-hidden rounded-[2rem] bg-gradient-to-br from-sun-soft via-rose-soft to-sky-soft p-8 sm:p-12 lg:grid-cols-2">
+          <FloatingShapes className="absolute -right-10 -top-10 size-80 opacity-70" />
+          <div className="relative">
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-surface/80 px-3 py-1 text-xs font-semibold text-coral backdrop-blur">
+              <Sparkles className="size-3.5" /> New: Community board
+            </p>
+            <h2 className="mt-4 font-display text-4xl leading-tight text-ink sm:text-5xl">You&apos;re not the only one.</h2>
+            <p className="mt-4 max-w-lg text-[17px] leading-relaxed text-ink-2">
+              Ask other students for advice, share a small win or a photo that made your day, and get thoughtful replies,
+              including from counselors. Post with your name or anonymously.
+            </p>
+            <ul className="mt-6 space-y-2.5 text-[15px] text-ink-2">
+              {[
+                { icon: Heart, text: "Send support with one tap", tone: "bg-rose-soft text-rose" },
+                { icon: VenetianMask, text: "Anonymous to other students when you need it", tone: "bg-lilac-soft text-lilac" },
+                { icon: ShieldCheck, text: "Moderated by counselors, with easy reporting", tone: "bg-mint-soft text-[#1f8a6b]" },
+              ].map((f) => (
+                <li key={f.text} className="flex items-center gap-3">
+                  <span className={`flex size-8 items-center justify-center rounded-xl ${f.tone}`}>
+                    <f.icon className="size-4" />
+                  </span>
+                  {f.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="relative mx-auto w-full max-w-md space-y-3">
+            {[
+              { name: "Anonymous", text: "How do you stay calm the night before an exam?", tag: "Asking for advice", tagTone: "bg-sun-soft text-[#8a5a00]", replies: "6 suggestions", rotate: "-rotate-1" },
+              { name: "Ms. Hassan", counselor: true, text: "Lay out everything you need the evening before, then do something unrelated for an hour. Your brain needs the break.", tag: "Reply", tagTone: "bg-primary-soft text-primary", replies: "24 support", rotate: "rotate-1 translate-x-6" },
+            ].map((c, i) => (
+              <div key={i} className={cn("rounded-3xl border border-line bg-surface p-4 shadow-md transition-transform duration-500 hover:rotate-0", c.rotate)}>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="flex items-center gap-2 text-sm font-medium text-ink">
+                    {c.counselor ? (
+                      <span className="arch-sm flex size-8 items-center justify-center bg-primary-soft text-xs font-semibold text-primary">MH</span>
+                    ) : (
+                      <span className="arch-sm flex size-8 items-center justify-center bg-lilac-soft text-lilac">
+                        <VenetianMask className="size-4" />
+                      </span>
+                    )}
+                    {c.name}
+                    {c.counselor && <span className="rounded-full bg-primary-soft px-1.5 py-0.5 text-[10px] font-semibold text-primary">Counselor</span>}
+                  </p>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${c.tagTone}`}>{c.tag}</span>
+                </div>
+                <p className="mt-2.5 text-sm leading-relaxed text-ink">{c.text}</p>
+                <p className="mt-3 flex items-center gap-1.5 text-xs text-ink-3">
+                  <Heart className="size-3.5 fill-rose text-rose" /> {c.replies}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </section>
+
       <section id="privacy" className="scroll-mt-16 border-y border-line bg-surface">
         <div className="mx-auto grid max-w-7xl gap-14 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[1fr_1.2fr]">
           <Reveal>
             <p className="text-sm font-medium text-primary">Privacy &amp; confidentiality</p>
             <h2 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Private by design. Honest about the limits.</h2>
             <p className="mt-5 text-[17px] leading-relaxed text-ink-2">
-              Access rules live in the database itself — not just the interface — so a student can only ever see their own
+              Access rules live in the database itself, not just the interface, so a student can only ever see their own
               conversations, and a counselor only the ones assigned to them.
             </p>
             <div className="mt-8 space-y-4">
@@ -392,6 +452,7 @@ export default function LandingPage() {
                     { what: "Messages in a conversation", v: [true, true, false] },
                     { what: "Request subject & topic", v: [true, true, false] },
                     { what: "Name, username & year", v: [true, true, true] },
+                    { what: "Who sent an anonymous message", v: [true, false, false] },
                     { what: "Counselor's private notes", v: [false, true, false] },
                     { what: "Toolkit activities & letters", v: [true, false, false] },
                     { what: "Overall usage numbers", v: [false, "own", true] },
@@ -451,7 +512,7 @@ export default function LandingPage() {
             <p className="mx-auto mt-4 max-w-lg text-[17px] leading-relaxed opacity-70">Whatever&apos;s behind it, there&apos;s someone here whose job is to listen.</p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="bg-bg text-ink hover:bg-surface-2">
-                <Link href="/register">Get started — it&apos;s free</Link>
+                <Link href="/register">Get started, it&apos;s free</Link>
               </Button>
               <Button asChild size="lg" variant="ghost" className="text-bg hover:bg-white/10 hover:text-bg">
                 <Link href="/toolkit">Try the toolkit first</Link>

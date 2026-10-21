@@ -19,6 +19,7 @@ export async function startConversation(_: ActionResult | null, formData: FormDa
     p_category: parsed.data.category,
     p_urgency: parsed.data.urgency,
     p_body: parsed.data.body,
+    p_anonymous: parsed.data.identity === "anonymous",
   });
   if (error || !id) return { ok: false, error: friendlyError(error) };
 
@@ -72,6 +73,17 @@ export async function updateConversation(input: {
   if (!data) return { ok: false, error: "Conversation not found." };
 
   revalidatePath(viewer.role === "student" ? "/student" : "/counselor", "layout");
+  return { ok: true };
+}
+
+/** An anonymous student chooses to share their name with the counselor. */
+export async function revealIdentity(conversationId: string): Promise<ActionResult> {
+  await assertRole("student");
+  if (!messageSchema.shape.conversationId.safeParse(conversationId).success) return { ok: false, error: "Invalid conversation." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reveal_identity", { p_conversation: conversationId });
+  if (error) return { ok: false, error: friendlyError(error) };
+  revalidatePath("/student", "layout");
   return { ok: true };
 }
 

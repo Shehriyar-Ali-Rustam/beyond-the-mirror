@@ -23,7 +23,7 @@ export default async function PendingPage() {
         <div className="w-full max-w-md rounded-3xl border border-line bg-surface shadow-sm">
           <EmptyState
             icon={suspended ? <ShieldOff /> : <Clock />}
-            title={suspended ? "This account is paused" : `Thanks, ${viewer.full_name.split(" ")[0]} — you're almost in`}
+            title={suspended ? "This account is paused" : `Thanks, ${viewer.full_name.split(" ")[0]}, you're almost in`}
             description={
               suspended
                 ? "An administrator has paused access to this account. Please contact your school if you think this is a mistake."

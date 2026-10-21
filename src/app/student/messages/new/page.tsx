@@ -71,7 +71,7 @@ export default async function NewRequestPage({ searchParams }: PageProps<"/stude
               <li className="flex gap-2">
                 <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-clay" />
                 If you or someone else might be at serious risk, your counselor may need to involve others to keep you
-                safe — they&apos;ll talk to you about it first whenever they can.
+                safe. They&apos;ll talk to you about it first whenever they can.
               </li>
             </ul>
           </div>

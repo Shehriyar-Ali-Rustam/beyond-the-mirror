@@ -14,7 +14,7 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  `img-src 'self' data: blob: ${supabaseOrigins()[0]}`,
   "font-src 'self' data:",
   `connect-src 'self' ${supabaseOrigins().join(" ")}`,
   "frame-ancestors 'none'",
@@ -34,6 +34,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Community photos are compressed in the browser first; this leaves headroom.
+    serverActions: { bodySizeLimit: "4mb" },
+  },
   turbopack: {
     rules: {
       "*.css": {

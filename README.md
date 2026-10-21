@@ -1,6 +1,6 @@
 # Beyond the Mirror
 
-**A private student–counselor support platform.** Students message their school counselor, track every request, book sessions and use a self-help toolkit. Counselors get a triaged inbox, private notes, scheduling and insights. Administrators manage accounts and caseloads — without ever seeing a single message.
+**A private student–counselor support platform.** Students message their school counselor, track every request, book sessions and use a self-help toolkit. Counselors get a triaged inbox, private notes, scheduling and insights. Administrators manage accounts and caseloads without ever seeing a single message.
 
 Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Postgres, Auth, Realtime)** and deployable to **Vercel**.
 
@@ -9,8 +9,10 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 | Student home | Counselor inbox |
 | --- | --- |
 | ![Student home](docs/screenshots/student-home.png) | ![Counselor inbox](docs/screenshots/counselor-inbox.png) |
-| **Admin overview** | **Self-help toolkit** |
-| ![Admin overview](docs/screenshots/admin-overview.png) | ![Toolkit](docs/screenshots/toolkit.png) |
+| **Community board** | **Self-help toolkit** |
+| ![Community board](docs/screenshots/community.png) | ![Toolkit](docs/screenshots/toolkit.png) |
+| **Admin overview** | **Phone** |
+| ![Admin overview](docs/screenshots/admin-overview.png) | ![Phone chat](docs/screenshots/mobile-chat.png) |
 
 ---
 
@@ -20,6 +22,8 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 
 **Students**
 - Private, real-time conversations with their assigned counselor (topic, urgency, status, "Seen" receipts)
+- **Anonymous messages:** a student can write to their counselor without revealing who they are, and share their name later if they choose. Anonymity is enforced in the database: the counselor's data never contains the student's identity
+- **Community board:** posts asking for advice or sharing something, with an optional photo, replies, "Support" reactions, reporting and counselor moderation. Students can post anonymously (hidden from other students; staff can see who posted, for safeguarding)
 - Guided "new request" flow with draft saving and a safety prompt for urgent requests
 - Request tracking: *Sent → Seen → Replied → Resolved*, resolve/reopen, and feedback
 - Session booking from the counselor's open slots (in person / online / phone), cancellation, post-session rating
@@ -30,10 +34,11 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 **Counselors**
 - Two-pane inbox with live updates, search, filters (status, topic, urgency, unread) and sorting
 - Status/urgency/topic controls, quick-reply templates, student side panel with history
-- Private case notes (visible only to the author — not students, not admins)
+- Private case notes (visible only to the author, not students or admins)
 - Availability management (one-off or weekly repeating slots) and booking management
 - Overview dashboard: awaiting reply, urgent queue, median first-response time, ratings, topic breakdown
 - Presence (Available / In a session / Away), profile, announcements
+- Community moderation: hide or delete posts and replies, see report counts
 
 **Administrators**
 - Approve or decline counselor sign-ups, change roles, pause/restore access
@@ -51,17 +56,19 @@ Also: a clean white theme, responsive layouts from phone to desktop, accessible 
 Access control is enforced **in the database**, not just the UI. The browser only ever holds the Supabase publishable (anon) key.
 
 - **Row Level Security on every table.** Students read only their own conversations; counselors only conversations assigned to them; admins have *no* policy that reaches messages, subjects, notes or feedback text.
-- **Column-level grants.** Users can update only harmless profile fields — `role`, `status` and `counselor_id` are not writable by users. Role/assignment changes go through admin-only `SECURITY DEFINER` RPCs that re-check the caller.
+- **Column-level grants.** Users can update only harmless profile fields. `role`, `status` and `counselor_id` are not writable by users. Role/assignment changes go through admin-only `SECURITY DEFINER` RPCs that re-check the caller.
 - **Counselor accounts start `pending`** and have no access until an admin approves them. Sign-up details can't grant a role.
 - **Username accounts.** Supabase Auth needs an email-shaped identifier, so each username maps to an internal address on the reserved `.invalid` domain. Nothing is ever emailed. Reserved usernames (`admin`, `support`, …) are blocked in the database itself.
 - **Built-in admin.** The admin password is stored only as a salted scrypt hash (or taken from `ADMIN_PASSWORD` if set) and checked in constant time. On first login the server creates the admin account using a one-time token that only the server can mint, so nobody can claim the admin role through the public auth API.
 - **Server actions** re-verify the session and role, validate input with Zod, and call the database as the user (so RLS still applies).
+- **Anonymity by design.** Anonymous conversations store the owner in a private table the API can't reach; the conversation has no student, and the student's messages have no sender. Feedback on them can't be traced either.
+- **Community data is never exposed directly.** Posts, replies and reactions are only readable through functions that mask anonymous authors. Photos go to a private storage bucket after the server checks the real file type, and are shown through short-lived signed links. The browser re-draws each photo before upload, which shrinks it and strips hidden metadata such as GPS location.
 - **Brute-force protection.** After 8 failed logins for a username (or 40 from one IP) in 15 minutes, logins are blocked for that window. Sign-ups are limited per IP. Attempts are stored in a table only the server can access.
 - **Rate limits** on messages and new requests; length limits on all text fields; safe redirects.
 - **Security headers:** a strict Content-Security-Policy (scripts only from this site; network only to your Supabase project), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy and a locked-down permissions policy.
-- **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords — never to read conversations, and never sent to the browser.
+- **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords, never to read conversations, and never sent to the browser.
 
-`scripts/test-rls.mjs` contains **39 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, reserved usernames, double booking, pending accounts, …).
+`scripts/test-rls.mjs` contains **56 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, reserved usernames, double booking, pending accounts, …).
 
 ---
 
@@ -100,7 +107,7 @@ Useful scripts:
 | `npm run db:migrate` | Apply pending migrations to the database in `DATABASE_URL` |
 | `npm run db:types` | Regenerate `src/lib/supabase/database.types.ts` |
 | `npm run seed` | Demo data (local or a dev project) |
-| `npm run test:rls` | Security tests — **local DB only** (run after `db:reset` + `seed`, with `ADMIN_PASSWORD` set to the admin password) |
+| `npm run test:rls` | Security tests, **local DB only** (run after `db:reset` + `seed`, with `ADMIN_PASSWORD` set to the admin password) |
 
 ---
 
@@ -122,7 +129,7 @@ Vercel → Settings → **Environment Variables**:
 
 | Variable | Value |
 | --- | --- |
-| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Optional — override the built-in admin login |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Optional: override the built-in admin login |
 | `ADMIN_DISPLAY_NAME` | Optional, e.g. `Ms. Sana Malik` |
 | `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` |
 | `NEXT_PUBLIC_DEFAULT_TIMEZONE` | e.g. `Asia/Karachi` |
@@ -153,7 +160,7 @@ Go to `/login` and use the admin login. The admin account is created on first lo
 supabase/migrations/       Schema, RLS policies, grants, triggers, RPCs, realtime publication
 scripts/                   migrate.mjs (build-time migrations), seed.mjs (demo data), test-rls.mjs (security tests)
 src/proxy.ts               Session refresh + optimistic auth redirect (Next 16 "proxy")
-src/actions/               Server actions — validated, role-checked mutations
+src/actions/               Server actions: validated, role-checked mutations
 src/lib/                   auth (DAL), supabase clients, validation, constants, time/tz, queries
 src/hooks/                 realtime subscriptions, form helpers
 src/components/ui/         Design-system primitives (button, input, dialog, badge, …)

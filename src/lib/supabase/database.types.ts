@@ -143,14 +143,14 @@ isOneToOne: false
                   ]
                 },"conversations": {
                   Row: {
-                    "category": Database["public"]['Enums']["request_category"],"counselor_id": string | null,"counselor_last_read_at": string | null,"created_at": string,"first_response_at": string | null,"id": string,"last_message_at": string,"last_message_preview": string | null,"last_message_sender": string | null,"resolved_at": string | null,"status": Database["public"]['Enums']["request_status"],"student_id": string,"student_last_read_at": string,"subject": string,"updated_at": string,"urgency": Database["public"]['Enums']["request_urgency"]
+                    "category": Database["public"]['Enums']["request_category"],"counselor_id": string | null,"counselor_last_read_at": string | null,"created_at": string,"first_response_at": string | null,"id": string,"is_anonymous": boolean,"last_from_student": boolean,"last_message_at": string,"last_message_preview": string | null,"last_message_sender": string | null,"resolved_at": string | null,"status": Database["public"]['Enums']["request_status"],"student_id": string | null,"student_last_read_at": string,"subject": string,"updated_at": string,"urgency": Database["public"]['Enums']["request_urgency"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "category"?: Database["public"]['Enums']["request_category"],"counselor_id"?: string | null,"counselor_last_read_at"?: string | null,"created_at"?: string,"first_response_at"?: string | null,"id"?: string,"last_message_at"?: string,"last_message_preview"?: string | null,"last_message_sender"?: string | null,"resolved_at"?: string | null,"status"?: Database["public"]['Enums']["request_status"],"student_id": string,"student_last_read_at"?: string,"subject": string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["request_urgency"]
+                    "category"?: Database["public"]['Enums']["request_category"],"counselor_id"?: string | null,"counselor_last_read_at"?: string | null,"created_at"?: string,"first_response_at"?: string | null,"id"?: string,"is_anonymous"?: boolean,"last_from_student"?: boolean,"last_message_at"?: string,"last_message_preview"?: string | null,"last_message_sender"?: string | null,"resolved_at"?: string | null,"status"?: Database["public"]['Enums']["request_status"],"student_id"?: string | null,"student_last_read_at"?: string,"subject": string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["request_urgency"]
                   }
                   Update: {
-                    "category"?: Database["public"]['Enums']["request_category"],"counselor_id"?: string | null,"counselor_last_read_at"?: string | null,"created_at"?: string,"first_response_at"?: string | null,"id"?: string,"last_message_at"?: string,"last_message_preview"?: string | null,"last_message_sender"?: string | null,"resolved_at"?: string | null,"status"?: Database["public"]['Enums']["request_status"],"student_id"?: string,"student_last_read_at"?: string,"subject"?: string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["request_urgency"]
+                    "category"?: Database["public"]['Enums']["request_category"],"counselor_id"?: string | null,"counselor_last_read_at"?: string | null,"created_at"?: string,"first_response_at"?: string | null,"id"?: string,"is_anonymous"?: boolean,"last_from_student"?: boolean,"last_message_at"?: string,"last_message_preview"?: string | null,"last_message_sender"?: string | null,"resolved_at"?: string | null,"status"?: Database["public"]['Enums']["request_status"],"student_id"?: string | null,"student_last_read_at"?: string,"subject"?: string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["request_urgency"]
                   }
                   Relationships: [
                     {
@@ -207,14 +207,14 @@ isOneToOne: false
                   ]
                 },"messages": {
                   Row: {
-                    "body": string,"conversation_id": string,"created_at": string,"id": string,"sender_id": string | null
+                    "body": string,"conversation_id": string,"created_at": string,"from_student": boolean,"id": string,"sender_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "body": string,"conversation_id": string,"created_at"?: string,"id"?: string,"sender_id"?: string | null
+                    "body": string,"conversation_id": string,"created_at"?: string,"from_student"?: boolean,"id"?: string,"sender_id"?: string | null
                   }
                   Update: {
-                    "body"?: string,"conversation_id"?: string,"created_at"?: string,"id"?: string,"sender_id"?: string | null
+                    "body"?: string,"conversation_id"?: string,"created_at"?: string,"from_student"?: boolean,"id"?: string,"sender_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -251,6 +251,110 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"post_comments": {
+                  Row: {
+                    "author_id": string,"body": string,"created_at": string,"hidden": boolean,"id": string,"is_anonymous": boolean,"post_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"body": string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"is_anonymous"?: boolean,"post_id": string
+                  }
+                  Update: {
+                    "author_id"?: string,"body"?: string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"is_anonymous"?: boolean,"post_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_comments_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_comments_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_reactions": {
+                  Row: {
+                    "created_at": string,"post_id": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"post_id": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"post_id"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_reactions_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_reactions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"post_reports": {
+                  Row: {
+                    "comment_id": string | null,"created_at": string,"id": string,"post_id": string,"reason": string | null,"reporter_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "comment_id"?: string | null,"created_at"?: string,"id"?: string,"post_id": string,"reason"?: string | null,"reporter_id": string
+                  }
+                  Update: {
+                    "comment_id"?: string | null,"created_at"?: string,"id"?: string,"post_id"?: string,"reason"?: string | null,"reporter_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "post_reports_comment_id_fkey"
+      columns: ["comment_id"]
+isOneToOne: false
+      referencedRelation: "post_comments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_reports_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "post_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"posts": {
+                  Row: {
+                    "author_id": string,"body": string,"created_at": string,"hidden": boolean,"id": string,"image_path": string | null,"is_anonymous": boolean,"kind": Database["public"]['Enums']["post_kind"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"body": string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"image_path"?: string | null,"is_anonymous"?: boolean,"kind"?: Database["public"]['Enums']["post_kind"]
+                  }
+                  Update: {
+                    "author_id"?: string,"body"?: string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"image_path"?: string | null,"is_anonymous"?: boolean,"kind"?: Database["public"]['Enums']["post_kind"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "posts_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"profiles": {
                   Row: {
                     "avatar_hue": number,"bio": string | null,"counselor_id": string | null,"created_at": string,"email": string | null,"full_name": string,"grade": string | null,"id": string,"office_hours": string | null,"presence": Database["public"]['Enums']["counselor_presence"],"role": Database["public"]['Enums']["user_role"],"section": string | null,"specialties": (string)[],"status": Database["public"]['Enums']["account_status"],"student_number": string | null,"title": string | null,"updated_at": string,"username": string,"whatsapp": string | null
@@ -277,7 +381,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "admin_assign_counselor":
+            "add_comment":
+{ Args: { "p_anonymous": boolean,"p_body": string,"p_post": string }; Returns: string
+                           },
+"admin_assign_counselor":
 { Args: { "p_counselor": string,"p_move_open"?: boolean,"p_student": string }; Returns: undefined
                            },
 "admin_stats":
@@ -292,6 +399,16 @@ isOneToOne: false
 "can_access_conversation":
 { Args: { "cid": string }; Returns: boolean
                            },
+"community_comments":
+{ Args: { "p_post": string }; Returns: {
+              "author_hue": number,"author_name": string,"author_role": Database["public"]['Enums']["user_role"],"body": string,"created_at": string,"hidden": boolean,"id": string,"is_anonymous": boolean,"is_mine": boolean
+            }[]
+                           },
+"community_feed":
+{ Args: { "p_before"?: string,"p_limit"?: number }; Returns: {
+              "author_hue": number,"author_name": string,"author_role": Database["public"]['Enums']["user_role"],"body": string,"comment_count": number,"created_at": string,"hidden": boolean,"id": string,"image_path": string,"is_anonymous": boolean,"is_mine": boolean,"kind": Database["public"]['Enums']["post_kind"],"reacted": boolean,"reaction_count": number,"report_count": number
+            }[]
+                           },
 "counselor_can_see_student":
 { Args: { "sid": string }; Returns: boolean
                            },
@@ -301,13 +418,28 @@ isOneToOne: false
 "create_admin_provision_token":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"create_post":
+{ Args: { "p_anonymous": boolean,"p_body": string,"p_image_path": string,"p_kind": Database["public"]['Enums']["post_kind"] }; Returns: string
+                           },
 "current_role_active":
 { Args: Record<PropertyKey, never>; Returns: Database["public"]['Enums']["user_role"]
+                           },
+"delete_comment":
+{ Args: { "p_comment": string }; Returns: undefined
+                           },
+"delete_post":
+{ Args: { "p_post": string }; Returns: string
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"is_conversation_owner":
+{ Args: { "cid": string }; Returns: boolean
+                           },
 "is_counselor":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"is_staff":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "leave_feedback":
@@ -315,6 +447,9 @@ isOneToOne: false
                            },
 "mark_conversation_read":
 { Args: { "p_conversation": string }; Returns: undefined
+                           },
+"moderate_post":
+{ Args: { "p_hidden": boolean,"p_post": string }; Returns: undefined
                            },
 "my_counselor_id":
 { Args: Record<PropertyKey, never>; Returns: string
@@ -338,15 +473,24 @@ isOneToOne: false
         isOneToOne: false
         isSetofReturn: true
       } },
+"report_content":
+{ Args: { "p_comment": string,"p_post": string,"p_reason": string }; Returns: undefined
+                           },
+"reveal_identity":
+{ Args: { "p_conversation": string }; Returns: undefined
+                           },
 "start_conversation":
-{ Args: { "p_body": string,"p_category": Database["public"]['Enums']["request_category"],"p_subject": string,"p_urgency": Database["public"]['Enums']["request_urgency"] }; Returns: string
+{ Args: { "p_anonymous"?: boolean,"p_body": string,"p_category": Database["public"]['Enums']["request_category"],"p_subject": string,"p_urgency": Database["public"]['Enums']["request_urgency"] }; Returns: string
+                           },
+"toggle_reaction":
+{ Args: { "p_post": string }; Returns: boolean
                            },
 "update_appointment":
 { Args: { "p_appointment": string,"p_reason": string,"p_status": Database["public"]['Enums']["appointment_status"] }; Returns: undefined
                            }
           }
           Enums: {
-            "account_status": "active"|"pending"|"suspended","announcement_audience": "everyone"|"all_students"|"my_students"|"counselors","appointment_mode": "in_person"|"online"|"phone","appointment_status": "confirmed"|"completed"|"cancelled","counselor_presence": "available"|"busy"|"away","request_category": "academic"|"exams"|"career"|"wellbeing"|"friendship"|"family"|"bullying"|"other","request_status": "pending"|"in_progress"|"resolved","request_urgency": "low"|"normal"|"high"|"urgent","user_role": "student"|"counselor"|"admin"
+            "account_status": "active"|"pending"|"suspended","announcement_audience": "everyone"|"all_students"|"my_students"|"counselors","appointment_mode": "in_person"|"online"|"phone","appointment_status": "confirmed"|"completed"|"cancelled","counselor_presence": "available"|"busy"|"away","post_kind": "advice"|"share","request_category": "academic"|"exams"|"career"|"wellbeing"|"friendship"|"family"|"bullying"|"other","request_status": "pending"|"in_progress"|"resolved","request_urgency": "low"|"normal"|"high"|"urgent","user_role": "student"|"counselor"|"admin"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -466,7 +610,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "account_status": ["active", "pending", "suspended"],"announcement_audience": ["everyone", "all_students", "my_students", "counselors"],"appointment_mode": ["in_person", "online", "phone"],"appointment_status": ["confirmed", "completed", "cancelled"],"counselor_presence": ["available", "busy", "away"],"request_category": ["academic", "exams", "career", "wellbeing", "friendship", "family", "bullying", "other"],"request_status": ["pending", "in_progress", "resolved"],"request_urgency": ["low", "normal", "high", "urgent"],"user_role": ["student", "counselor", "admin"]
+            "account_status": ["active", "pending", "suspended"],"announcement_audience": ["everyone", "all_students", "my_students", "counselors"],"appointment_mode": ["in_person", "online", "phone"],"appointment_status": ["confirmed", "completed", "cancelled"],"counselor_presence": ["available", "busy", "away"],"post_kind": ["advice", "share"],"request_category": ["academic", "exams", "career", "wellbeing", "friendship", "family", "bullying", "other"],"request_status": ["pending", "in_progress", "resolved"],"request_urgency": ["low", "normal", "high", "urgent"],"user_role": ["student", "counselor", "admin"]
           }
         }
 } as const

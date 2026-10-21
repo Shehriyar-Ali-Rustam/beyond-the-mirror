@@ -9,7 +9,7 @@ export function SiteFooter() {
         <div>
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-2">
-            A private space for students to reach their school counselor — and for counselors to keep up with everyone who
+            A private space for students to reach their school counselor, and for counselors to keep up with everyone who
             needs them.
           </p>
           <p className="mt-6 max-w-sm rounded-2xl bg-danger-soft/60 px-4 py-3 text-xs leading-relaxed text-ink-2">

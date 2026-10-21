@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Bell, CalendarDays, CheckCheck, MessageSquare, ShieldAlert, Star, UserCheck } from "lucide-react";
+import { Bell, CalendarDays, CheckCheck, Flag, MessageSquare, MessagesSquare, ShieldAlert, Star, UserCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { markAllNotificationsRead, markNotificationRead } from "@/actions/notifications";
 import { useRealtime } from "@/hooks/use-realtime";
@@ -21,6 +21,8 @@ const ICONS: Record<string, typeof Bell> = {
   feedback: Star,
   account: UserCheck,
   counselor_request: UserCheck,
+  community: MessagesSquare,
+  report: Flag,
 };
 
 export function NotificationBell({ userId, initialUnread }: { userId: string; initialUnread: number }) {

@@ -32,7 +32,8 @@ export default async function StudentAppointments() {
       .order("created_at", { ascending: false })
       .limit(100),
     counselor ? supabase.rpc("open_slots") : Promise.resolve({ data: [] }),
-    supabase.from("feedback").select("appointment_id").eq("student_id", viewer.id).not("appointment_id", "is", null),
+    // RLS limits students to their own feedback.
+    supabase.from("feedback").select("appointment_id").not("appointment_id", "is", null),
   ]);
 
   const now = new Date().getTime();
@@ -47,7 +48,7 @@ export default async function StudentAppointments() {
         title="Sessions"
         description={
           counselor
-            ? `Book time to talk with ${counselor.full_name} — in person or online, whichever feels easier.`
+            ? `Book time to talk with ${counselor.full_name}, in person or online, whichever feels easier.`
             : "Book time to talk with your counselor."
         }
       />

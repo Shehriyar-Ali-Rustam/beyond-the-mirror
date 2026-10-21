@@ -75,7 +75,7 @@ export function ColumnChart({ data, label }: { data: { key: string; label: strin
   );
 }
 
-/** Proportion of requests by status — reserved status colours, always labelled. */
+/** Proportion of requests by status, in reserved status colours, always labelled. */
 export function StatusBar({ segments }: { segments: { label: string; value: number; className: string }[] }) {
   const total = segments.reduce((a, b) => a + b.value, 0);
   if (!total) return <p className="text-sm text-ink-2">No requests yet.</p>;

@@ -18,11 +18,11 @@ const body = Instrument_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "Beyond the Mirror — student support, done properly",
+    default: "Beyond the Mirror | Student support, done properly",
     template: "%s · Beyond the Mirror",
   },
   description:
-    "A private, secure space where students reach their school counselor — to ask, to vent, to book time, or simply to be heard.",
+    "A private, secure space where students reach their school counselor to ask, to vent, to book time, or simply to be heard.",
   openGraph: {
     title: "Beyond the Mirror",
     description: "Say what the mirror doesn't show. Private student–counselor support.",

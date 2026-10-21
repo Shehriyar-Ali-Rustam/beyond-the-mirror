@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "/#how", label: "How it works" },
   { href: "/#portals", label: "For counselors" },
+  { href: "/#community", label: "Community" },
   { href: "/toolkit", label: "Toolkit" },
   { href: "/#privacy", label: "Privacy" },
 ];

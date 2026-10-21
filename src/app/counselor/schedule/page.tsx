@@ -51,7 +51,7 @@ export default async function CounselorSchedule() {
         <div className="space-y-5">
           {toClose.length > 0 && (
             <Card className="border-warn/30">
-              <CardHeader title="How did these go?" description="Mark finished sessions complete — students will be invited to leave feedback." />
+              <CardHeader title="How did these go?" description="Mark finished sessions complete. Students will be invited to leave feedback." />
               <CardBody className="space-y-2 pt-4">
                 {toClose.map((a) => (
                   <div key={a.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-warn-soft/50 p-3">

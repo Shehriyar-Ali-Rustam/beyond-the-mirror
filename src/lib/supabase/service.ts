@@ -12,7 +12,7 @@ export function hasServiceKey() {
 /**
  * Privileged client that bypasses Row Level Security. Server-only, and used
  * ONLY for account management (creating username accounts, the fixed admin
- * login, admin password resets) — never to read conversations.
+ * login, admin password resets), never to read conversations.
  */
 export function createServiceClient() {
   const key = serviceKey();

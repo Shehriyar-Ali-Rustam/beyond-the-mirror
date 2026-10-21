@@ -14,7 +14,7 @@ async function tablesReady() {
 
 /**
  * Is the database usable? If it's connected but the tables are missing (e.g.
- * the build couldn't reach it), create them now — the site heals itself.
+ * the build couldn't reach it), create them now, so the site heals itself.
  */
 export const getDatabaseStatus = cache(async (): Promise<DbStatus> => {
   if (!isSupabaseConfigured()) return "unconfigured";

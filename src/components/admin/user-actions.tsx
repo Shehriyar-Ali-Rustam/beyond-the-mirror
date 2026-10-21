@@ -83,7 +83,7 @@ export function UserActions({ user }: { user: { id: string; full_name: string; u
       <Dialog open={temp !== null} onOpenChange={(o) => !o && setTemp(null)}>
         <DialogContent
           title={`Temporary password for ${user.full_name}`}
-          description="Share it with them in person. It's shown only once — they can change it under Settings after logging in."
+          description="Share it with them in person. It's shown only once. They can change it under Settings after logging in."
         >
           <div className="rounded-2xl bg-surface-2 p-4 text-center">
             <p className="text-xs text-ink-3">Username</p>

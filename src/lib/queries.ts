@@ -3,10 +3,17 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Conversation, Profile } from "@/lib/types";
 
-export function isUnreadFor(viewer: Pick<Profile, "id" | "role">, c: Conversation) {
-  if (!c.last_message_sender || c.last_message_sender === viewer.id) return false;
-  const lastRead = viewer.role === "student" ? c.student_last_read_at : c.counselor_last_read_at;
+/** Did the other side speak last, after this viewer last read the thread? */
+export function isUnreadFor(viewer: Pick<Profile, "role">, c: Conversation) {
+  const student = viewer.role === "student";
+  if (!c.last_message_preview || c.last_from_student === student) return false;
+  const lastRead = student ? c.student_last_read_at : c.counselor_last_read_at;
   return !lastRead || new Date(c.last_message_at) > new Date(lastRead);
+}
+
+/** True when the viewer sent the latest message. */
+export function sentLastBy(viewer: Pick<Profile, "role">, c: Conversation) {
+  return c.last_from_student === (viewer.role === "student");
 }
 
 export const getUnreadNotificationCount = cache(async (userId: string) => {
@@ -21,13 +28,11 @@ export const getUnreadNotificationCount = cache(async (userId: string) => {
 
 export const getUnreadConversationCount = cache(async (viewer: Profile) => {
   const supabase = await createClient();
-  const column = viewer.role === "student" ? "student_id" : "counselor_id";
-  const { data } = await supabase
-    .from("conversations")
-    .select("*")
-    .eq(column, viewer.id)
-    .neq("last_message_sender", viewer.id)
-    .limit(500);
+  // Row Level Security already limits students to their own conversations
+  // (including anonymous ones, which have no student_id).
+  let query = supabase.from("conversations").select("*").limit(500);
+  if (viewer.role !== "student") query = query.eq("counselor_id", viewer.id);
+  const { data } = await query;
   return (data ?? []).filter((c) => isUnreadFor(viewer, c)).length;
 });
 

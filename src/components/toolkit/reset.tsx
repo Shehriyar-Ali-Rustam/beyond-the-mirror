@@ -95,7 +95,7 @@ export function Breathing({ compact }: { compact?: boolean }) {
         </Button>
       </div>
       <p className="mt-3 h-5 text-sm text-ink-3" aria-live="polite">
-        {cycles > 0 && `${cycles} ${cycles === 1 ? "breath" : "breaths"} — ${cycles >= 5 ? "notice how your body feels now." : "keep going."}`}
+        {cycles > 0 && `${cycles} ${cycles === 1 ? "breath" : "breaths"}, ${cycles >= 5 ? "notice how your body feels now." : "keep going."}`}
       </p>
     </div>
   );
@@ -169,7 +169,7 @@ function Grounding() {
             <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-ink-2">{SENSES[i].hint}</p>
             <p className="mt-2 text-sm text-ink-3">Name them in your head, or out loud. Take your time.</p>
             <Button className="mt-8" onClick={() => setI(i + 1)}>
-              {i < SENSES.length - 1 ? "Done — next" : "Finish"}
+              {i < SENSES.length - 1 ? "Done, next" : "Finish"}
             </Button>
           </motion.div>
         ) : (
@@ -196,7 +196,7 @@ const GENTLE_STEPS = [
   "Step outside or open a window for two minutes",
   "Wash your face or have a shower",
   "Put on one song you love",
-  "Message one person — even just “hey”",
+  "Message one person, even just “hey”",
   "Write down the one thing worrying you most",
   "Let tonight's to-do list be just one item",
   "Go to bed 30 minutes earlier",

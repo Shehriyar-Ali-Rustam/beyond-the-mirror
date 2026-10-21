@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useActionForm } from "@/hooks/use-action-form";
 import { AnimatePresence, motion } from "motion/react";
-import { Send } from "lucide-react";
+import { Send, UserRound, VenetianMask } from "lucide-react";
 import { startConversation } from "@/actions/messages";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Textarea } from "@/components/ui/input";
@@ -22,6 +22,7 @@ export function NewRequestForm({ initialCategory, whatsapp }: { initialCategory?
   const [state, onSubmit, pending] = useActionForm(startConversation);
   const [category, setCategory] = useState<Category>(initialCategory ?? "wellbeing");
   const [urgency, setUrgency] = useState<Urgency>("normal");
+  const [identity, setIdentity] = useState<"named" | "anonymous">("named");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const fe = state && !state.ok ? state.fieldErrors : undefined;
@@ -73,7 +74,9 @@ export function NewRequestForm({ initialCategory, whatsapp }: { initialCategory?
                     : "border-line bg-surface hover:-translate-y-0.5 hover:border-line-strong hover:shadow-sm",
                 )}
               >
-                <c.icon className={cn("size-5", active ? "text-primary" : "text-ink-3")} />
+                <span className={cn("flex size-9 items-center justify-center rounded-xl transition-transform duration-300", c.tone, active && "scale-110")}>
+                  <c.icon className="size-[18px]" />
+                </span>
                 <span>
                   <span className="block text-sm font-medium text-ink">{c.label}</span>
                   <span className="mt-0.5 block text-xs leading-snug text-ink-3">{c.hint}</span>
@@ -123,9 +126,70 @@ export function NewRequestForm({ initialCategory, whatsapp }: { initialCategory?
         </AnimatePresence>
       </fieldset>
 
+      <fieldset>
+        <legend className="text-[15px] font-semibold text-ink">
+          <span className="mr-2 text-ink-3">3</span> How do you want to share?
+        </legend>
+        <input type="hidden" name="identity" value={identity} />
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {(
+            [
+              { value: "named", icon: UserRound, title: "With my name", hint: "Your counselor knows it's you and can follow up in person." },
+              { value: "anonymous", icon: VenetianMask, title: "Anonymously", hint: "Your counselor won't see your name. You can share it later if you want." },
+            ] as const
+          ).map((o) => {
+            const active = identity === o.value;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => setIdentity(o.value)}
+                aria-pressed={active}
+                className={cn(
+                  "flex items-start gap-3 rounded-2xl border p-4 text-left transition-all duration-200",
+                  active
+                    ? o.value === "anonymous"
+                      ? "border-lilac bg-lilac-soft shadow-sm"
+                      : "border-primary bg-primary-soft shadow-sm"
+                    : "border-line bg-surface hover:border-line-strong",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex size-9 shrink-0 items-center justify-center rounded-xl",
+                    active ? (o.value === "anonymous" ? "bg-lilac text-white" : "bg-primary text-primary-ink") : "bg-surface-2 text-ink-3",
+                  )}
+                >
+                  <o.icon className="size-[18px]" />
+                </span>
+                <span>
+                  <span className="block text-sm font-medium text-ink">{o.title}</span>
+                  <span className="mt-0.5 block text-xs leading-snug text-ink-2">{o.hint}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        <AnimatePresence>
+          {identity === "anonymous" && (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden text-[13px] leading-relaxed text-ink-2"
+            >
+              <span className="mt-3 block rounded-xl bg-surface-2 px-3.5 py-2.5">
+                Good to know: if you might be in danger, an anonymous message means your counselor can&apos;t find you to
+                help. In that case, please share your name or talk to a trusted adult now.
+              </span>
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </fieldset>
+
       <fieldset className="space-y-5">
         <legend className="mb-4 text-[15px] font-semibold text-ink">
-          <span className="mr-2 text-ink-3">3</span> Tell your counselor
+          <span className="mr-2 text-ink-3">4</span> Tell your counselor
         </legend>
         <Field label="In a few words" htmlFor="subject" error={fe?.subject}>
           <Input

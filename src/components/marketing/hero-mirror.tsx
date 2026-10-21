@@ -14,13 +14,13 @@ const SCENES = [
   {
     surface: "It's nothing.",
     student: "My friends stopped saving me a seat at lunch. I don't know what I did.",
-    counselor: "That sounds really lonely. Let's figure out what's going on — together.",
+    counselor: "That sounds really lonely. Let's figure out what's going on together.",
     outcome: { icon: TrendingUp, text: "In progress · Friendships" },
   },
   {
     surface: "Just tired.",
     student: "Things at home are loud right now and I can't focus on revision.",
-    counselor: "You're not alone in this. Here's a plan for this week — and my door's open.",
+    counselor: "You're not alone in this. Here's a plan for this week, and my door's open.",
     outcome: { icon: CheckCheck, text: "Resolved · “It really helped”" },
   },
 ];

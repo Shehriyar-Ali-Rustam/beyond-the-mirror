@@ -81,7 +81,7 @@ export default async function StudentResources() {
               <ShieldCheck className="size-4 text-primary" /> Your privacy, in short
             </p>
             <p className="mt-2 leading-relaxed text-ink-2">
-              Your conversations are visible only to you and your counselor. Admins see account details and totals —
+              Your conversations are visible only to you and your counselor. Admins see account details and totals,
               never message content.
             </p>
           </div>

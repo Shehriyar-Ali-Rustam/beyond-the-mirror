@@ -64,7 +64,7 @@ export default async function CounselorOverview() {
   const stats = (statsRaw ?? {}) as Stats;
   // Needs attention: the student spoke last, ranked by urgency, then longest wait.
   const queue = (open ?? [])
-    .filter((c) => c.last_message_sender === c.student_id)
+    .filter((c) => c.last_from_student)
     .sort((a, b) => URGENCY_RANK[a.urgency] - URGENCY_RANK[b.urgency] || a.last_message_at.localeCompare(b.last_message_at))
     .slice(0, 6);
   const upcoming = (sessions ?? []).sort((a, b) => a.slot.starts_at.localeCompare(b.slot.starts_at)).slice(0, 5);
@@ -90,7 +90,7 @@ export default async function CounselorOverview() {
         <Stat label="Median first reply" value={minutesLabel(stats.median_first_response_minutes)} icon={<Clock />} tone="primary" hint={`${stats.resolved_7d ?? 0} resolved this week`} />
         <Stat
           label="Student rating"
-          value={stats.avg_rating ? Number(stats.avg_rating).toFixed(1) : "—"}
+          value={stats.avg_rating ? Number(stats.avg_rating).toFixed(1) : "-"}
           icon={<Star />}
           tone="ok"
           hint={stats.ratings_count ? `From ${stats.ratings_count} ${stats.ratings_count === 1 ? "rating" : "ratings"}` : "No ratings yet"}
@@ -116,10 +116,10 @@ export default async function CounselorOverview() {
                 {queue.map((c) => (
                   <li key={c.id}>
                     <Link href={`/counselor/inbox/${c.id}`} className="flex items-center gap-3.5 rounded-2xl px-2 py-3 transition hover:bg-surface-2">
-                      <Avatar name={c.student?.full_name ?? "Student"} hue={c.student?.avatar_hue} />
+                      <Avatar name={c.student?.full_name ?? "Anonymous"} hue={c.student?.avatar_hue ?? 200} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="truncate font-medium text-ink">{c.student?.full_name}</p>
+                          <p className="truncate font-medium text-ink">{c.student?.full_name ?? "Anonymous student"}</p>
                           <UrgencyBadge urgency={c.urgency} />
                         </div>
                         <p className="truncate text-sm text-ink-2">{c.subject}</p>

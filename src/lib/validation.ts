@@ -66,6 +66,7 @@ export const newRequestSchema = z.object({
   category: categorySchema,
   urgency: urgencySchema,
   body: trimmed(10, 4000, "Message"),
+  identity: z.enum(["named", "anonymous"]).default("named"),
 });
 
 export const messageSchema = z.object({

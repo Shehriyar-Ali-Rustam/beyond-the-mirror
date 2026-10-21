@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { MessagesSquare, Plus, SearchX } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { isUnreadFor } from "@/lib/queries";
+import { isUnreadFor, sentLastBy } from "@/lib/queries";
 import { getTz } from "@/lib/tz";
 import { ilikeTerm } from "@/lib/search";
 import { PageHeader } from "@/components/shell/app-shell";
@@ -28,7 +28,6 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
   let query = supabase
     .from("conversations")
     .select("*")
-    .eq("student_id", viewer.id)
     .order("last_message_at", { ascending: false })
     .limit(100);
   if (status === "open") query = query.neq("status", "resolved");
@@ -38,7 +37,7 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
 
   const [{ data: conversations }, { data: all }] = await Promise.all([
     query,
-    supabase.from("conversations").select("status").eq("student_id", viewer.id),
+    supabase.from("conversations").select("status"),
   ]);
   const counts = {
     all: all?.length ?? 0,
@@ -48,7 +47,7 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
 
   return (
     <div className="mx-auto max-w-4xl">
-      <LiveRefresh channel={`student-convs:${viewer.id}`} table="conversations" filter={`student_id=eq.${viewer.id}`} />
+      <LiveRefresh channel={`student-convs:${viewer.id}`} table="conversations" />
       <PageHeader
         title="Messages"
         description="Every conversation with your counselor, in one place."
@@ -81,7 +80,7 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
                 unread={isUnreadFor(viewer, c)}
                 tz={tz}
                 audience="student"
-                youSentLast={c.last_message_sender === viewer.id}
+                youSentLast={sentLastBy(viewer, c)}
               />
             ))}
           </div>
@@ -91,7 +90,7 @@ export default async function StudentMessages({ searchParams }: PageProps<"/stud
           <EmptyState
             icon={<MessagesSquare />}
             title={status === "resolved" ? "No resolved conversations yet" : "Your inbox is empty"}
-            description="Write to your counselor about anything — school, friends, home, or how you're feeling."
+            description="Write to your counselor about anything: school, friends, home, or how you're feeling."
             action={
               <Button asChild>
                 <Link href="/student/messages/new">Write your first message</Link>

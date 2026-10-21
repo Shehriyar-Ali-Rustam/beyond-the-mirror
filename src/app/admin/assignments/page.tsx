@@ -67,7 +67,7 @@ export default async function AdminAssignments({ searchParams }: PageProps<"/adm
             ))}
           </ul>
         ) : (
-          <EmptyState icon={<SearchX />} title={view === "unassigned" ? "Everyone has a counselor" : "No students found"} description={view === "unassigned" ? "Nice — every active student is matched." : "Try a different search."} />
+          <EmptyState icon={<SearchX />} title={view === "unassigned" ? "Everyone has a counselor" : "No students found"} description={view === "unassigned" ? "Nice, every active student is matched." : "Try a different search."} />
         )}
       </Card>
     </div>

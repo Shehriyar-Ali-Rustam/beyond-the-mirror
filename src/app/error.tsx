@@ -14,7 +14,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <EmptyState
         icon={<CloudOff />}
         title="Something went wrong on our side"
-        description="Your messages are safe. Try again in a moment — if it keeps happening, let your school know."
+        description="Your messages are safe. Try again in a moment. If it keeps happening, let your school know."
         action={
           <Button onClick={reset}>
             <RotateCcw /> Try again

@@ -62,7 +62,7 @@ export function TalkCta({ category, title, body }: { category?: Category; title?
       <div className="flex-1">
         <p className="font-medium text-ink">{title ?? "Want to talk it through with someone?"}</p>
         <p className="mt-0.5 text-sm text-ink-2">
-          {body ?? "Your counselor is there for exactly this — no problem is too small."}
+          {body ?? "Your counselor is there for exactly this. No problem is too small."}
         </p>
       </div>
       <Button asChild>

@@ -4,6 +4,8 @@ import { shortStamp } from "@/lib/time";
 import type { Conversation } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { VenetianMask } from "lucide-react";
 import { CategoryIcon, StatusBadge, UrgencyBadge } from "./status";
 
 export function ConversationRow({
@@ -15,6 +17,7 @@ export function ConversationRow({
   person,
   active,
   youSentLast,
+  anonymous,
 }: {
   conversation: Conversation;
   href: string;
@@ -24,6 +27,7 @@ export function ConversationRow({
   person?: { name: string; hue: number };
   active?: boolean;
   youSentLast?: boolean;
+  anonymous?: boolean;
 }) {
   return (
     <Link
@@ -52,6 +56,11 @@ export function ConversationRow({
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <StatusBadge status={c.status} audience={audience} />
           <UrgencyBadge urgency={c.urgency} />
+          {(anonymous ?? c.is_anonymous) && (
+            <Badge tone="lilac">
+              <VenetianMask /> Anonymous
+            </Badge>
+          )}
           {audience === "counselor" && (
             <span className="text-xs text-ink-3">· {CATEGORIES[c.category].label}</span>
           )}

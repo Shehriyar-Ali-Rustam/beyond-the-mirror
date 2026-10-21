@@ -96,9 +96,9 @@ await test("cannot post into another student's conversation", async () => {
   const { error } = await zara.c.from("messages").insert({ conversation_id: omarConv, sender_id: zara.id, body: "hi" });
   assert.ok(error);
 });
-await test("cannot impersonate a sender", async () => {
-  const { error } = await zara.c.from("messages").insert({ conversation_id: zaraConv, sender_id: omar.id, body: "spoof" });
-  assert.ok(error);
+await test("cannot impersonate a sender (the real sender is always recorded)", async () => {
+  const { data, error } = await zara.c.from("messages").insert({ conversation_id: zaraConv, sender_id: omar.id, body: "spoof" }).select("sender_id").maybeSingle();
+  assert.ok(error || data?.sender_id === zara.id);
 });
 await test("cannot see other students' profiles", async () => {
   const { data } = await zara.c.from("profiles").select("id").eq("id", omar.id);
@@ -174,7 +174,7 @@ await test("private notes are visible only to their author", async () => {
 });
 await test("reply moves request to in progress and notifies the student", async () => {
   const { data: conv } = await amira.c.from("conversations").select("id, status").eq("student_id", omar.id).eq("status", "pending").limit(1).single();
-  const { error } = await amira.c.from("messages").insert({ conversation_id: conv.id, sender_id: amira.id, body: "I'm here — let's talk." });
+  const { error } = await amira.c.from("messages").insert({ conversation_id: conv.id, sender_id: amira.id, body: "I'm here, let's talk." });
   assert.ifError(error);
   const { data: after } = await omar.c.from("conversations").select("status, first_response_at").eq("id", conv.id).single();
   assert.equal(after.status, "in_progress");
@@ -248,7 +248,6 @@ await test("can assign a counselor and open requests follow", async () => {
   assert.ifError((await admin.c.rpc("admin_assign_counselor", { p_student: omar.id, p_counselor: amira.id, p_move_open: true })).error);
 });
 
-console.log("\nPending counselor sign-ups");
 const service = createClient(url, secret, { auth: { persistSession: false } });
 async function provision(username, metadata, appMetadata) {
   const email = `${username}@${domain}`;
@@ -258,6 +257,107 @@ async function provision(username, metadata, appMetadata) {
   await c.auth.signInWithPassword({ email, password });
   return { c, id: data.user.id };
 }
+console.log("\nAnonymous conversations");
+let anonConv;
+await test("student can open an anonymous request", async () => {
+  const { data, error } = await zara.c.rpc("start_conversation", { p_subject: "Anonymous worry", p_category: "wellbeing", p_urgency: "normal", p_body: "I would rather not say who I am yet.", p_anonymous: true });
+  assert.ifError(error);
+  anonConv = data;
+  const { data: mine } = await zara.c.from("conversations").select("id, is_anonymous").eq("id", anonConv).single();
+  assert.equal(mine.is_anonymous, true);
+});
+await test("counselor sees the request but nothing that identifies the student", async () => {
+  const { data: conv } = await amira.c.from("conversations").select("*").eq("id", anonConv).single();
+  assert.equal(conv.student_id, null);
+  assert.equal(conv.last_message_sender, null);
+  const { data: msgs } = await amira.c.from("messages").select("sender_id, from_student").eq("conversation_id", anonConv);
+  assert.ok(msgs.length === 1 && msgs[0].sender_id === null && msgs[0].from_student === true);
+  const { data: notes } = await amira.c.from("notifications").select("body").eq("href", `/counselor/inbox/${anonConv}`);
+  assert.ok(notes.length > 0 && notes.every((n) => !n.body.includes("Zara")));
+});
+await test("anonymous student can keep messaging; replies reach them", async () => {
+  assert.ifError((await zara.c.from("messages").insert({ conversation_id: anonConv, body: "Still me." })).error);
+  assert.ifError((await amira.c.from("messages").insert({ conversation_id: anonConv, sender_id: amira.id, body: "I'm here for you." })).error);
+  const { data: n } = await zara.c.from("notifications").select("id").eq("href", `/student/messages/${anonConv}`);
+  assert.ok(n.length > 0);
+  const { data: msgs } = await amira.c.from("messages").select("sender_id").eq("conversation_id", anonConv).eq("from_student", true);
+  assert.ok(msgs.every((m) => m.sender_id === null));
+});
+await test("counselor cannot forge a student message", async () => {
+  await amira.c.from("messages").insert({ conversation_id: anonConv, sender_id: null, from_student: true, body: "forged" });
+  const { data } = await zara.c.from("messages").select("from_student, body").eq("conversation_id", anonConv).eq("body", "forged");
+  assert.ok(data.every((m) => m.from_student === false));
+});
+await test("other students cannot see an anonymous conversation", async () => {
+  assert.equal((await omar.c.from("conversations").select("id").eq("id", anonConv)).data.length, 0);
+  assert.equal((await omar.c.from("messages").select("id").eq("conversation_id", anonConv)).data.length, 0);
+  assert.ok((await omar.c.rpc("reveal_identity", { p_conversation: anonConv })).error);
+});
+await test("is_conversation_owner reveals nothing about others", async () => {
+  const { data } = await amira.c.rpc("is_conversation_owner", { cid: anonConv });
+  assert.equal(data, false);
+});
+await test("student can choose to share their name later", async () => {
+  assert.ifError((await zara.c.rpc("reveal_identity", { p_conversation: anonConv })).error);
+  const { data: conv } = await amira.c.from("conversations").select("student_id, is_anonymous").eq("id", anonConv).single();
+  assert.equal(conv.student_id, zara.id);
+  assert.equal(conv.is_anonymous, false);
+});
+await test("counselors cannot read who left feedback", async () => {
+  const { error } = await amira.c.from("feedback").select("student_id").limit(1);
+  assert.ok(error, "student_id must not be selectable");
+});
+
+console.log("\nCommunity board");
+let postId;
+await test("student can post anonymously", async () => {
+  const { data, error } = await zara.c.rpc("create_post", { p_kind: "advice", p_body: "How do you deal with exam nerves?", p_image_path: null, p_anonymous: true });
+  assert.ifError(error);
+  postId = data;
+});
+await test("other students don't see the author of an anonymous post", async () => {
+  const { data } = await omar.c.rpc("community_feed", {});
+  const p = data.find((x) => x.id === postId);
+  assert.ok(p && p.author_name === null && p.author_hue === null && p.is_mine === false);
+});
+await test("the author and staff can see who posted", async () => {
+  const mine = (await zara.c.rpc("community_feed", {})).data.find((x) => x.id === postId);
+  assert.ok(mine.is_mine && mine.author_name);
+  const staff = (await amira.c.rpc("community_feed", {})).data.find((x) => x.id === postId);
+  assert.ok(staff.author_name);
+});
+await test("post tables are not readable or writable directly", async () => {
+  assert.equal(((await omar.c.from("posts").select("id")).data ?? []).length, 0);
+  assert.ok((await omar.c.from("posts").insert({ author_id: omar.id, body: "x" })).error);
+  assert.ok((await omar.c.from("post_comments").select("author_id")).error || ((await omar.c.from("post_comments").select("author_id")).data ?? []).length === 0);
+});
+await test("anonymous replies hide the author from students", async () => {
+  assert.ifError((await omar.c.rpc("add_comment", { p_post: postId, p_body: "Breathing exercises help me.", p_anonymous: true })).error);
+  const { data } = await zara.c.rpc("community_comments", { p_post: postId });
+  assert.ok(data.length === 1 && data[0].author_name === null);
+});
+await test("only the author or staff can delete a post", async () => {
+  assert.ok((await omar.c.rpc("delete_post", { p_post: postId })).error);
+});
+await test("three reports hide a post from students", async () => {
+  const extra = await provision(`reporter${Date.now() % 100000}`, { full_name: "Reporter" });
+  await omar.c.rpc("report_content", { p_post: postId, p_comment: null, p_reason: "test" });
+  await extra.c.rpc("report_content", { p_post: postId, p_comment: null, p_reason: "test" });
+  await amira.c.rpc("report_content", { p_post: postId, p_comment: null, p_reason: "test" });
+  const visible = (await omar.c.rpc("community_feed", {})).data.some((x) => x.id === postId);
+  assert.equal(visible, false);
+  const staffView = (await amira.c.rpc("community_feed", {})).data.find((x) => x.id === postId);
+  assert.ok(staffView?.hidden === true && staffView.report_count >= 3);
+  await service.auth.admin.deleteUser(extra.id);
+});
+await test("staff can remove a post", async () => {
+  assert.ifError((await amira.c.rpc("delete_post", { p_post: postId })).error);
+});
+await test("anonymous visitors can't read the community", async () => {
+  assert.ok((await anon.rpc("community_feed", {})).error);
+});
+
+console.log("\nPending counselor sign-ups");
 await test("start pending with no access until approved", async () => {
   const { c, id, error } = await provision(`pending${Date.now() % 100000}`, { full_name: "Pending Person", role_request: "counselor" });
   assert.ifError(error);

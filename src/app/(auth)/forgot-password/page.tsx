@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
     <div className="animate-fade-up">
       <h1 className="font-display text-[2rem] leading-tight text-ink">Forgot your password?</h1>
       <p className="mt-2 text-[15px] leading-relaxed text-ink-2">
-        Accounts here don&apos;t use email, so resets are done in person — it only takes a minute.
+        Accounts here don&apos;t use email, so resets are done in person. It only takes a minute.
       </p>
       <div className="mt-8 space-y-3">
         {[

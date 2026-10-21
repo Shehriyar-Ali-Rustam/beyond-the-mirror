@@ -11,7 +11,7 @@ import { clearFailedLogins, clientIp, isRateLimited, recordAttempt } from "@/lib
 import { fieldErrors, loginSchema, passwordSchema, registerSchema } from "@/lib/validation";
 import type { ActionResult } from "@/lib/types";
 
-const NOT_READY = "Accounts aren't available yet — the site's database still needs to be connected.";
+const NOT_READY = "Accounts aren't available yet. The site's database still needs to be connected.";
 const BAD_LOGIN = "That username and password don't match an account.";
 const TOO_MANY = "Too many attempts. Please wait a few minutes and try again.";
 
@@ -118,7 +118,7 @@ export async function signUp(_: ActionResult | null, formData: FormData): Promis
   const ip = await clientIp();
   if (await isRateLimited("signup", null, ip)) return { ok: false, error: TOO_MANY };
 
-  const taken = { ok: false as const, error: "Please check the form.", fieldErrors: { username: ["That username is taken — try another."] } };
+  const taken = { ok: false as const, error: "Please check the form.", fieldErrors: { username: ["That username is taken. Try another."] } };
   if (isReservedUsername(v.username)) return taken;
 
   const service = createServiceClient();

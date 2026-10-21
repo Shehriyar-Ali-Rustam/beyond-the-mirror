@@ -82,14 +82,14 @@ function Planner() {
   const minDate = new Date().toISOString().slice(0, 10);
 
   const text = plan
-    .map((d) => `${d.date.toDateString()}: ${d.exams.length ? `EXAM — ${d.exams.join(", ")}` : d.rest ? "Rest day" : d.blocks.join(" → ") || "Light review"}`)
+    .map((d) => `${d.date.toDateString()}: ${d.exams.length ? `EXAM: ${d.exams.join(", ")}` : d.rest ? "Rest day" : d.blocks.join(" → ") || "Light review"}`)
     .join("\n");
 
   return (
     <div className="space-y-6 py-6">
       <p className="text-[15px] leading-relaxed text-ink-2">
         A realistic plan beats a perfect one. Add your exams, be honest about how you feel about each subject, and
-        we&apos;ll spread your time out — with breaks and a rest day built in.
+        we&apos;ll spread your time out, with breaks and a rest day built in.
       </p>
       <div className="space-y-2">
         {subjects.map((s) => (
@@ -151,9 +151,9 @@ function Planner() {
                   {d.date.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}
                 </p>
                 {d.exams.length ? (
-                  <p className="mt-1 text-sm font-semibold text-clay">Exam: {d.exams.join(", ")} — you&apos;ve got this</p>
+                  <p className="mt-1 text-sm font-semibold text-clay">Exam: {d.exams.join(", ")}. You&apos;ve got this!</p>
                 ) : d.rest ? (
-                  <p className="mt-1 text-sm text-ink-2">Rest day. Genuinely rest — it helps memory.</p>
+                  <p className="mt-1 text-sm text-ink-2">Rest day. Genuinely rest, it helps memory.</p>
                 ) : (
                   <ul className="mt-1.5 space-y-1">
                     {d.blocks.map((b, i) => (
@@ -181,7 +181,7 @@ const SCRIPTS = [
   },
   {
     title: "When the marks are lower than expected",
-    text: "I got my results and they're lower than I hoped. I'm disappointed too. I've been thinking about what went wrong and I'd like to make a plan — can we talk about what support might help?",
+    text: "I got my results and they're lower than I hoped. I'm disappointed too. I've been thinking about what went wrong and I'd like to make a plan. Can we talk about what support might help?",
   },
   {
     title: "When the pressure feels like too much",
@@ -197,8 +197,8 @@ function FamilyScripts() {
   return (
     <div className="space-y-4 py-6">
       <p className="text-[15px] leading-relaxed text-ink-2">
-        Parents often react to marks out of worry, not anger. Starting the conversation yourself — calmly, at a good
-        time — usually goes better than waiting for them to ask.
+        Parents often react to marks out of worry, not anger. Starting the conversation yourself, calmly and at a good
+        time, usually goes better than waiting for them to ask.
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         {SCRIPTS.map((s) => (
@@ -212,7 +212,7 @@ function FamilyScripts() {
       <div className="rounded-2xl bg-surface-2 p-4 text-sm leading-relaxed text-ink-2">
         <p className="font-medium text-ink">Tips that help</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>Pick a calm moment — not right before school or during an argument.</li>
+          <li>Pick a calm moment, not right before school or during an argument.</li>
           <li>Lead with how you feel, then what you need.</li>
           <li>Bring a plan, even a small one. It shows you&apos;re taking it seriously.</li>
           <li>If it&apos;s hard to say, write it as a message or letter first.</li>
@@ -233,7 +233,7 @@ function CalmNow() {
           "One exam measures one day, not who you are or what you'll become.",
           "Feeling nervous means you care. A bit of stress can actually sharpen focus.",
           "You don't need to feel ready to start. Five minutes is enough to begin.",
-          "Sleep is part of revision — memories are stored while you sleep.",
+          "Sleep is part of revision. Memories are stored while you sleep.",
           "There's almost always another route: resits, other courses, other paths.",
         ].map((t) => (
           <p key={t} className="flex gap-3">

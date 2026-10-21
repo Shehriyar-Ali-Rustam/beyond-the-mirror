@@ -1,6 +1,6 @@
 -- skip-if: select to_regclass('public.profiles') is not null
 -- =============================================================================
--- Beyond the Mirror — core schema
+-- Beyond the Mirror: core schema
 --
 -- Security model (read this first):
 --   * Every table has Row Level Security enabled. The browser only ever holds

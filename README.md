@@ -28,7 +28,11 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Request tracking: *Sent → Seen → Replied → Resolved*, resolve/reopen, and feedback
 - Session booking from the counselor's open slots (in person / online / phone), cancellation, post-session rating
 - Live notifications (bell + toasts) for replies, bookings and status changes
-- Self-help toolkit (also public, no login): *Name the feeling, Untangle a thought, Bad-day reset, Exam stress kit (with revision planner), What should I say?, Friends/family/bullying guides, Letters you won't send*
+- **A Voice That Understands:** 20 to 60 second voice notes recorded by students for moments like *feeling lonely*, *before an exam*, *giving up on your day* or *feeling overwhelmed*, in English and Urdu. Record in the browser (or upload a file), stay anonymous if you like, and a counselor reviews every recording before anyone hears it. A "Play me something" button picks a random note
+- **Check in with yourself:** 10 questions on exam pressure, overthinking, concentration, sleep and feeling overwhelmed (*Never / Sometimes / Often / Almost always*), with practical ideas for each area (study timetable, breathing, breaks, sleep habits). Higher stress points to a counselor or trusted adult. Not a diagnosis, and nothing is saved
+- **The Little Reset Zone:** five mood-boosting games: *Smash the Stress*, *Spin the Fun Wheel*, *Mystery Box* (jokes, stickers, kind messages, mini challenges), *Doodle & Guess* (ready-made doodles plus a shared Doodle Wall) and *Guess the Emoji* (movies, foods, animals and phrases, three levels)
+- **The Mood Portal:** pick a mood colour and the whole site's background and animations change with you, with matching suggestions: a voice note, a game, breathing and a comforting message. Optionally describe the feeling in a few words (stays on the device)
+- Self-help toolkit (also public, no login): *Check in with yourself, Name the feeling, Untangle a thought, Bad-day reset, Exam stress kit (with revision planner), What should I say?, Friends/family/bullying guides, Letters you won't send*
 - Optional WhatsApp hand-off if the counselor publishes a number
 
 **Counselors**
@@ -39,6 +43,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Overview dashboard: awaiting reply, urgent queue, median first-response time, ratings, topic breakdown
 - Presence (Available / In a session / Away), profile, announcements
 - Community moderation: hide or delete posts and replies, see report counts
+- Voice note review queue (listen first, then approve or decline with a note to the student) and Doodle Wall moderation
 
 **Administrators**
 - Approve or decline counselor sign-ups, change roles, pause/restore access
@@ -63,12 +68,13 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 - **Server actions** re-verify the session and role, validate input with Zod, and call the database as the user (so RLS still applies).
 - **Anonymity by design.** Anonymous conversations store the owner in a private table the API can't reach; the conversation has no student, and the student's messages have no sender. Feedback on them can't be traced either.
 - **Community data is never exposed directly.** Posts, replies and reactions are only readable through functions that mask anonymous authors. Photos go to a private storage bucket after the server checks the real file type, and are shown through short-lived signed links. The browser re-draws each photo before upload, which shrinks it and strips hidden metadata such as GPS location.
+- **Voice notes and doodles** are stored in private buckets after the server checks the real file type, and are only reachable through functions that return approved notes, hide anonymous speakers' names, and never send a doodle's answer until it has been guessed. Each user can submit a limited number per day, and three reports hide a doodle automatically.
 - **Brute-force protection.** After 8 failed logins for a username (or 40 from one IP) in 15 minutes, logins are blocked for that window. Sign-ups are limited per IP. Attempts are stored in a table only the server can access.
 - **Rate limits** on messages and new requests; length limits on all text fields; safe redirects.
-- **Security headers:** a strict Content-Security-Policy (scripts only from this site; network only to your Supabase project), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy and a locked-down permissions policy.
+- **Security headers:** a strict Content-Security-Policy (scripts only from this site; network and media only from your Supabase project), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy and a locked-down permissions policy (the microphone is allowed only on this site, for recording voice notes).
 - **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords, never to read conversations, and never sent to the browser.
 
-`scripts/test-rls.mjs` contains **56 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, reserved usernames, double booking, pending accounts, …).
+`scripts/test-rls.mjs` contains **69 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, voice note review, Doodle Wall answers, reserved usernames, double booking, pending accounts, …).
 
 ---
 
@@ -121,7 +127,7 @@ In Vercel, open your project → **Storage** → **Create / Connect Database** �
 
 This adds the database variables automatically (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL_NON_POOLING`, …). The tables are created automatically: during the build, or, if the build can't reach the database, on the first visit to the login page. Database problems never fail a deploy.
 
-> **Using an existing Supabase project instead?** Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` yourself (Supabase → Project Settings → API). Then either add `DATABASE_URL` (Settings → Database → connection string) so builds apply migrations, or run both files in `supabase/migrations/` in order in the SQL Editor.
+> **Using an existing Supabase project instead?** Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` yourself (Supabase → Project Settings → API). Then either add `DATABASE_URL` (Settings → Database → connection string) so builds apply migrations, or run the files in `supabase/migrations/` in order in the SQL Editor.
 
 ### 2. Optional environment variables
 
@@ -165,8 +171,11 @@ src/lib/                   auth (DAL), supabase clients, validation, constants, 
 src/hooks/                 realtime subscriptions, form helpers
 src/components/ui/         Design-system primitives (button, input, dialog, badge, …)
 src/components/shared/     Chat thread, status badges, counselor card, stats
-src/components/toolkit/    The seven self-help tools
-src/app/(marketing)/       Landing page + public toolkit
+src/components/toolkit/    The eight self-help tools
+src/components/voices/     Voice notes: player, recorder, review queue
+src/components/play/       Reset Zone games and the Doodle Wall
+src/components/mood/       Mood Portal and the mood-coloured background
+src/app/(marketing)/       Landing page, public toolkit, games and Mood Portal
 src/app/(auth)/            Login, register, password reset
 src/app/student|counselor|admin/   Role-based portals
 ```

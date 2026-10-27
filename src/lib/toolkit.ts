@@ -1,6 +1,6 @@
-import { Feather, GraduationCap, HeartHandshake, MessageSquareQuote, Palette, Scale, Wind, type LucideIcon } from "lucide-react";
+import { ClipboardCheck, Feather, GraduationCap, HeartHandshake, MessageSquareQuote, Palette, Scale, Wind, type LucideIcon } from "lucide-react";
 
-export type ToolSlug = "feelings" | "untangle" | "reset" | "exams" | "say-it" | "situations" | "letters";
+export type ToolSlug = "check-in" | "feelings" | "untangle" | "reset" | "exams" | "say-it" | "situations" | "letters";
 
 export const TOOLS: {
   slug: ToolSlug;
@@ -12,6 +12,16 @@ export const TOOLS: {
   hue: number;
   tone: string;
 }[] = [
+  {
+    slug: "check-in",
+    title: "Check in with yourself",
+    tagline: "How have the last two weeks felt?",
+    description: "Ten quick questions about exam pressure, overthinking, focus, sleep and feeling overwhelmed, with practical ideas for each.",
+    minutes: "3 min",
+    icon: ClipboardCheck,
+    hue: 190,
+    tone: "bg-sky-soft text-sky",
+  },
   {
     slug: "feelings",
     title: "Name the feeling",
@@ -87,6 +97,7 @@ export const TOOLS: {
 export const toolBySlug = (slug: string) => TOOLS.find((t) => t.slug === slug);
 
 export const CHECK_INS: { label: string; tool: ToolSlug }[] = [
+  { label: "How stressed am I, really?", tool: "check-in" },
   { label: "I don't know what I'm feeling", tool: "feelings" },
   { label: "I can't stop overthinking", tool: "untangle" },
   { label: "Today is just too much", tool: "reset" },

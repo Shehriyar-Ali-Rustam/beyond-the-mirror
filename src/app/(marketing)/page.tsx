@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
+  AudioLines,
   BarChart3,
   Bell,
   CalendarDays,
@@ -11,6 +12,7 @@ import {
   ClipboardList,
   Eye,
   Flag,
+  Gamepad2,
   GraduationCap,
   HeartHandshake,
   Heart,
@@ -19,6 +21,7 @@ import {
   Lock,
   MessagesSquare,
   NotebookPen,
+  Palette,
   ShieldCheck,
   Sparkles,
   VenetianMask,
@@ -35,6 +38,8 @@ import { Reveal } from "@/components/marketing/reveal";
 import { CATEGORIES } from "@/lib/constants";
 import { STUDENT_FAQ } from "@/lib/content";
 import { TOOLS } from "@/lib/toolkit";
+import { GAMES } from "@/lib/games";
+import { MOODS } from "@/lib/moods";
 import { cn } from "@/lib/utils";
 
 const FAQ = [
@@ -333,7 +338,7 @@ export default function LandingPage() {
             <Reveal className="max-w-2xl">
               <p className="text-sm font-medium text-primary">The toolkit</p>
               <h2 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Help for the moments in between.</h2>
-              <p className="mt-4 text-[17px] leading-relaxed text-ink-2">Seven short activities anyone can use. No account needed. Nothing you type is stored.</p>
+              <p className="mt-4 text-[17px] leading-relaxed text-ink-2">Eight short activities anyone can use. No account needed. Nothing you type is stored.</p>
             </Reveal>
             <Reveal>
               <Button asChild variant="secondary">
@@ -345,7 +350,7 @@ export default function LandingPage() {
           </div>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {TOOLS.map((t, i) => (
-              <Reveal key={t.slug} delay={i * 0.05} className={cn(i === 0 && "lg:col-span-2 lg:row-span-2", i >= 5 && "lg:col-span-2")}>
+              <Reveal key={t.slug} delay={i * 0.05} className={cn(i === 0 && "lg:col-span-2 lg:row-span-2", i === 5 && "lg:col-span-2")}>
                 <Link
                   href={`/toolkit/${t.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg"
@@ -367,6 +372,77 @@ export default function LandingPage() {
                 </Link>
               </Reveal>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------ Feel-good corner */}
+      <section id="feel-good" className="scroll-mt-16 px-5 pb-20 sm:px-8 sm:pb-28">
+        <div className="mx-auto max-w-7xl">
+          <Reveal className="max-w-2xl">
+            <p className="text-sm font-medium text-primary">The feel-good corner</p>
+            <h2 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Small things that lift a heavy day.</h2>
+            <p className="mt-4 text-[17px] leading-relaxed text-ink-2">
+              Real voices from other students, quick games for a brain break, and a portal that changes colour with your mood.
+            </p>
+          </Reveal>
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            <Reveal className="relative flex flex-col overflow-hidden rounded-[2rem] bg-gradient-to-br from-lilac-soft via-sky-soft to-rose-soft p-7">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-surface text-lilac shadow-sm">
+                <AudioLines className="size-5" />
+              </span>
+              <h3 className="mt-5 font-display text-2xl text-ink">A Voice That Understands</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink-2">
+                20 to 60 second voice notes recorded by students, for when you feel lonely, before an exam, or when it&apos;s all too much.
+                In English and Urdu. Every recording is checked by a counselor first, and speakers can stay anonymous.
+              </p>
+              <Illustration name="podcast-listener" className="mx-auto mt-6 w-60" />
+              <Button asChild variant="secondary" className="mt-6 self-start">
+                <Link href="/login">
+                  Log in to listen <ArrowRight />
+                </Link>
+              </Button>
+            </Reveal>
+            <Reveal delay={0.08} className="relative flex flex-col overflow-hidden rounded-[2rem] bg-gradient-to-br from-sun-soft via-coral-soft to-rose-soft p-7">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-surface text-coral shadow-sm">
+                <Gamepad2 className="size-5" />
+              </span>
+              <h3 className="mt-5 font-display text-2xl text-ink">The Little Reset Zone</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink-2">Five mood-boosting games. Play now, no account needed.</p>
+              <ul className="mt-5 grid grid-cols-1 gap-2">
+                {GAMES.map((g) => (
+                  <li key={g.slug}>
+                    <Link href={`/play/${g.slug}`} className="group flex items-center gap-3 rounded-2xl bg-surface/80 px-3 py-2.5 text-sm font-medium text-ink transition hover:bg-surface hover:shadow-sm">
+                      <span className="text-xl transition group-hover:scale-125" aria-hidden>
+                        {g.emoji}
+                      </span>
+                      {g.title}
+                      <ArrowUpRight className="ml-auto size-4 text-ink-3 transition group-hover:text-ink" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+            <Reveal delay={0.16} className="relative flex flex-col overflow-hidden rounded-[2rem] bg-gradient-to-br from-mint-soft via-sky-soft to-lilac-soft p-7">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-surface text-rose shadow-sm">
+                <Palette className="size-5" />
+              </span>
+              <h3 className="mt-5 font-display text-2xl text-ink">The Mood Portal 🌀</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink-2">
+                Pick the colour of your mood and the whole site changes with you, with ideas that match: a voice note, a game, some
+                breathing or a kind message.
+              </p>
+              <div className="mb-8 mt-6 flex flex-wrap gap-2.5" aria-hidden>
+                {MOODS.map((m, i) => (
+                  <span key={m.id} className="size-10 animate-float rounded-full shadow-sm ring-2 ring-surface" style={{ background: m.color, animationDelay: `${i * 0.3}s` }} />
+                ))}
+              </div>
+              <Button asChild className="mt-auto self-start">
+                <Link href="/mood">
+                  Open the Mood Portal <ArrowRight />
+                </Link>
+              </Button>
+            </Reveal>
           </div>
         </div>
       </section>

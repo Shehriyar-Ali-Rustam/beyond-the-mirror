@@ -2,6 +2,7 @@
 
 import type { ToolSlug } from "@/lib/toolkit";
 import { ToolContextProvider, type ToolContext } from "./shared";
+import { CheckInTool } from "./check-in";
 import { FeelingsTool } from "./feelings";
 import { UntangleTool } from "./untangle";
 import { ResetTool } from "./reset";
@@ -11,6 +12,7 @@ import { SituationsTool } from "./situations";
 import { LettersTool } from "./letters";
 
 const COMPONENTS: Record<ToolSlug, () => React.ReactElement> = {
+  "check-in": CheckInTool,
   feelings: FeelingsTool,
   untangle: UntangleTool,
   reset: ResetTool,

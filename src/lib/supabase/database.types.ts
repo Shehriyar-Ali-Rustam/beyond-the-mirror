@@ -167,6 +167,78 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"doodle_guesses": {
+                  Row: {
+                    "attempts": number,"doodle_id": string,"revealed": boolean,"solved": boolean,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts"?: number,"doodle_id": string,"revealed"?: boolean,"solved"?: boolean,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "attempts"?: number,"doodle_id"?: string,"revealed"?: boolean,"solved"?: boolean,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "doodle_guesses_doodle_id_fkey"
+      columns: ["doodle_id"]
+isOneToOne: false
+      referencedRelation: "doodles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "doodle_guesses_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"doodle_reports": {
+                  Row: {
+                    "created_at": string,"doodle_id": string,"reporter_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"doodle_id": string,"reporter_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"doodle_id"?: string,"reporter_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "doodle_reports_doodle_id_fkey"
+      columns: ["doodle_id"]
+isOneToOne: false
+      referencedRelation: "doodles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "doodle_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"doodles": {
+                  Row: {
+                    "author_id": string,"created_at": string,"hidden": boolean,"id": string,"image_path": string,"word": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"image_path": string,"word": string
+                  }
+                  Update: {
+                    "author_id"?: string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"image_path"?: string,"word"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "doodles_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"feedback": {
                   Row: {
                     "appointment_id": string | null,"comment": string | null,"conversation_id": string | null,"counselor_id": string | null,"created_at": string,"id": string,"rating": number,"student_id": string
@@ -375,6 +447,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"voice_notes": {
+                  Row: {
+                    "audio_path": string,"author_id": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"is_anonymous": boolean,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count": number,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"speaker_name": string | null,"status": Database["public"]['Enums']["review_status"],"title": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audio_path": string,"author_id": string,"category": Database["public"]['Enums']["voice_category"],"created_at"?: string,"duration_seconds": number,"id"?: string,"is_anonymous"?: boolean,"language"?: Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count"?: number,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"speaker_name"?: string | null,"status"?: Database["public"]['Enums']["review_status"],"title": string
+                  }
+                  Update: {
+                    "audio_path"?: string,"author_id"?: string,"category"?: Database["public"]['Enums']["voice_category"],"created_at"?: string,"duration_seconds"?: number,"id"?: string,"is_anonymous"?: boolean,"language"?: Database["public"]['Enums']["voice_language"],"mime_type"?: string,"play_count"?: number,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"speaker_name"?: string | null,"status"?: Database["public"]['Enums']["review_status"],"title"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "voice_notes_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "voice_notes_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -415,8 +513,14 @@ isOneToOne: false
 "counselor_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"count_voice_play":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
 "create_admin_provision_token":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"create_doodle":
+{ Args: { "p_image_path": string,"p_word": string }; Returns: string
                            },
 "create_post":
 { Args: { "p_anonymous": boolean,"p_body": string,"p_image_path": string,"p_kind": Database["public"]['Enums']["post_kind"] }; Returns: string
@@ -427,8 +531,22 @@ isOneToOne: false
 "delete_comment":
 { Args: { "p_comment": string }; Returns: undefined
                            },
+"delete_doodle":
+{ Args: { "p_id": string }; Returns: string
+                           },
 "delete_post":
 { Args: { "p_post": string }; Returns: string
+                           },
+"delete_voice_note":
+{ Args: { "p_id": string }; Returns: string
+                           },
+"doodle_wall":
+{ Args: { "p_before"?: string,"p_limit"?: number }; Returns: {
+              "answer": string,"attempts": number,"author_name": string,"created_at": string,"hidden": boolean,"hint": string,"id": string,"image_path": string,"is_mine": boolean,"report_count": number,"revealed": boolean,"solved": boolean,"solvers": number
+            }[]
+                           },
+"guess_doodle":
+{ Args: { "p_guess": string,"p_id": string }; Returns: Json
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -448,11 +566,22 @@ isOneToOne: false
 "mark_conversation_read":
 { Args: { "p_conversation": string }; Returns: undefined
                            },
+"moderate_doodle":
+{ Args: { "p_hidden": boolean,"p_id": string }; Returns: undefined
+                           },
 "moderate_post":
 { Args: { "p_hidden": boolean,"p_post": string }; Returns: undefined
                            },
 "my_counselor_id":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"my_voice_notes":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "audio_path": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count": number,"review_note": string,"status": Database["public"]['Enums']["review_status"],"title": string
+            }[]
+                           },
+"normalize_guess":
+{ Args: { "t": string }; Returns: string
                            },
 "notify":
 { Args: { "p_body": string,"p_href": string,"p_kind": string,"p_title": string,"p_user": string }; Returns: undefined
@@ -473,24 +602,51 @@ isOneToOne: false
         isOneToOne: false
         isSetofReturn: true
       } },
+"random_voice_note":
+{ Args: { "p_category"?: Database["public"]['Enums']["voice_category"] }; Returns: {
+              "audio_path": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"is_mine": boolean,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count": number,"speaker": string,"title": string
+            }[]
+                           },
 "report_content":
 { Args: { "p_comment": string,"p_post": string,"p_reason": string }; Returns: undefined
+                           },
+"report_doodle":
+{ Args: { "p_id": string }; Returns: undefined
+                           },
+"reveal_doodle":
+{ Args: { "p_id": string }; Returns: string
                            },
 "reveal_identity":
 { Args: { "p_conversation": string }; Returns: undefined
                            },
+"review_voice_note":
+{ Args: { "p_approve": boolean,"p_id": string,"p_note": string }; Returns: undefined
+                           },
 "start_conversation":
 { Args: { "p_anonymous"?: boolean,"p_body": string,"p_category": Database["public"]['Enums']["request_category"],"p_subject": string,"p_urgency": Database["public"]['Enums']["request_urgency"] }; Returns: string
+                           },
+"submit_voice_note":
+{ Args: { "p_anonymous": boolean,"p_audio_path": string,"p_category": Database["public"]['Enums']["voice_category"],"p_duration": number,"p_language": Database["public"]['Enums']["voice_language"],"p_mime": string,"p_speaker_name": string,"p_title": string }; Returns: string
                            },
 "toggle_reaction":
 { Args: { "p_post": string }; Returns: boolean
                            },
 "update_appointment":
 { Args: { "p_appointment": string,"p_reason": string,"p_status": Database["public"]['Enums']["appointment_status"] }; Returns: undefined
+                           },
+"voice_library":
+{ Args: { "p_category"?: Database["public"]['Enums']["voice_category"],"p_language"?: Database["public"]['Enums']["voice_language"] }; Returns: {
+              "audio_path": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"is_mine": boolean,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count": number,"speaker": string,"title": string
+            }[]
+                           },
+"voice_review_queue":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "audio_path": string,"author_name": string,"author_username": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"is_anonymous": boolean,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"speaker_name": string,"title": string
+            }[]
                            }
           }
           Enums: {
-            "account_status": "active"|"pending"|"suspended","announcement_audience": "everyone"|"all_students"|"my_students"|"counselors","appointment_mode": "in_person"|"online"|"phone","appointment_status": "confirmed"|"completed"|"cancelled","counselor_presence": "available"|"busy"|"away","post_kind": "advice"|"share","request_category": "academic"|"exams"|"career"|"wellbeing"|"friendship"|"family"|"bullying"|"other","request_status": "pending"|"in_progress"|"resolved","request_urgency": "low"|"normal"|"high"|"urgent","user_role": "student"|"counselor"|"admin"
+            "account_status": "active"|"pending"|"suspended","announcement_audience": "everyone"|"all_students"|"my_students"|"counselors","appointment_mode": "in_person"|"online"|"phone","appointment_status": "confirmed"|"completed"|"cancelled","counselor_presence": "available"|"busy"|"away","post_kind": "advice"|"share","request_category": "academic"|"exams"|"career"|"wellbeing"|"friendship"|"family"|"bullying"|"other","request_status": "pending"|"in_progress"|"resolved","request_urgency": "low"|"normal"|"high"|"urgent","review_status": "pending"|"approved"|"rejected","user_role": "student"|"counselor"|"admin","voice_category": "lonely"|"exam"|"giving_up"|"overwhelmed"|"hope"|"self_worth","voice_language": "en"|"ur"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -610,7 +766,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "account_status": ["active", "pending", "suspended"],"announcement_audience": ["everyone", "all_students", "my_students", "counselors"],"appointment_mode": ["in_person", "online", "phone"],"appointment_status": ["confirmed", "completed", "cancelled"],"counselor_presence": ["available", "busy", "away"],"post_kind": ["advice", "share"],"request_category": ["academic", "exams", "career", "wellbeing", "friendship", "family", "bullying", "other"],"request_status": ["pending", "in_progress", "resolved"],"request_urgency": ["low", "normal", "high", "urgent"],"user_role": ["student", "counselor", "admin"]
+            "account_status": ["active", "pending", "suspended"],"announcement_audience": ["everyone", "all_students", "my_students", "counselors"],"appointment_mode": ["in_person", "online", "phone"],"appointment_status": ["confirmed", "completed", "cancelled"],"counselor_presence": ["available", "busy", "away"],"post_kind": ["advice", "share"],"request_category": ["academic", "exams", "career", "wellbeing", "friendship", "family", "bullying", "other"],"request_status": ["pending", "in_progress", "resolved"],"request_urgency": ["low", "normal", "high", "urgent"],"review_status": ["pending", "approved", "rejected"],"user_role": ["student", "counselor", "admin"],"voice_category": ["lonely", "exam", "giving_up", "overwhelmed", "hope", "self_worth"],"voice_language": ["en", "ur"]
           }
         }
 } as const

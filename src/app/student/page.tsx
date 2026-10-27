@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, CalendarDays, MapPin, MessageSquarePlus, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, AudioLines, CalendarDays, ClipboardCheck, Gamepad2, MapPin, MessageSquarePlus, Palette, Sparkles } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getCounselor, isUnreadFor, sentLastBy } from "@/lib/queries";
@@ -18,6 +18,7 @@ import { ConversationRow } from "@/components/shared/conversation-row";
 import { AnnouncementList } from "@/components/shared/announcement-list";
 import { SafetyNote } from "@/components/shared/safety-note";
 import { ArchPhoto } from "@/components/visual/arch-photo";
+import { Illustration } from "@/components/visual/illustration";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -205,6 +206,19 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
             All tools
           </Link>
         </div>
+        <Link
+          href="/student/toolkit/check-in"
+          className="group mt-5 flex items-center gap-4 rounded-2xl bg-gradient-to-r from-sky-soft via-mint-soft to-sun-soft p-4 transition hover:shadow-md"
+        >
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-surface text-sky shadow-sm">
+            <ClipboardCheck className="size-6" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-medium text-ink">Take the 3 minute check-in</span>
+            <span className="block text-sm text-ink-2">10 questions on exams, overthinking, focus, sleep and stress, with ideas that fit your answers.</span>
+          </span>
+          <ArrowRight className="size-5 shrink-0 text-ink-2 transition group-hover:translate-x-1" />
+        </Link>
         <div className="mt-5 flex flex-wrap gap-2">
           {CHECK_INS.map((c) => {
             const tool = TOOLS.find((t) => t.slug === c.tool)!;
@@ -223,6 +237,51 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
             );
           })}
         </div>
+      </section>
+
+      <section className="mt-5 grid gap-4 md:grid-cols-3" aria-label="Feel-good corner">
+        {[
+          {
+            href: "/student/voices",
+            title: "A Voice That Understands",
+            body: "Short voice notes from other students for the heavy moments. Or record your own.",
+            icon: AudioLines,
+            art: "podcast-listener" as const,
+            tone: "from-lilac-soft to-sky-soft",
+            chip: "bg-lilac-soft text-lilac",
+          },
+          {
+            href: "/student/play",
+            title: "The Little Reset Zone",
+            body: "Five quick games for a brain break: smash stress, spin the wheel, doodle and more.",
+            icon: Gamepad2,
+            art: "gaming" as const,
+            tone: "from-sun-soft to-coral-soft",
+            chip: "bg-sun-soft text-[#a26a00]",
+          },
+          {
+            href: "/student/mood",
+            title: "The Mood Portal",
+            body: "Pick a colour for your mood. The site changes with you and suggests what might help.",
+            icon: Palette,
+            art: "choose-color" as const,
+            tone: "from-rose-soft to-mint-soft",
+            chip: "bg-rose-soft text-rose",
+          },
+        ].map((c) => (
+          <Link
+            key={c.href}
+            href={c.href}
+            className={`group relative flex flex-col overflow-hidden rounded-3xl bg-gradient-to-br p-5 transition hover:-translate-y-1 hover:shadow-md ${c.tone}`}
+          >
+            <span className={`flex size-10 items-center justify-center rounded-xl ${c.chip}`}>
+              <c.icon className="size-5" />
+            </span>
+            <p className="mt-4 font-display text-lg text-ink">{c.title}</p>
+            <p className="mt-1 flex-1 text-sm leading-relaxed text-ink-2">{c.body}</p>
+            <Illustration name={c.art} className="mt-4 h-24 w-auto self-end transition-transform duration-500 group-hover:-translate-y-1" />
+          </Link>
+        ))}
       </section>
 
       <Link

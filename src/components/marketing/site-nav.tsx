@@ -7,13 +7,15 @@ import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MoodButton } from "@/components/mood/mood-button";
 
 const LINKS = [
   { href: "/#how", label: "How it works" },
   { href: "/#portals", label: "For counselors" },
   { href: "/#community", label: "Community" },
   { href: "/toolkit", label: "Toolkit" },
-  { href: "/#privacy", label: "Privacy" },
+  { href: "/play", label: "Reset Zone" },
+  { href: "/mood", label: "Mood Portal" },
 ];
 
 export function SiteNav({ signedInHref }: { signedInHref: string | null }) {
@@ -30,7 +32,7 @@ export function SiteNav({ signedInHref }: { signedInHref: string | null }) {
     <header className={cn("sticky top-0 z-40 transition-all duration-300", scrolled ? "border-b border-line bg-bg/85 backdrop-blur-md" : "border-b border-transparent")}>
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-5 sm:px-8">
         <Logo />
-        <nav aria-label="Primary" className="hidden flex-1 items-center justify-center gap-1 md:flex">
+        <nav aria-label="Primary" className="hidden flex-1 items-center justify-center gap-1 lg:flex">
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="rounded-full px-3.5 py-2 text-sm text-ink-2 transition hover:bg-surface-2 hover:text-ink">
               {l.label}
@@ -38,6 +40,7 @@ export function SiteNav({ signedInHref }: { signedInHref: string | null }) {
           ))}
         </nav>
         <div className="ml-auto hidden items-center gap-2 md:flex">
+          <MoodButton portalHref="/mood" />
           {signedInHref ? (
             <Button asChild>
               <Link href={signedInHref}>Open dashboard</Link>
@@ -54,12 +57,15 @@ export function SiteNav({ signedInHref }: { signedInHref: string | null }) {
           )}
         </div>
         <Dialog.Root open={open} onOpenChange={setOpen}>
-          <Dialog.Trigger className="ml-auto rounded-xl p-2 text-ink-2 hover:bg-surface-2 md:hidden" aria-label="Open menu">
+          <div className="ml-auto md:hidden">
+            <MoodButton portalHref="/mood" />
+          </div>
+          <Dialog.Trigger className="rounded-xl p-2 text-ink-2 hover:bg-surface-2 lg:hidden" aria-label="Open menu">
             <Menu className="size-5" />
           </Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-50 bg-[rgb(15_20_22/0.4)] data-[state=open]:animate-fade-in md:hidden" />
-            <Dialog.Content className="fixed inset-x-3 top-3 z-50 rounded-3xl border border-line bg-surface p-5 shadow-lg data-[state=open]:animate-fade-up md:hidden">
+            <Dialog.Overlay className="fixed inset-0 z-50 bg-[rgb(15_20_22/0.4)] data-[state=open]:animate-fade-in lg:hidden" />
+            <Dialog.Content className="fixed inset-x-3 top-3 z-50 rounded-3xl border border-line bg-surface p-5 shadow-lg data-[state=open]:animate-fade-up lg:hidden">
               <Dialog.Title className="sr-only">Menu</Dialog.Title>
               <Dialog.Description className="sr-only">Site navigation</Dialog.Description>
               <div className="mb-4 flex items-center justify-between">

@@ -5,6 +5,7 @@ import { MobileNav } from "./mobile-nav";
 import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
 import { TimezoneSync } from "./timezone-sync";
+import { MoodButton } from "@/components/mood/mood-button";
 
 export function AppShell({
   viewer,
@@ -35,6 +36,7 @@ export function AppShell({
             <Logo href={`/${viewer.role}`} compact />
           </div>
           <div className="ml-auto flex items-center gap-1.5">
+            <MoodButton portalHref={viewer.role === "student" ? "/student/mood" : "/mood"} />
             <NotificationBell userId={viewer.id} initialUnread={unreadNotifications} />
             <UserMenu name={viewer.full_name} username={viewer.username} hue={viewer.avatar_hue} role={viewer.role} />
           </div>

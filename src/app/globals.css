@@ -243,3 +243,89 @@
   background: color-mix(in oklab, hsl(var(--h) 50% 58%) 20%, var(--surface));
   color: color-mix(in oklab, hsl(var(--h) 55% 30%) 88%, var(--ink));
 }
+
+/* -----------------------------------------------------------------------------
+   Mood Portal: the chosen mood colours the whole site (set on <html>).
+----------------------------------------------------------------------------- */
+html[data-mood] body {
+  background: linear-gradient(160deg, var(--mood-1), var(--mood-2) 55%, var(--mood-3));
+  background-attachment: fixed;
+}
+.mood-ambient {
+  animation: fade-in 1.2s ease-out both;
+}
+.mood-blob {
+  position: absolute;
+  width: 55vmax;
+  height: 55vmax;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  animation: mood-blob 28s ease-in-out infinite alternate;
+}
+.mood-particle {
+  position: absolute;
+  top: 0;
+  will-change: transform, opacity;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes mood-blob {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(6vw, 4vh) scale(1.1); }
+  100% { transform: translate(-4vw, 8vh) scale(0.95); }
+}
+@keyframes amb-rise {
+  0% { transform: translate(0, 105vh) rotate(0deg); opacity: 0; }
+  12%, 88% { opacity: 0.6; }
+  100% { transform: translate(4vw, -10vh) rotate(25deg); opacity: 0; }
+}
+@keyframes amb-fall {
+  0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
+  12%, 88% { opacity: 0.6; }
+  50% { transform: translate(3vw, 50vh) rotate(120deg); }
+  100% { transform: translate(-2vw, 110vh) rotate(260deg); opacity: 0; }
+}
+@keyframes amb-rain {
+  from { transform: translate(0, -15vh); }
+  to { transform: translate(-6vw, 110vh); }
+}
+@keyframes amb-twinkle {
+  0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0.1; }
+  50% { transform: scale(1) rotate(45deg); opacity: 0.75; }
+}
+@keyframes amb-orbit {
+  from { transform: rotate(0deg) translateX(8vmin) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(8vmin) rotate(-360deg); }
+}
+@keyframes amb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+  50% { transform: translate(4vw, -6vh) scale(1.2); opacity: 0.45; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mood-particle { display: none; }
+}
+
+/* -----------------------------------------------------------------------------
+   Reset Zone games
+----------------------------------------------------------------------------- */
+@keyframes pop-out {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes float-up {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-36px); opacity: 0; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+@keyframes bar-bounce {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.55); }
+}

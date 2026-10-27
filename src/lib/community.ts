@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceClient, hasServiceKey } from "@/lib/supabase/service";
+import { removePrivate, signPrivate, uploadPrivate } from "@/lib/storage";
 import type { Database } from "@/lib/supabase/database.types";
 
 export const COMMUNITY_BUCKET = "community";
@@ -13,12 +13,8 @@ export type Post = Omit<FeedRow, "reaction_count" | "comment_count" | "report_co
   image_url: string | null;
 };
 
-/** Signed, short-lived URLs for private community photos. */
 export async function signImages(paths: string[]) {
-  const unique = [...new Set(paths)];
-  if (!unique.length || !hasServiceKey()) return new Map<string, string>();
-  const { data } = await createServiceClient().storage.from(COMMUNITY_BUCKET).createSignedUrls(unique, 60 * 60);
-  return new Map((data ?? []).filter((d) => d.signedUrl && d.path).map((d) => [d.path!, d.signedUrl]));
+  return signPrivate(COMMUNITY_BUCKET, paths);
 }
 
 /** One page of the feed, as the current user is allowed to see it. */
@@ -57,28 +53,12 @@ export async function inspectImage(file: File) {
   return { ok: true as const, bytes, type: match.type, ext: match.ext };
 }
 
-export async function uploadImage(bytes: Uint8Array, type: string, ext: string) {
-  const service = createServiceClient();
-  const path = `posts/${crypto.randomUUID()}.${ext}`;
-  const put = () => service.storage.from(COMMUNITY_BUCKET).upload(path, bytes, { contentType: type, upsert: false });
-  let { error } = await put();
-  if (error && /bucket not found/i.test(error.message)) {
-    // First upload on a fresh project: create the private bucket, then retry.
-    await service.storage.createBucket(COMMUNITY_BUCKET, {
-      public: false,
-      fileSizeLimit: 5 * 1024 * 1024,
-      allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"],
-    });
-    ({ error } = await put());
-  }
-  if (error) {
-    console.error("[community] upload failed:", error.message);
-    return null;
-  }
-  return path;
+const IMAGE_BUCKET_OPTIONS = { fileSizeLimit: 5 * 1024 * 1024, allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"] };
+
+export async function uploadImage(bytes: Uint8Array, type: string, ext: string, folder: "posts" | "doodles" = "posts") {
+  return uploadPrivate(COMMUNITY_BUCKET, `${folder}/${crypto.randomUUID()}.${ext}`, bytes, type, IMAGE_BUCKET_OPTIONS);
 }
 
 export async function removeImage(path: string | null | undefined) {
-  if (!path || !hasServiceKey()) return;
-  await createServiceClient().storage.from(COMMUNITY_BUCKET).remove([path]);
+  return removePrivate(COMMUNITY_BUCKET, path);
 }

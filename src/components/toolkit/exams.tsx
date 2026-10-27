@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/input";
@@ -248,6 +248,11 @@ function CalmNow() {
 
 export function ExamsTool() {
   const [tab, setTab] = useState<"calm" | "plan" | "family">("calm");
+  // Other tools link straight to the planner with #plan.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the hash is only readable after mount
+    if (window.location.hash === "#plan") setTab("plan");
+  }, []);
   return (
     <div className="space-y-6">
       <Tabs

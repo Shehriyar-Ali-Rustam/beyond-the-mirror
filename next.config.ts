@@ -15,6 +15,7 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${supabaseOrigins()[0]}`,
+  `media-src 'self' blob: ${supabaseOrigins()[0]}`,
   "font-src 'self' data:",
   `connect-src 'self' ${supabaseOrigins().join(" ")}`,
   "frame-ancestors 'none'",
@@ -28,14 +29,15 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  // The microphone is only used on this site, for recording voice notes.
+  { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: {
-    // Community photos are compressed in the browser first; this leaves headroom.
+    // Community photos are compressed in the browser and voice notes are capped at 3.5 MB.
     serverActions: { bodySizeLimit: "4mb" },
   },
   turbopack: {

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Instrument_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { MOOD_BOOT_SCRIPT } from "@/lib/moods";
 import "./globals.css";
 
 const display = Fraunces({
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} h-full antialiased`}>
       <body className="min-h-full">
+        <script dangerouslySetInnerHTML={{ __html: MOOD_BOOT_SCRIPT }} />
         <Providers>{children}</Providers>
       </body>
     </html>

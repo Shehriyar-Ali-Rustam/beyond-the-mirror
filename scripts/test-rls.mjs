@@ -58,6 +58,7 @@ if (!process.env.ADMIN_PASSWORD) {
 
 const zara = await as("zara");
 const omar = await as("omar");
+const lina = await as("lina");
 const amira = await as("amira");
 const daniel = await as("daniel");
 const admin = await as(adminUsername);
@@ -355,6 +356,83 @@ await test("staff can remove a post", async () => {
 });
 await test("anonymous visitors can't read the community", async () => {
   assert.ok((await anon.rpc("community_feed", {})).error);
+});
+
+console.log("\nVoice notes");
+const fakePath = () => `voices/${crypto.randomUUID()}.webm`;
+let voiceId;
+await test("anyone signed in can submit a voice note; it starts pending", async () => {
+  const { data, error } = await zara.c.rpc("submit_voice_note", { p_category: "exam", p_language: "en", p_title: "You've got this", p_speaker_name: "Zara", p_anonymous: true, p_audio_path: fakePath(), p_mime: "audio/webm", p_duration: 30 });
+  assert.ifError(error);
+  voiceId = data;
+  const { data: mine } = await zara.c.rpc("my_voice_notes");
+  assert.equal(mine.find((v) => v.id === voiceId).status, "pending");
+});
+await test("pending voice notes are not in the library", async () => {
+  const { data } = await omar.c.rpc("voice_library", {});
+  assert.ok(!data.some((v) => v.id === voiceId));
+});
+await test("students can't review or see the review queue", async () => {
+  assert.ok((await omar.c.rpc("voice_review_queue")).error);
+  assert.ok((await omar.c.rpc("review_voice_note", { p_id: voiceId, p_approve: true, p_note: "" })).error);
+});
+await test("staff review: approved notes appear, anonymous speakers stay unnamed", async () => {
+  const { data: queue } = await amira.c.rpc("voice_review_queue");
+  assert.ok(queue.some((v) => v.id === voiceId && v.author_name));
+  assert.ifError((await amira.c.rpc("review_voice_note", { p_id: voiceId, p_approve: true, p_note: "" })).error);
+  const { data } = await omar.c.rpc("voice_library", { p_category: "exam" });
+  const v = data.find((x) => x.id === voiceId);
+  assert.ok(v && v.speaker === null && !("author_id" in v));
+});
+await test("voice note tables are not readable directly", async () => {
+  assert.equal(((await omar.c.from("voice_notes").select("id")).data ?? []).length, 0);
+  assert.ok((await omar.c.from("voice_notes").insert({ author_id: omar.id, title: "x", category: "exam", audio_path: fakePath(), mime_type: "audio/webm", duration_seconds: 30, status: "approved" })).error);
+});
+await test("only the author or staff can delete a voice note", async () => {
+  assert.ok((await omar.c.rpc("delete_voice_note", { p_id: voiceId })).error);
+  assert.ifError((await zara.c.rpc("delete_voice_note", { p_id: voiceId })).error);
+});
+await test("anonymous visitors can't list voice notes", async () => {
+  assert.ok((await anon.rpc("voice_library", {})).error);
+});
+
+console.log("\nDoodle Wall");
+let doodleId;
+await test("a student can post a doodle; others don't receive the answer", async () => {
+  const { data, error } = await zara.c.rpc("create_doodle", { p_word: "Umbrella", p_image_path: `doodles/${crypto.randomUUID()}.png` });
+  assert.ifError(error);
+  doodleId = data;
+  const d = (await omar.c.rpc("doodle_wall", {})).data.find((x) => x.id === doodleId);
+  assert.ok(d && d.answer === null && d.hint === "________" && d.author_name === null);
+});
+await test("wrong guesses don't reveal the answer until the third try", async () => {
+  const r1 = (await omar.c.rpc("guess_doodle", { p_id: doodleId, p_guess: "rain" })).data;
+  assert.ok(r1.correct === false && r1.answer === null);
+  await omar.c.rpc("guess_doodle", { p_id: doodleId, p_guess: "cloud" });
+  const r3 = (await omar.c.rpc("guess_doodle", { p_id: doodleId, p_guess: "storm" })).data;
+  assert.equal(r3.answer, "umbrella");
+  const late = (await omar.c.rpc("guess_doodle", { p_id: doodleId, p_guess: "umbrella" })).data;
+  assert.equal(late.correct, false, "no points after the answer was revealed");
+});
+await test("correct guesses are recognised (case, spaces and plurals)", async () => {
+  const r = (await lina.c.rpc("guess_doodle", { p_id: doodleId, p_guess: "  UMBRELLAS " })).data;
+  assert.equal(r.correct, true);
+});
+await test("authors can't guess their own doodle", async () => {
+  assert.ok((await zara.c.rpc("guess_doodle", { p_id: doodleId, p_guess: "umbrella" })).error);
+});
+await test("doodle tables are not readable directly", async () => {
+  assert.equal(((await omar.c.from("doodles").select("word")).data ?? []).length, 0);
+});
+await test("three reports hide a doodle from students", async () => {
+  const extra = await provision(`dreporter${Date.now() % 100000}`, { full_name: "Reporter" });
+  await omar.c.rpc("report_doodle", { p_id: doodleId });
+  await lina.c.rpc("report_doodle", { p_id: doodleId });
+  await extra.c.rpc("report_doodle", { p_id: doodleId });
+  assert.ok(!(await omar.c.rpc("doodle_wall", {})).data.some((x) => x.id === doodleId));
+  assert.ok((await amira.c.rpc("doodle_wall", {})).data.some((x) => x.id === doodleId));
+  await service.auth.admin.deleteUser(extra.id);
+  assert.ifError((await amira.c.rpc("delete_doodle", { p_id: doodleId })).error);
 });
 
 console.log("\nPending counselor sign-ups");

@@ -23,6 +23,7 @@ import reading from "@/assets/photos/reading.jpg";
  * description so screen-reader users get the same context.
  */
 export const PHOTOS = {
+  "check-in": { src: sunrisePerson, alt: "A person watching the sun rise over the hills" },
   feelings: { src: feelings, alt: "A palette of bright watercolour paints" },
   untangle: { src: untangle, alt: "Someone writing in a notebook next to a cup of coffee" },
   reset: { src: reset, alt: "Soft morning light over layers of misty mountains" },

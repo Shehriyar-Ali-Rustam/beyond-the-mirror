@@ -4,6 +4,8 @@
 
 Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Postgres, Auth, Realtime)** and deployable to **Vercel**.
 
+> New to the project? Start with **[UNDERSTANDING.md](UNDERSTANDING.md)**, a plain-English overview of what the site does and how it's built.
+
 ![Landing page](docs/screenshots/landing.png)
 
 | Student home | Counselor inbox |

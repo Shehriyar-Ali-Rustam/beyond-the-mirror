@@ -28,26 +28,15 @@ export async function adminUpdateUser(input: { userId: string; role?: string; st
   return { ok: true };
 }
 
-export async function adminAssignCounselor(input: {
-  studentId: string;
-  counselorId: string | null;
-  moveOpen?: boolean;
-}): Promise<ActionResult> {
+/** Marks a counselor's professional details as checked, so students can be matched with them. */
+export async function adminVerifyCounselor(counselorId: string): Promise<ActionResult> {
   await assertRole("admin");
-  const parsed = z
-    .object({ studentId: uuid, counselorId: uuid.nullable(), moveOpen: z.boolean().default(true) })
-    .safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Invalid request." };
-
+  if (!uuid.safeParse(counselorId).success) return { ok: false, error: "Invalid request." };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("admin_assign_counselor", {
-    p_student: parsed.data.studentId,
-    p_counselor: parsed.data.counselorId as string,
-    p_move_open: parsed.data.moveOpen,
-  });
+  const { error } = await supabase.rpc("admin_verify_counselor", { p_counselor: counselorId });
   if (error) return { ok: false, error: friendlyError(error) };
   revalidatePath("/admin", "layout");
-  return { ok: true };
+  return { ok: true, message: "Verified. Students can now be matched with them." };
 }
 
 const WORDS = [

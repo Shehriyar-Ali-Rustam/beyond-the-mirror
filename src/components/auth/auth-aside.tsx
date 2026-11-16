@@ -13,7 +13,7 @@ export function AuthAside() {
   return (
     <aside className="relative hidden overflow-hidden lg:flex lg:items-center lg:justify-center" aria-hidden>
       <Image src={PHOTOS.reset.src} alt="" fill priority sizes="45vw" placeholder="blur" className="object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#123c37] via-[#1d5b51]/75 to-[#1d5b51]/25" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#2e1a3d] via-[#6b4386]/75 to-[#6b4386]/25" />
       <FloatingShapes variant="dark" className="absolute inset-0 h-full w-full opacity-70" />
       <div className="relative flex flex-col items-center px-12">
         <div className="relative h-[420px] w-[300px]">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 import { ToolGrid } from "@/components/toolkit/toolkit-views";
 import { PageHero } from "@/components/visual/page-hero";
+import { WellbeingHub } from "@/components/wellbeing/hub";
 
 export const metadata: Metadata = {
   title: "Self-help toolkit",
@@ -22,6 +23,8 @@ export default function PublicToolkit() {
           <ShieldCheck className="size-4" /> Nothing you type here is saved or sent anywhere.
         </p>
       </PageHero>
+      <WellbeingHub base="/toolkit" signedIn={false} />
+      <h2 className="mb-4 font-display text-2xl text-ink">Quick tools, no account needed</h2>
       <ToolGrid base="/toolkit" />
     </div>
   );

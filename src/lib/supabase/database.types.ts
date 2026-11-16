@@ -23,7 +23,47 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "announcements": {
+            "academic_reviews": {
+                  Row: {
+                    "created_at": string,"difficult": string | null,"id": string,"improve": string | null,"kind": string,"level": number | null,"note": string | null,"pressures": (string)[],"user_id": string,"week_start": string,"went_well": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"difficult"?: string | null,"id"?: string,"improve"?: string | null,"kind": string,"level"?: number | null,"note"?: string | null,"pressures"?: (string)[],"user_id"?: string,"week_start": string,"went_well"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"difficult"?: string | null,"id"?: string,"improve"?: string | null,"kind"?: string,"level"?: number | null,"note"?: string | null,"pressures"?: (string)[],"user_id"?: string,"week_start"?: string,"went_well"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "academic_reviews_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"academic_tasks": {
+                  Row: {
+                    "created_at": string,"done_at": string | null,"due_on": string,"est_hours": number,"id": string,"importance": number,"kind": string,"progress": number,"steps": NonNullable<Json>,"subject": string | null,"title": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"done_at"?: string | null,"due_on": string,"est_hours"?: number,"id"?: string,"importance"?: number,"kind"?: string,"progress"?: number,"steps"?: NonNullable<Json>,"subject"?: string | null,"title": string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"done_at"?: string | null,"due_on"?: string,"est_hours"?: number,"id"?: string,"importance"?: number,"kind"?: string,"progress"?: number,"steps"?: NonNullable<Json>,"subject"?: string | null,"title"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "academic_tasks_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"announcements": {
                   Row: {
                     "audience": Database["public"]['Enums']["announcement_audience"],"author_id": string,"body": string,"created_at": string,"id": string,"pinned": boolean,"title": string
                   }
@@ -115,6 +155,46 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"behaviour_goals": {
+                  Row: {
+                    "behaviour": string,"created_at": string,"id": string,"status": string,"target": string | null,"title": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "behaviour": string,"created_at"?: string,"id"?: string,"status"?: string,"target"?: string | null,"title": string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "behaviour"?: string,"created_at"?: string,"id"?: string,"status"?: string,"target"?: string | null,"title"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "behaviour_goals_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"behaviour_logs": {
+                  Row: {
+                    "after_effect": string | null,"before_context": string | null,"behaviour": string,"created_at": string,"feeling": string | null,"hours": number | null,"id": string,"impact": number | null,"label": string | null,"logged_on": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "after_effect"?: string | null,"before_context"?: string | null,"behaviour": string,"created_at"?: string,"feeling"?: string | null,"hours"?: number | null,"id"?: string,"impact"?: number | null,"label"?: string | null,"logged_on"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "after_effect"?: string | null,"before_context"?: string | null,"behaviour"?: string,"created_at"?: string,"feeling"?: string | null,"hours"?: number | null,"id"?: string,"impact"?: number | null,"label"?: string | null,"logged_on"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "behaviour_logs_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"case_notes": {
                   Row: {
                     "author_id": string,"body": string,"created_at": string,"id": string,"student_id": string
@@ -162,6 +242,78 @@ isOneToOne: false
     },{
       foreignKeyName: "conversations_student_id_fkey"
       columns: ["student_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"counselor_credentials": {
+                  Row: {
+                    "counselor_id": string,"created_at": string,"email": string,"experience_years": number,"expertise": (string)[],"phone": string,"qualifications": string,"updated_at": string,"verified_at": string | null,"verified_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "counselor_id": string,"created_at"?: string,"email": string,"experience_years": number,"expertise": (string)[],"phone": string,"qualifications": string,"updated_at"?: string,"verified_at"?: string | null,"verified_by"?: string | null
+                  }
+                  Update: {
+                    "counselor_id"?: string,"created_at"?: string,"email"?: string,"experience_years"?: number,"expertise"?: (string)[],"phone"?: string,"qualifications"?: string,"updated_at"?: string,"verified_at"?: string | null,"verified_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "counselor_credentials_counselor_id_fkey"
+      columns: ["counselor_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "counselor_credentials_verified_by_fkey"
+      columns: ["verified_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"counselor_matches": {
+                  Row: {
+                    "concern": string,"counselor_id": string | null,"created_at": string,"id": string,"kept_current": boolean,"score": number,"student_id": string,"tags": (string)[]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "concern": string,"counselor_id"?: string | null,"created_at"?: string,"id"?: string,"kept_current"?: boolean,"score": number,"student_id": string,"tags"?: (string)[]
+                  }
+                  Update: {
+                    "concern"?: string,"counselor_id"?: string | null,"created_at"?: string,"id"?: string,"kept_current"?: boolean,"score"?: number,"student_id"?: string,"tags"?: (string)[]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "counselor_matches_counselor_id_fkey"
+      columns: ["counselor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "counselor_matches_student_id_fkey"
+      columns: ["student_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"decisions": {
+                  Row: {
+                    "area": string,"chosen": string | null,"created_at": string,"id": string,"next_step": string | null,"options": NonNullable<Json>,"priorities": NonNullable<Json>,"reflection": string | null,"situation": string | null,"status": string,"title": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "area"?: string,"chosen"?: string | null,"created_at"?: string,"id"?: string,"next_step"?: string | null,"options"?: NonNullable<Json>,"priorities"?: NonNullable<Json>,"reflection"?: string | null,"situation"?: string | null,"status"?: string,"title": string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "area"?: string,"chosen"?: string | null,"created_at"?: string,"id"?: string,"next_step"?: string | null,"options"?: NonNullable<Json>,"priorities"?: NonNullable<Json>,"reflection"?: string | null,"situation"?: string | null,"status"?: string,"title"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "decisions_user_id_fkey"
+      columns: ["user_id"]
 isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
@@ -272,6 +424,124 @@ isOneToOne: false
     },{
       foreignKeyName: "feedback_student_id_fkey"
       columns: ["student_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"game_saves": {
+                  Row: {
+                    "data": NonNullable<Json>,"game": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "data": NonNullable<Json>,"game": string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "data"?: NonNullable<Json>,"game"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_saves_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"gratitude_comments": {
+                  Row: {
+                    "author_id": string,"body": string,"created_at": string,"hidden": boolean,"id": string,"is_anonymous": boolean,"post_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"body": string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"is_anonymous"?: boolean,"post_id": string
+                  }
+                  Update: {
+                    "author_id"?: string,"body"?: string,"created_at"?: string,"hidden"?: boolean,"id"?: string,"is_anonymous"?: boolean,"post_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "gratitude_comments_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "gratitude_comments_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "gratitude_posts"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"gratitude_posts": {
+                  Row: {
+                    "allow_comments": boolean,"author_id": string,"body": string,"category": Database["public"]['Enums']["gratitude_category"],"created_at": string,"held_reason": string | null,"id": string,"is_anonymous": boolean,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "allow_comments"?: boolean,"author_id": string,"body": string,"category": Database["public"]['Enums']["gratitude_category"],"created_at"?: string,"held_reason"?: string | null,"id"?: string,"is_anonymous"?: boolean,"status"?: string
+                  }
+                  Update: {
+                    "allow_comments"?: boolean,"author_id"?: string,"body"?: string,"category"?: Database["public"]['Enums']["gratitude_category"],"created_at"?: string,"held_reason"?: string | null,"id"?: string,"is_anonymous"?: boolean,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "gratitude_posts_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"gratitude_reactions": {
+                  Row: {
+                    "created_at": string,"kind": string,"post_id": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"kind": string,"post_id": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"kind"?: string,"post_id"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "gratitude_reactions_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "gratitude_posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "gratitude_reactions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"gratitude_reports": {
+                  Row: {
+                    "created_at": string,"post_id": string,"reason": string | null,"reporter_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"post_id": string,"reason"?: string | null,"reporter_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"post_id"?: string,"reason"?: string | null,"reporter_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "gratitude_reports_post_id_fkey"
+      columns: ["post_id"]
+isOneToOne: false
+      referencedRelation: "gratitude_posts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "gratitude_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
 isOneToOne: false
       referencedRelation: "profiles"
       referencedColumns: ["id"]
@@ -447,6 +717,72 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"reflection_entries": {
+                  Row: {
+                    "answer": string | null,"category": string,"created_at": string,"entry_on": string,"followups": NonNullable<Json>,"id": string,"question": string,"question_id": string,"skipped": boolean,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "answer"?: string | null,"category": string,"created_at"?: string,"entry_on"?: string,"followups"?: NonNullable<Json>,"id"?: string,"question": string,"question_id": string,"skipped"?: boolean,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "answer"?: string | null,"category"?: string,"created_at"?: string,"entry_on"?: string,"followups"?: NonNullable<Json>,"id"?: string,"question"?: string,"question_id"?: string,"skipped"?: boolean,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "reflection_entries_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"stress_entries": {
+                  Row: {
+                    "created_at": string,"entry_on": string,"frequency": string,"helped": string | null,"id": string,"impact_concentration": number,"impact_daily": number,"impact_motivation": number,"impact_relationships": number,"impact_sleep": number,"intensity": number,"other_source": string | null,"sources": (string)[],"triggers": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"entry_on"?: string,"frequency": string,"helped"?: string | null,"id"?: string,"impact_concentration"?: number,"impact_daily"?: number,"impact_motivation"?: number,"impact_relationships"?: number,"impact_sleep"?: number,"intensity": number,"other_source"?: string | null,"sources": (string)[],"triggers"?: string | null,"user_id"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"entry_on"?: string,"frequency"?: string,"helped"?: string | null,"id"?: string,"impact_concentration"?: number,"impact_daily"?: number,"impact_motivation"?: number,"impact_relationships"?: number,"impact_sleep"?: number,"intensity"?: number,"other_source"?: string | null,"sources"?: (string)[],"triggers"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "stress_entries_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"study_sessions": {
+                  Row: {
+                    "completed_at": string,"id": string,"minutes": number,"task_id": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "completed_at"?: string,"id"?: string,"minutes": number,"task_id"?: string | null,"user_id"?: string
+                  }
+                  Update: {
+                    "completed_at"?: string,"id"?: string,"minutes"?: number,"task_id"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "study_sessions_task_id_fkey"
+      columns: ["task_id"]
+isOneToOne: false
+      referencedRelation: "academic_tasks"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "study_sessions_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"voice_notes": {
                   Row: {
                     "audio_path": string,"author_id": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"is_anonymous": boolean,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count": number,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"speaker_name": string | null,"status": Database["public"]['Enums']["review_status"],"title": string
@@ -482,14 +818,27 @@ isOneToOne: false
             "add_comment":
 { Args: { "p_anonymous": boolean,"p_body": string,"p_post": string }; Returns: string
                            },
-"admin_assign_counselor":
-{ Args: { "p_counselor": string,"p_move_open"?: boolean,"p_student": string }; Returns: undefined
+"add_gratitude_comment":
+{ Args: { "p_anonymous"?: boolean,"p_body": string,"p_post": string }; Returns: string
+                           },
+"admin_match_areas":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "concern": string,"matches": number
+            }[]
+                           },
+"admin_matching_overview":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "counselor_id": string,"email": string,"experience_years": number,"expertise": (string)[],"full_name": string,"has_details": boolean,"matches_30d": number,"phone": string,"presence": Database["public"]['Enums']["counselor_presence"],"qualifications": string,"status": Database["public"]['Enums']["account_status"],"students": number,"username": string,"verified": boolean
+            }[]
                            },
 "admin_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "admin_update_user":
 { Args: { "p_role": Database["public"]['Enums']["user_role"],"p_status": Database["public"]['Enums']["account_status"],"p_user": string }; Returns: undefined
+                           },
+"admin_verify_counselor":
+{ Args: { "p_counselor": string }; Returns: undefined
                            },
 "book_appointment":
 { Args: { "p_reason": string,"p_slot": string }; Returns: string
@@ -510,8 +859,16 @@ isOneToOne: false
 "counselor_can_see_student":
 { Args: { "sid": string }; Returns: boolean
                            },
+"counselor_is_verified":
+{ Args: { "p_id": string }; Returns: boolean
+                           },
 "counselor_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"counselor_summaries":
+{ Args: { "p_ids": (string)[] }; Returns: {
+              "experience_years": number,"expertise": (string)[],"id": string,"qualifications": string,"verified": boolean
+            }[]
                            },
 "count_voice_play":
 { Args: { "p_id": string }; Returns: undefined
@@ -521,6 +878,9 @@ isOneToOne: false
                            },
 "create_doodle":
 { Args: { "p_image_path": string,"p_word": string }; Returns: string
+                           },
+"create_gratitude_post":
+{ Args: { "p_allow_comments"?: boolean,"p_anonymous"?: boolean,"p_body": string,"p_category": Database["public"]['Enums']["gratitude_category"] }; Returns: string
                            },
 "create_post":
 { Args: { "p_anonymous": boolean,"p_body": string,"p_image_path": string,"p_kind": Database["public"]['Enums']["post_kind"] }; Returns: string
@@ -534,6 +894,12 @@ isOneToOne: false
 "delete_doodle":
 { Args: { "p_id": string }; Returns: string
                            },
+"delete_gratitude_comment":
+{ Args: { "p_comment": string }; Returns: undefined
+                           },
+"delete_gratitude_post":
+{ Args: { "p_post": string }; Returns: undefined
+                           },
 "delete_post":
 { Args: { "p_post": string }; Returns: string
                            },
@@ -543,6 +909,19 @@ isOneToOne: false
 "doodle_wall":
 { Args: { "p_before"?: string,"p_limit"?: number }; Returns: {
               "answer": string,"attempts": number,"author_name": string,"created_at": string,"hidden": boolean,"hint": string,"id": string,"image_path": string,"is_mine": boolean,"report_count": number,"revealed": boolean,"solved": boolean,"solvers": number
+            }[]
+                           },
+"expertise_areas":
+{ Args: Record<PropertyKey, never>; Returns: (string)[]
+                           },
+"gratitude_comments_for":
+{ Args: { "p_post": string }; Returns: {
+              "author_hue": number,"author_name": string,"author_role": Database["public"]['Enums']["user_role"],"body": string,"created_at": string,"hidden": boolean,"id": string,"is_mine": boolean
+            }[]
+                           },
+"gratitude_feed":
+{ Args: { "p_before"?: string,"p_category"?: Database["public"]['Enums']["gratitude_category"],"p_limit"?: number }; Returns: {
+              "allow_comments": boolean,"appreciate": number,"author_hue": number,"author_name": string,"author_role": Database["public"]['Enums']["user_role"],"body": string,"category": Database["public"]['Enums']["gratitude_category"],"comment_count": number,"created_at": string,"held_reason": string,"id": string,"inspiring": number,"is_anonymous": boolean,"is_mine": boolean,"my_reaction": string,"relate": number,"report_count": number,"status": string
             }[]
                            },
 "guess_doodle":
@@ -566,8 +945,19 @@ isOneToOne: false
 "mark_conversation_read":
 { Args: { "p_conversation": string }; Returns: undefined
                            },
+"match_counselor":
+{ Args: { "p_concern": string,"p_urgent"?: boolean,"p_weights": Json }; Returns: {
+              "avatar_hue": number,"counselor_id": string,"experience_years": number,"expertise": (string)[],"full_name": string,"kept_current": boolean,"matched": (string)[],"presence": Database["public"]['Enums']["counselor_presence"],"qualifications": string,"score": number,"title": string
+            }[]
+                           },
 "moderate_doodle":
 { Args: { "p_hidden": boolean,"p_id": string }; Returns: undefined
+                           },
+"moderate_gratitude_comment":
+{ Args: { "p_comment": string,"p_hidden": boolean }; Returns: undefined
+                           },
+"moderate_gratitude_post":
+{ Args: { "p_post": string,"p_status": string }; Returns: undefined
                            },
 "moderate_post":
 { Args: { "p_hidden": boolean,"p_post": string }; Returns: undefined
@@ -607,11 +997,17 @@ isOneToOne: false
               "audio_path": string,"category": Database["public"]['Enums']["voice_category"],"created_at": string,"duration_seconds": number,"id": string,"is_mine": boolean,"language": Database["public"]['Enums']["voice_language"],"mime_type": string,"play_count": number,"speaker": string,"title": string
             }[]
                            },
+"react_gratitude":
+{ Args: { "p_kind": string,"p_post": string }; Returns: undefined
+                           },
 "report_content":
 { Args: { "p_comment": string,"p_post": string,"p_reason": string }; Returns: undefined
                            },
 "report_doodle":
 { Args: { "p_id": string }; Returns: undefined
+                           },
+"report_gratitude_post":
+{ Args: { "p_post": string,"p_reason"?: string }; Returns: undefined
                            },
 "reveal_doodle":
 { Args: { "p_id": string }; Returns: string
@@ -646,7 +1042,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "account_status": "active"|"pending"|"suspended","announcement_audience": "everyone"|"all_students"|"my_students"|"counselors","appointment_mode": "in_person"|"online"|"phone","appointment_status": "confirmed"|"completed"|"cancelled","counselor_presence": "available"|"busy"|"away","post_kind": "advice"|"share","request_category": "academic"|"exams"|"career"|"wellbeing"|"friendship"|"family"|"bullying"|"other","request_status": "pending"|"in_progress"|"resolved","request_urgency": "low"|"normal"|"high"|"urgent","review_status": "pending"|"approved"|"rejected","user_role": "student"|"counselor"|"admin","voice_category": "lonely"|"exam"|"giving_up"|"overwhelmed"|"hope"|"self_worth","voice_language": "en"|"ur"
+            "account_status": "active"|"pending"|"suspended","announcement_audience": "everyone"|"all_students"|"my_students"|"counselors","appointment_mode": "in_person"|"online"|"phone","appointment_status": "confirmed"|"completed"|"cancelled","counselor_presence": "available"|"busy"|"away","gratitude_category": "people"|"small_moments"|"achievements"|"kindness"|"learned"|"happy","post_kind": "advice"|"share","request_category": "academic"|"exams"|"career"|"wellbeing"|"friendship"|"family"|"bullying"|"other","request_status": "pending"|"in_progress"|"resolved","request_urgency": "low"|"normal"|"high"|"urgent","review_status": "pending"|"approved"|"rejected","user_role": "student"|"counselor"|"admin","voice_category": "lonely"|"exam"|"giving_up"|"overwhelmed"|"hope"|"self_worth","voice_language": "en"|"ur"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -766,7 +1162,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "account_status": ["active", "pending", "suspended"],"announcement_audience": ["everyone", "all_students", "my_students", "counselors"],"appointment_mode": ["in_person", "online", "phone"],"appointment_status": ["confirmed", "completed", "cancelled"],"counselor_presence": ["available", "busy", "away"],"post_kind": ["advice", "share"],"request_category": ["academic", "exams", "career", "wellbeing", "friendship", "family", "bullying", "other"],"request_status": ["pending", "in_progress", "resolved"],"request_urgency": ["low", "normal", "high", "urgent"],"review_status": ["pending", "approved", "rejected"],"user_role": ["student", "counselor", "admin"],"voice_category": ["lonely", "exam", "giving_up", "overwhelmed", "hope", "self_worth"],"voice_language": ["en", "ur"]
+            "account_status": ["active", "pending", "suspended"],"announcement_audience": ["everyone", "all_students", "my_students", "counselors"],"appointment_mode": ["in_person", "online", "phone"],"appointment_status": ["confirmed", "completed", "cancelled"],"counselor_presence": ["available", "busy", "away"],"gratitude_category": ["people", "small_moments", "achievements", "kindness", "learned", "happy"],"post_kind": ["advice", "share"],"request_category": ["academic", "exams", "career", "wellbeing", "friendship", "family", "bullying", "other"],"request_status": ["pending", "in_progress", "resolved"],"request_urgency": ["low", "normal", "high", "urgent"],"review_status": ["pending", "approved", "rejected"],"user_role": ["student", "counselor", "admin"],"voice_category": ["lonely", "exam", "giving_up", "overwhelmed", "hope", "self_worth"],"voice_language": ["en", "ur"]
           }
         }
 } as const

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, AudioLines, Palette, Wind } from "lucide-react";
 import { GAMES, type GameSlug } from "@/lib/games";
 import { getDoodleWall } from "@/lib/doodles";
+import { getGameSave } from "@/lib/game-saves";
 import type { Role } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { PageHero } from "@/components/visual/page-hero";
@@ -72,6 +73,7 @@ export function PlayHub({ base, role }: { base: string; role: Role | null }) {
 export async function GameView({ slug, base, role }: { slug: GameSlug; base: string; role: Role | null }) {
   const game = GAMES.find((g) => g.slug === slug)!;
   const wall = slug === "doodle" && role ? await getDoodleWall() : null;
+  const save = (slug === "pet" || slug === "cozy") && role ? await getGameSave(slug) : null;
   return (
     <div className="mx-auto max-w-6xl">
       <Link href={base} className="mb-5 inline-flex items-center gap-1.5 text-sm text-ink-2 hover:text-ink">
@@ -84,7 +86,7 @@ export async function GameView({ slug, base, role }: { slug: GameSlug; base: str
           <p className="mt-1 text-sm leading-relaxed text-ink-2">{game.description}</p>
         </div>
       </div>
-      <GameRenderer slug={slug} role={role} wall={wall} />
+      <GameRenderer slug={slug} role={role} wall={wall} save={save} />
     </div>
   );
 }

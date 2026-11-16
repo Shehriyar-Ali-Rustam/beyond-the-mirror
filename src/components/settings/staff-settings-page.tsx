@@ -3,8 +3,9 @@ import { PageHero } from "@/components/visual/page-hero";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { StaffProfileForm } from "./staff-profile-form";
 import { PasswordForm } from "./password-form";
+import { CredentialsForm, type Credentials } from "./credentials-form";
 
-export function StaffSettingsPage({ viewer }: { viewer: Profile }) {
+export function StaffSettingsPage({ viewer, credentials }: { viewer: Profile; credentials?: Credentials }) {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <PageHero illustration="secure-login" tone="mint" title={viewer.role === "counselor" ? "Profile & settings" : "Settings"} />
@@ -14,6 +15,14 @@ export function StaffSettingsPage({ viewer }: { viewer: Profile }) {
           <StaffProfileForm profile={viewer} />
         </CardBody>
       </Card>
+      {viewer.role === "counselor" && (
+        <Card>
+          <CardHeader title="Professional details" description="Used for verification and to match students with you." />
+          <CardBody>
+            <CredentialsForm credentials={credentials ?? null} />
+          </CardBody>
+        </Card>
+      )}
       <Card>
         <CardHeader title="Password" />
         <CardBody>

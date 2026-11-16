@@ -1,4 +1,4 @@
-export type GameSlug = "smash" | "wheel" | "mystery" | "doodle" | "emoji";
+export type GameSlug = "pet" | "cozy" | "smash" | "wheel" | "mystery" | "doodle" | "emoji";
 
 export const GAMES: {
   slug: GameSlug;
@@ -9,6 +9,24 @@ export const GAMES: {
   gradient: string;
   accent: string;
 }[] = [
+  {
+    slug: "pet",
+    title: "Little Paws 3D",
+    tagline: "Your virtual pet best friend",
+    description: "Adopt a 3D pet, name it and look after it: feed, bathe, dress up, play and talk together. It remembers you.",
+    emoji: "🐾",
+    gradient: "from-mint-soft via-sky-soft to-lilac-soft",
+    accent: "#1f8a6b",
+  },
+  {
+    slug: "cozy",
+    title: "Cozy Room",
+    tagline: "Your little rainy escape",
+    description: "A calm room with rain on the window, soft music and warm light. Decorate it, change the view and just breathe.",
+    emoji: "🌧️",
+    gradient: "from-sky-soft via-lilac-soft to-rose-soft",
+    accent: "#2f7cc0",
+  },
   {
     slug: "smash",
     title: "Smash the Stress",

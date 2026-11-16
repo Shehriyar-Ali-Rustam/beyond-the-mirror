@@ -57,7 +57,7 @@ export default async function AdminOverview() {
       <PageHero illustration="sorting-thoughts" tone="lavender"
         eyebrow={`${greeting()}, ${firstName(viewer.full_name)}`}
         title="Platform overview"
-        description="Accounts, assignments and how the service is being used, in aggregate only."
+        description="Accounts, counselor verification and how the service is being used, in aggregate only."
       />
 
       <div className="mb-5 flex items-start gap-3 rounded-2xl border border-line bg-surface-2/60 px-4 py-3 text-sm text-ink-2">
@@ -80,10 +80,10 @@ export default async function AdminOverview() {
             </Link>
           )}
           {s.unassigned_students > 0 && (
-            <Link href="/admin/assignments" className="group flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 transition hover:bg-surface-2">
+            <Link href="/admin/matching?status=unmatched" className="group flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 transition hover:bg-surface-2">
               <UserX className="size-5 text-warn" />
               <span className="flex-1 text-sm text-ink">
-                <span className="font-semibold">{s.unassigned_students}</span> {s.unassigned_students === 1 ? "student has" : "students have"} no counselor yet
+                <span className="font-semibold">{s.unassigned_students}</span> {s.unassigned_students === 1 ? "student hasn't" : "students haven't"} been matched yet. They will be as soon as they ask for help.
               </span>
               <ArrowRight className="size-4 text-ink-3 transition group-hover:translate-x-0.5" />
             </Link>
@@ -145,8 +145,8 @@ export default async function AdminOverview() {
             title="Counselor caseloads"
             action={
               <Button asChild variant="ghost" size="sm">
-                <Link href="/admin/assignments">
-                  Manage <ArrowRight />
+                <Link href="/admin/matching">
+                  Matching <ArrowRight />
                 </Link>
               </Button>
             }

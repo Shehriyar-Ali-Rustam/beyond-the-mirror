@@ -18,10 +18,10 @@ import { cn } from "@/lib/utils";
 const PROMPTS = ["What's been happening?", "How is it affecting you?", "What would help right now?"];
 const DRAFT_KEY = "btm:draft";
 
-export function NewRequestForm({ initialCategory, whatsapp }: { initialCategory?: Category; whatsapp: string | null }) {
+export function NewRequestForm({ initialCategory, initialUrgency, whatsapp }: { initialCategory?: Category; initialUrgency?: Urgency; whatsapp: string | null }) {
   const [state, onSubmit, pending] = useActionForm(startConversation);
   const [category, setCategory] = useState<Category>(initialCategory ?? "wellbeing");
-  const [urgency, setUrgency] = useState<Urgency>("normal");
+  const [urgency, setUrgency] = useState<Urgency>(initialUrgency ?? "normal");
   const [identity, setIdentity] = useState<"named" | "anonymous">("named");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");

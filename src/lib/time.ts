@@ -83,3 +83,7 @@ export function shortStamp(d: string | Date, tz: string) {
 export function timeRange(start: string | Date, end: string | Date, tz: string) {
   return `${formatTime(start, tz)}–${formatTime(end, tz)}`;
 }
+
+/** The current moment, and a moment `days` ago (server-side helpers kept out of component bodies). */
+export const now = () => new Date();
+export const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000);

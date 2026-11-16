@@ -75,8 +75,8 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
       <div className="grid gap-5 lg:grid-cols-3">
         {/* Primary action */}
         <Link
-          href="/student/messages/new"
-          className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-[#2c7a6c] p-6 text-primary-ink shadow-md transition-transform duration-300 hover:-translate-y-0.5 sm:p-8 lg:col-span-2"
+          href={counselor ? "/student/messages/new" : "/student/match"}
+          className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-[#8f5fae] p-6 text-primary-ink shadow-md transition-transform duration-300 hover:-translate-y-0.5 sm:p-8 lg:col-span-2"
         >
           <div className="paper-grain absolute inset-0 opacity-40" aria-hidden />
           <ArchPhoto
@@ -108,7 +108,12 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
               compact
               illustration="in-thought"
               title="No counselor yet"
-              description="Send your first message and we'll connect you with an available counselor straight away."
+              description="Answer a few quick questions and we'll match you with a verified counselor who fits what you're going through."
+              action={
+                <Button asChild size="sm">
+                  <Link href="/student/match">Find my counselor</Link>
+                </Button>
+              }
             />
           </Card>
         )}

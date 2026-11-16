@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { assertRole } from "@/lib/auth";
 import { friendlyError } from "@/lib/utils";
-import { counselorProfileSchema, fieldErrors, presenceSchema, studentProfileSchema } from "@/lib/validation";
+import { counselorProfileSchema, credentialsSchema, fieldErrors, presenceSchema, studentProfileSchema } from "@/lib/validation";
 import type { ActionResult } from "@/lib/types";
 
 export async function updateStudentProfile(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
@@ -37,10 +37,8 @@ export async function updateStaffProfile(_: ActionResult | null, formData: FormD
     bio: formData.get("bio") ?? undefined,
     officeHours: formData.get("officeHours") ?? undefined,
     whatsapp: formData.get("whatsapp") ?? undefined,
-    specialties: String(formData.get("specialties") ?? "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean),
+    // Areas of expertise now live in the verified professional details.
+    specialties: [],
   });
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
   const v = parsed.data;
@@ -55,7 +53,6 @@ export async function updateStaffProfile(_: ActionResult | null, formData: FormD
       bio: v.bio || null,
       office_hours: v.officeHours || null,
       whatsapp: v.whatsapp ? v.whatsapp.replace(/\s+/g, " ") : null,
-      specialties: v.specialties,
     })
     .eq("id", viewer.id);
   if (error) return { ok: false, error: friendlyError(error) };
@@ -72,4 +69,31 @@ export async function setPresence(presence: string): Promise<ActionResult> {
   if (error) return { ok: false, error: friendlyError(error) };
   revalidatePath("/counselor", "layout");
   return { ok: true };
+}
+
+export async function saveCredentials(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  const viewer = await assertRole("counselor");
+  const parsed = credentialsSchema.safeParse({
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    qualifications: formData.get("qualifications"),
+    experienceYears: formData.get("experienceYears"),
+    expertise: formData.getAll("expertise"),
+  });
+  if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
+  const v = parsed.data;
+  const row = { qualifications: v.qualifications, experience_years: v.experienceYears, email: v.email, phone: v.phone, expertise: v.expertise };
+
+  const supabase = await createClient();
+  const { data: existing } = await supabase.from("counselor_credentials").select("counselor_id, verified_at").eq("counselor_id", viewer.id).maybeSingle();
+  const { error } = existing
+    ? await supabase.from("counselor_credentials").update(row).eq("counselor_id", viewer.id)
+    : await supabase.from("counselor_credentials").insert({ counselor_id: viewer.id, ...row });
+  if (error) return { ok: false, error: friendlyError(error) };
+  const { data: after } = await supabase.from("counselor_credentials").select("verified_at").eq("counselor_id", viewer.id).maybeSingle();
+  revalidatePath("/counselor", "layout");
+  return {
+    ok: true,
+    message: after?.verified_at ? "Details saved." : "Saved. The administrator will verify your details before new students are matched with you.",
+  };
 }

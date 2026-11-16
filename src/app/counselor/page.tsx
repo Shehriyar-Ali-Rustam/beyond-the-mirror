@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, CalendarDays, Clock, Inbox, MessageCircleReply, Star, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, BadgeCheck, CalendarDays, Clock, Inbox, MessageCircleReply, Star, Users } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTz } from "@/lib/tz";
@@ -42,7 +42,7 @@ export default async function CounselorOverview() {
   const tz = await getTz();
   const now = new Date().toISOString();
 
-  const [{ data: statsRaw }, { data: open }, { data: sessions }, { data: feedback }] = await Promise.all([
+  const [{ data: statsRaw }, { data: open }, { data: sessions }, { data: feedback }, { data: credentials }] = await Promise.all([
     supabase.rpc("counselor_stats"),
     supabase
       .from("conversations")
@@ -59,6 +59,7 @@ export default async function CounselorOverview() {
       .gt("slot.ends_at", now)
       .limit(20),
     supabase.from("feedback").select("rating, comment, created_at").eq("counselor_id", viewer.id).order("created_at", { ascending: false }).limit(3),
+    supabase.from("counselor_credentials").select("verified_at").eq("counselor_id", viewer.id).maybeSingle(),
   ]);
 
   const stats = (statsRaw ?? {}) as Stats;
@@ -83,6 +84,21 @@ export default async function CounselorOverview() {
         description="Here's what needs you today."
         actions={<PresenceSwitcher value={viewer.presence} />}
       />
+
+      {(!credentials || !credentials.verified_at) && (
+        <Link
+          href="/counselor/settings"
+          className="mb-5 flex items-center gap-4 rounded-2xl border border-lilac/30 bg-lilac-soft p-4 transition hover:shadow-sm"
+        >
+          <BadgeCheck className="size-5 shrink-0 text-lilac" />
+          <span className="flex-1 text-sm text-ink">
+            {credentials
+              ? "Your professional details are waiting for the administrator to verify them. New students will be matched with you once they're verified."
+              : "Add your qualifications, experience and areas of expertise so students who need your kind of support are matched with you."}
+          </span>
+          <ArrowRight className="size-4 text-ink-3" />
+        </Link>
+      )}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat label="Awaiting your reply" value={stats.awaiting_reply ?? 0} icon={<MessageCircleReply />} tone={stats.awaiting_reply ? "clay" : "neutral"} hint={`${stats.pending ?? 0} new · ${stats.in_progress ?? 0} in progress`} />
@@ -200,7 +216,7 @@ export default async function CounselorOverview() {
               </span>
               <div>
                 <p className="text-2xl font-semibold leading-none text-ink">{stats.students ?? 0}</p>
-                <p className="text-xs text-ink-3">assigned students</p>
+                <p className="text-xs text-ink-3">matched students</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

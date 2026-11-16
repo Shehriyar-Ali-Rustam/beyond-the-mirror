@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EXPERTISE_AREAS } from "@/lib/expertise";
 
 const trimmed = (min: number, max: number, label: string) =>
   z
@@ -48,18 +49,59 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Enter your password."),
 });
 
-export const registerSchema = z.object({
-  role: z.enum(["student", "counselor"]),
+/** Accepts "0300 1234567", "+92 300 1234567", "92-300-1234567" and similar. */
+export const phoneSchema = z
+  .string({ message: "Phone number is required." })
+  .trim()
+  .min(1, "Phone number is required.")
+  .transform((v) => {
+    const digits = v.replace(/[^0-9+]/g, "");
+    if (/^0[0-9]{10}$/.test(digits)) return `+92${digits.slice(1)}`;
+    if (/^92[0-9]{10}$/.test(digits)) return `+${digits}`;
+    return digits;
+  })
+  .pipe(z.string().regex(/^\+?[0-9]{10,15}$/, "Enter a valid phone number, e.g. +92 300 1234567."));
+
+export const expertiseSchema = z
+  .array(z.enum(EXPERTISE_AREAS))
+  .min(1, "Choose at least one area of expertise.")
+  .max(6, "Choose up to 6 areas.");
+
+export const credentialsSchema = z.object({
+  email: z.string({ message: "Professional email is required." }).trim().toLowerCase().min(1, "Professional email is required.").pipe(z.email("Enter a valid email address.")),
+  phone: phoneSchema,
+  qualifications: trimmed(2, 300, "Qualifications"),
+  experienceYears: z.coerce
+    .number({ message: "Enter your years of experience." })
+    .int("Use whole years.")
+    .min(0, "Experience can't be negative.")
+    .max(60, "Please check your years of experience."),
+  expertise: expertiseSchema,
+});
+
+const baseRegister = {
   fullName: trimmed(2, 80, "Name"),
   username: usernameSchema,
   password: passwordSchema,
-  grade: optionalText(40, "Year / grade"),
-  section: optionalText(40, "Class / section"),
-  studentNumber: optionalText(40, "Student ID"),
-  title: optionalText(80, "Title"),
-  contactEmail: optionalEmail,
   agree: z.literal("on", { message: "Please confirm you've read how privacy works here." }),
-});
+};
+
+export const registerSchema = z.discriminatedUnion("role", [
+  z.object({
+    ...baseRegister,
+    role: z.literal("student"),
+    grade: optionalText(40, "Year / grade"),
+    section: optionalText(40, "Class / section"),
+    studentNumber: optionalText(40, "Student ID"),
+    contactEmail: optionalEmail,
+  }),
+  z.object({
+    ...baseRegister,
+    role: z.literal("counselor"),
+    title: optionalText(80, "Title"),
+    ...credentialsSchema.shape,
+  }),
+]);
 
 export const newRequestSchema = z.object({
   subject: trimmed(3, 120, "Subject"),

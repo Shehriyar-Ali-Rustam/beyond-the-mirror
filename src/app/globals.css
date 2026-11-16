@@ -2,8 +2,8 @@
 
 /* -----------------------------------------------------------------------------
    Beyond the Mirror - design tokens
-   Paper & ink base, an evergreen primary for trust, clay for warmth,
-   and a quiet lilac "reflection" used only for the mirror motif.
+   Paper & ink base, a plum primary taken from the logo, clay for warmth,
+   and a quiet lilac "reflection" for the mirror motif.
 ----------------------------------------------------------------------------- */
 :root {
   --bg: #f9faf9;
@@ -17,11 +17,11 @@
   --line: #e7eae7;
   --line-strong: #d6dbd7;
 
-  --primary: #1d5b51;
-  --primary-hover: #164a42;
+  --primary: #6b4386;
+  --primary-hover: #58366f;
   --primary-ink: #ffffff;
-  --primary-soft: #e4f1ed;
-  --primary-soft-ink: #1d5b51;
+  --primary-soft: #f1e9f6;
+  --primary-soft-ink: #5b3873;
 
   --clay: #cf764d;
   --clay-soft: #fcece3;
@@ -54,7 +54,7 @@
   --shadow-sm: 0 1px 2px rgb(21 32 28 / 0.04), 0 1px 3px rgb(21 32 28 / 0.03);
   --shadow-md: 0 6px 20px -8px rgb(21 32 28 / 0.12), 0 2px 6px -2px rgb(21 32 28 / 0.05);
   --shadow-lg: 0 28px 56px -24px rgb(21 32 28 / 0.22), 0 10px 20px -10px rgb(21 32 28 / 0.08);
-  --ring: rgb(29 91 81 / 0.28);
+  --ring: rgb(107 67 134 / 0.28);
 
   color-scheme: light;
 }

@@ -44,7 +44,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
 
   return (
     <div className="mx-auto max-w-5xl">
-      <PageHero illustration="studying" tone="peach" title="Students" description="Students assigned to you. Open a profile for their history, sessions and your private notes." />
+      <PageHero illustration="studying" tone="peach" title="Students" description="Students matched with you. Open a profile for their history, sessions and your private notes." />
       <Suspense>
         <ListFilters
           tabs={[
@@ -81,7 +81,7 @@ export default async function CounselorStudents({ searchParams }: PageProps<"/co
         ) : q ? (
           <EmptyState icon={<SearchX />} title="No matches" description="Try a different name." />
         ) : (
-          <EmptyState illustration="studying" title="No students here yet" description="Students are assigned by an administrator, or automatically when they send their first message." />
+          <EmptyState illustration="studying" title="No students here yet" description="Students are matched with you automatically when what they need fits your verified areas of expertise." />
         )}
       </Card>
     </div>

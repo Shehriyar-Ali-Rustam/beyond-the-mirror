@@ -44,7 +44,16 @@ export const getCounselor = cache(async (counselorId: string | null) => {
     .select("id, full_name, title, bio, specialties, office_hours, presence, whatsapp, avatar_hue, status, role")
     .eq("id", counselorId)
     .maybeSingle();
-  return data;
+  if (!data) return null;
+  const { data: summary } = await supabase.rpc("counselor_summaries", { p_ids: [counselorId] });
+  const s = summary?.[0];
+  return {
+    ...data,
+    expertise: s?.expertise ?? [],
+    experience_years: s?.experience_years ?? null,
+    qualifications: s?.qualifications ?? null,
+    verified: s?.verified ?? false,
+  };
 });
 
 export type CounselorPublic = NonNullable<Awaited<ReturnType<typeof getCounselor>>>;

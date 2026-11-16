@@ -63,6 +63,16 @@ async function main() {
   }
   const amira = ids.amira, daniel = ids.daniel;
   const [zara, omar, lina, ethan] = ["zara", "omar", "lina", "ethan"].map((u) => ids[u]);
+
+  // Verified professional details, used by automatic matching. Contact details are placeholders.
+  const credentials = [
+    { counselor_id: amira, qualifications: "MA Counselling Psychology", experience_years: 9, email: "amira.hassan@example.com", phone: "+923001234567", expertise: ["academic", "anxiety", "low_mood", "self_esteem", "career"] },
+    { counselor_id: daniel, qualifications: "MSc Child and Adolescent Mental Health", experience_years: 6, email: "daniel.okafor@example.com", phone: "+923007654321", expertise: ["family", "friendships", "bullying", "anger", "grief"] },
+  ];
+  for (const c of credentials) {
+    await db.from("counselor_credentials").upsert(c);
+    await db.from("counselor_credentials").update({ verified_at: new Date().toISOString() }).eq("counselor_id", c.counselor_id);
+  }
   await db.from("profiles").update({ counselor_id: amira }).in("id", [zara, omar, lina]);
   await db.from("profiles").update({ counselor_id: daniel }).eq("id", ethan);
 

@@ -20,10 +20,11 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 
 ## Features
 
-**Accounts:** no email needed. Students and counselors sign up with a **username, password and a few profile details** (name, year, class, student ID; contact email is optional). There's one **built-in administrator login** (overridable with environment variables), so there's no admin sign-up and no SQL step.
+**Accounts:** students need no email: they sign up with a **username, password and a few profile details** (name, year, class, student ID). **Counselors apply with a professional profile**: full name, professional email, phone number, qualifications, years of experience and areas of expertise (email and phone are compulsory and visible only to the administrator). There's one **built-in administrator login** (overridable with environment variables), so there's no admin sign-up and no SQL step.
 
 **Students**
-- Private, real-time conversations with their assigned counselor (topic, urgency, status, "Seen" receipts)
+- **Smart counselor matching:** "How are you feeling today?" asks what's going on (exams, family, friendships, overthinking, emotional tiredness, feeling low without knowing why, or something else), a follow-up, and an optional note in English or Roman Urdu. The answers are turned into concern areas on our own server (no outside AI service) and the student is matched with the **verified** counselor whose expertise, experience, availability and caseload fit best. Worrying words bring up safety information and mark the request urgent
+- Private, real-time conversations with their matched counselor (topic, urgency, status, "Seen" receipts)
 - **Anonymous messages:** a student can write to their counselor without revealing who they are, and share their name later if they choose. Anonymity is enforced in the database: the counselor's data never contains the student's identity
 - **Community board:** posts asking for advice or sharing something, with an optional photo, replies, "Support" reactions, reporting and counselor moderation. Students can post anonymously (hidden from other students; staff can see who posted, for safeguarding)
 - Guided "new request" flow with draft saving and a safety prompt for urgent requests
@@ -32,7 +33,14 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Live notifications (bell + toasts) for replies, bookings and status changes
 - **A Voice That Understands:** 20 to 60 second voice notes recorded by students for moments like *feeling lonely*, *before an exam*, *giving up on your day* or *feeling overwhelmed*, in English and Urdu. Record in the browser (or upload a file), stay anonymous if you like, and a counselor reviews every recording before anyone hears it. A "Play me something" button picks a random note
 - **Check in with yourself:** 10 questions on exam pressure, overthinking, concentration, sleep and feeling overwhelmed (*Never / Sometimes / Often / Almost always*), with practical ideas for each area (study timetable, breathing, breaks, sleep habits). Higher stress points to a counselor or trusted adult. Not a diagnosis, and nothing is saved
-- **The Little Reset Zone:** five mood-boosting games: *Smash the Stress*, *Spin the Fun Wheel*, *Mystery Box* (jokes, stickers, kind messages, mini challenges), *Doodle & Guess* (ready-made doodles plus a shared Doodle Wall) and *Guess the Emoji* (movies, foods, animals and phrases, three levels)
+- **Wellbeing toolkit** (six connected tools, saved privately to the student's account, editable and deletable, never visible to counselors or admins unless shared):
+  - *Daily Reflection Cards*: a thoughtful question each day across seven themes, follow-up questions, a skip option, a private journal and a weekly reflection
+  - *Behaviour Pattern Tracker*: log habits (sleep, study, screen time, avoiding tasks…) with what came before, how you felt and what happened after; automatic pattern spotting, weekly and monthly reports, reflection questions and small goals
+  - *Stress Pattern Analysis*: sources, frequency, intensity, effects on concentration, sleep, motivation and relationships, triggers and history; a personal summary, coping approaches and an option to share the summary with a counselor (not a diagnosis)
+  - *Academic Pressure Manager*: tasks with deadlines, subjects, estimates and progress, priority ordering, step-by-step breakdowns, an automatic 7-day study plan, a focus timer with breaks, academic stress check-ins, a weekly review and support suggestions when pressure is high
+  - *Decision-Making Assistant*: situation, options, benefits and challenges, outcomes and risks, personal priorities, a side-by-side comparison and a final reflection. It never decides for you
+  - *Gratitude Wall*: anonymous-by-default posts in six categories, appreciation reactions (no follower counts), optional supportive comments, automatic screening that holds posts with contact details, links or hurtful language for review, reporting and counselor moderation
+- **The Little Reset Zone:** seven games: *Little Paws 3D* (adopt, name, feed, bathe, dress up, play with and talk to your own 3D virtual pet), *Cozy Room* (a calm rainy room to decorate, with rain on the window and gentle sound), *Smash the Stress*, *Spin the Fun Wheel*, *Mystery Box* (jokes, stickers, kind messages, mini challenges), *Doodle & Guess* (ready-made doodles plus a shared Doodle Wall) and *Guess the Emoji* (movies, foods, animals and phrases, three levels). Game progress is saved to the student's account
 - **The Mood Portal:** pick a mood colour and the whole site's background and animations change with you, with matching suggestions: a voice note, a game, breathing and a comforting message. Optionally describe the feeling in a few words (stays on the device)
 - Self-help toolkit (also public, no login): *Check in with yourself, Name the feeling, Untangle a thought, Bad-day reset, Exam stress kit (with revision planner), What should I say?, Friends/family/bullying guides, Letters you won't send*
 - Optional WhatsApp hand-off if the counselor publishes a number
@@ -45,16 +53,17 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Overview dashboard: awaiting reply, urgent queue, median first-response time, ratings, topic breakdown
 - Presence (Available / In a session / Away), profile, announcements
 - Community moderation: hide or delete posts and replies, see report counts
-- Voice note review queue (listen first, then approve or decline with a note to the student) and Doodle Wall moderation
+- Voice note review queue (listen first, then approve or decline with a note to the student), Doodle Wall moderation and Gratitude Wall review
+- Professional details (qualifications, experience, areas of expertise) that drive matching; changes are re-verified by the administrator
 
 **Administrators**
-- Approve or decline counselor sign-ups, change roles, pause/restore access
+- Verify counselor applications (qualifications, experience, expertise, email and phone) before approving them, and re-verify when counselors change their details; change roles, pause/restore access
 - Reset a student's or counselor's password (shows a one-time temporary password, since accounts have no email)
-- Assign students to counselors (open requests move with them); auto-matching to lightest caseload
+- **No manual assignment:** a Matching page explains how students are matched, shows each counselor's verification, expertise and caseload, and what kinds of support students needed (totals only)
 - Aggregate-only statistics: requests per day, by status and topic, caseloads, response times
 - Announcements to everyone / students / staff
 
-Also: a warm "through the window" visual theme (photos framed in the brand's arch shape, illustrated page banners and empty states, a sunrise colour palette), a clean white base, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
+Also: the Beyond the Mirror logo and a plum brand colour taken from it, a warm "through the window" visual theme (photos framed in the brand's arch shape, illustrated page banners and empty states, a sunrise colour palette), a clean white base, responsive layouts from phone to desktop, accessible components (Radix), loading/empty/error states, and timezone-correct dates.
 
 ---
 
@@ -65,6 +74,8 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 - **Row Level Security on every table.** Students read only their own conversations; counselors only conversations assigned to them; admins have *no* policy that reaches messages, subjects, notes or feedback text.
 - **Column-level grants.** Users can update only harmless profile fields. `role`, `status` and `counselor_id` are not writable by users. Role/assignment changes go through admin-only `SECURITY DEFINER` RPCs that re-check the caller.
 - **Counselor accounts start `pending`** and have no access until an admin approves them. Sign-up details can't grant a role.
+- **Verified counselors only.** A counselor's email and phone sit in a separate table that only they and the administrator can read; students get a safe summary (qualifications, experience, areas) through a function. Approving an application verifies it; editing qualifications, experience or areas clears verification until the admin checks again. Matching (`private.rank_counselors`) only ever scores verified counselors, and the manual assignment function no longer exists.
+- **Personal toolkit records are owner-only.** Reflections, behaviour logs, goals, stress entries, tasks, study sessions, reviews, decisions and game saves have a single policy: `user_id = auth.uid()`. Counselors and admins have no access. Each table has a per-user row limit.
 - **Username accounts.** Supabase Auth needs an email-shaped identifier, so each username maps to an internal address on the reserved `.invalid` domain. Nothing is ever emailed. Reserved usernames (`admin`, `support`, …) are blocked in the database itself.
 - **Built-in admin.** The admin password is stored only as a salted scrypt hash (or taken from `ADMIN_PASSWORD` if set) and checked in constant time. On first login the server creates the admin account using a one-time token that only the server can mint, so nobody can claim the admin role through the public auth API.
 - **Server actions** re-verify the session and role, validate input with Zod, and call the database as the user (so RLS still applies).
@@ -76,7 +87,7 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 - **Security headers:** a strict Content-Security-Policy (scripts only from this site; network and media only from your Supabase project), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy and a locked-down permissions policy (the microphone is allowed only on this site, for recording voice notes).
 - **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords, never to read conversations, and never sent to the browser.
 
-`scripts/test-rls.mjs` contains **69 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, voice note review, Doodle Wall answers, reserved usernames, double booking, pending accounts, …).
+`scripts/test-rls.mjs` contains **80 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, voice note review, Doodle Wall answers, counselor contact privacy and verification, verified-only matching, private toolkit records, Gratitude Wall screening, reserved usernames, double booking, pending accounts, …).
 
 ---
 
@@ -176,6 +187,10 @@ src/components/shared/     Chat thread, status badges, counselor card, stats
 src/components/toolkit/    The eight self-help tools
 src/components/voices/     Voice notes: player, recorder, review queue
 src/components/play/       Reset Zone games and the Doodle Wall
+src/components/pet/        Little Paws 3D (three.js / React Three Fiber, everything generated in code)
+src/components/cozy/       Cozy Room
+src/components/wellbeing/  The six-tool wellbeing toolkit and the Gratitude Wall
+src/lib/matching.ts        Concern analysis for smart matching (scoring happens in the database)
 src/components/mood/       Mood Portal and the mood-coloured background
 src/app/(marketing)/       Landing page, public toolkit, games and Mood Portal
 src/app/(auth)/            Login, register, password reset

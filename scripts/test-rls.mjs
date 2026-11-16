@@ -242,11 +242,8 @@ await test("can read all profiles and aggregate stats", async () => {
 await test("cannot change their own role", async () => {
   assert.ok((await admin.c.rpc("admin_update_user", { p_user: admin.id, p_role: "student", p_status: null })).error);
 });
-await test("can assign a counselor and open requests follow", async () => {
-  assert.ifError((await admin.c.rpc("admin_assign_counselor", { p_student: omar.id, p_counselor: daniel.id, p_move_open: true })).error);
-  const { data } = await daniel.c.from("conversations").select("id").eq("student_id", omar.id).neq("status", "resolved");
-  assert.ok(data.length > 0);
-  assert.ifError((await admin.c.rpc("admin_assign_counselor", { p_student: omar.id, p_counselor: amira.id, p_move_open: true })).error);
+await test("cannot assign counselors by hand (matching is automatic)", async () => {
+  assert.ok((await admin.c.rpc("admin_assign_counselor", { p_student: omar.id, p_counselor: daniel.id, p_move_open: true })).error);
 });
 
 const service = createClient(url, secret, { auth: { persistSession: false } });
@@ -436,8 +433,13 @@ await test("three reports hide a doodle from students", async () => {
 });
 
 console.log("\nPending counselor sign-ups");
+const COUNSELOR_META = { role_request: "counselor", contact_email: "pending@example.com", phone: "+923001110000", qualifications: "MA Counselling", experience_years: "3", expertise: ["career"] };
+await test("counselor sign-ups without professional details are refused", async () => {
+  const { error } = await provision(`nodetails${Date.now() % 100000}`, { full_name: "No Details", role_request: "counselor" });
+  assert.ok(error, "email, phone, qualifications, experience and expertise are required");
+});
 await test("start pending with no access until approved", async () => {
-  const { c, id, error } = await provision(`pending${Date.now() % 100000}`, { full_name: "Pending Person", role_request: "counselor" });
+  const { c, id, error } = await provision(`pending${Date.now() % 100000}`, { full_name: "Pending Person", ...COUNSELOR_META });
   assert.ifError(error);
   const { data: me } = await c.from("profiles").select("role, status").eq("id", id).single();
   assert.equal(me.status, "pending");
@@ -467,6 +469,95 @@ await test("login-attempt records are invisible to users", async () => {
 await test("public sign-up endpoint is disabled", async () => {
   const { error } = await client().auth.signUp({ email: `drive-by${Date.now()}@${domain}`, password, options: { data: { username: `driveby${Date.now() % 10000}` } } });
   assert.ok(error);
+});
+
+console.log("\nCounselor credentials and matching");
+await test("students can't see counselors' contact details", async () => {
+  assert.equal(((await zara.c.from("counselor_credentials").select("email, phone")).data ?? []).length, 0);
+  const { data } = await zara.c.rpc("counselor_summaries", { p_ids: [amira.id, daniel.id] });
+  assert.ok(data.length === 2 && data.every((r) => !("email" in r) && !("phone" in r)));
+});
+await test("counselors see only their own details; admins see all", async () => {
+  const own = (await amira.c.from("counselor_credentials").select("counselor_id")).data ?? [];
+  assert.ok(own.length === 1 && own[0].counselor_id === amira.id);
+  assert.ok(((await admin.c.from("counselor_credentials").select("counselor_id")).data ?? []).length >= 2);
+});
+await test("counselors can't verify themselves; changing expertise needs re-verification", async () => {
+  assert.ok((await amira.c.from("counselor_credentials").update({ verified_at: new Date().toISOString() }).eq("counselor_id", amira.id)).error);
+  const before = (await amira.c.from("counselor_credentials").select("expertise").eq("counselor_id", amira.id).single()).data.expertise;
+  assert.ifError((await amira.c.from("counselor_credentials").update({ expertise: [...before.filter((e) => e !== "grief"), "grief"] }).eq("counselor_id", amira.id)).error);
+  assert.equal((await admin.c.from("counselor_credentials").select("verified_at").eq("counselor_id", amira.id).single()).data.verified_at, null);
+  assert.ok((await daniel.c.rpc("admin_verify_counselor", { p_counselor: amira.id })).error, "only admins verify");
+  await amira.c.from("counselor_credentials").update({ expertise: before }).eq("counselor_id", amira.id);
+  assert.ifError((await admin.c.rpc("admin_verify_counselor", { p_counselor: amira.id })).error);
+});
+await test("matching picks the verified specialist, and never an unverified counselor", async () => {
+  const s = await provision(`matcher${Date.now() % 100000}`, { full_name: "Matcher" });
+  const family = (await s.c.rpc("match_counselor", { p_concern: "family", p_weights: { family: 1 }, p_urgent: false })).data[0];
+  assert.equal(family.counselor_id, daniel.id);
+  await service.from("counselor_credentials").update({ verified_at: null }).eq("counselor_id", daniel.id);
+  const again = (await s.c.rpc("match_counselor", { p_concern: "family", p_weights: { family: 1 }, p_urgent: false })).data[0];
+  assert.notEqual(again.counselor_id, daniel.id);
+  await admin.c.rpc("admin_verify_counselor", { p_counselor: daniel.id });
+  await service.auth.admin.deleteUser(s.id);
+});
+await test("only students can be matched; match records and admin overview are private", async () => {
+  assert.ok((await amira.c.rpc("match_counselor", { p_concern: "family", p_weights: {}, p_urgent: false })).error);
+  assert.equal(((await zara.c.from("counselor_matches").select("id")).data ?? []).length, 0);
+  assert.ok((await zara.c.rpc("admin_matching_overview")).error);
+  assert.ok((await amira.c.rpc("admin_matching_overview")).error);
+});
+
+console.log("\nPersonal toolkit");
+await test("records are private to their owner, even from counselors and admins", async () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const rows = {
+    reflection_entries: { entry_on: today, question_id: "energy", category: "emotional", question: "What has been taking most of your energy lately?", answer: "Private", skipped: false },
+    behaviour_logs: { behaviour: "study", label: "Private log" },
+    stress_entries: { sources: ["academic"], intensity: 3, frequency: "often" },
+    academic_tasks: { title: "Private task", due_on: today },
+    decisions: { title: "Private decision" },
+    game_saves: { game: "pet", data: { name: "Mochi" } },
+  };
+  for (const [table, row] of Object.entries(rows)) {
+    const ins = await zara.c.from(table).insert(row);
+    assert.ifError(ins.error);
+    for (const other of [omar, amira, admin]) assert.equal(((await other.c.from(table).select("user_id")).data ?? []).filter((r) => r.user_id === zara.id).length, 0, `${table} leaked`);
+    assert.equal(((await anon.from(table).select("user_id")).data ?? []).length, 0);
+    await omar.c.from(table).delete().eq("user_id", zara.id);
+    assert.ok(((await zara.c.from(table).select("user_id")).data ?? []).length > 0, `${table} deleted by someone else`);
+    assert.ok((await zara.c.from(table).insert({ ...row, ...(table === "game_saves" ? { game: "cozy" } : {}), user_id: omar.id })).error, `${table} accepted a spoofed owner`);
+    await zara.c.from(table).delete().eq("user_id", zara.id);
+  }
+});
+
+console.log("\nGratitude Wall");
+let gpost;
+await test("anonymous posts hide the author from students but not from staff", async () => {
+  assert.equal((await zara.c.rpc("create_gratitude_post", { p_category: "kindness", p_body: "Someone shared their notes with me today.", p_anonymous: true, p_allow_comments: true })).data, "published");
+  const mine = (await zara.c.rpc("gratitude_feed", {})).data.find((p) => p.is_mine);
+  gpost = mine.id;
+  const seen = (await omar.c.rpc("gratitude_feed", {})).data.find((p) => p.id === gpost);
+  assert.ok(seen && seen.author_name === null);
+  assert.equal((await amira.c.rpc("gratitude_feed", {})).data.find((p) => p.id === gpost).author_name, "Zara Ahmed");
+});
+await test("posts with contact details are held for review", async () => {
+  assert.equal((await zara.c.rpc("create_gratitude_post", { p_category: "people", p_body: "Thanks! Message me on 0300 1234567", p_anonymous: true, p_allow_comments: true })).data, "held");
+  assert.ok(!(await omar.c.rpc("gratitude_feed", {})).data.some((p) => p.body.includes("0300")));
+  assert.ok((await amira.c.rpc("gratitude_feed", {})).data.some((p) => p.status === "held" && p.body.includes("0300")));
+});
+await test("tables can't be read directly and comments are screened", async () => {
+  assert.equal(((await omar.c.from("gratitude_posts").select("id")).data ?? []).length, 0);
+  assert.ok((await omar.c.rpc("add_gratitude_comment", { p_post: gpost, p_body: "add me @sneaky_handle", p_anonymous: true })).error);
+  assert.ifError((await omar.c.rpc("add_gratitude_comment", { p_post: gpost, p_body: "That's really kind.", p_anonymous: true })).error);
+});
+await test("students can't moderate; three reports hold a post", async () => {
+  assert.ok((await omar.c.rpc("moderate_gratitude_post", { p_post: gpost, p_status: "hidden" })).error);
+  const extra = await provision(`greporter${Date.now() % 100000}`, { full_name: "Reporter" });
+  for (const r of [omar, lina, extra]) await r.c.rpc("report_gratitude_post", { p_post: gpost, p_reason: "" });
+  assert.ok(!(await omar.c.rpc("gratitude_feed", {})).data.some((p) => p.id === gpost));
+  await service.auth.admin.deleteUser(extra.id);
+  for (const p of (await zara.c.rpc("gratitude_feed", {})).data.filter((x) => x.is_mine)) await zara.c.rpc("delete_gratitude_post", { p_post: p.id });
 });
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

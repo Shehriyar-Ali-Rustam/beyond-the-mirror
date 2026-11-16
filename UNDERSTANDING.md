@@ -22,9 +22,9 @@ There are three kinds of users. Each one sees a different part of the website, c
 
 | User | What they use it for |
 | --- | --- |
-| **Student** | Ask for help, chat with their counselor, book sessions, use the self-help tools, games and voice notes |
-| **Counselor** | Reply to students, manage sessions, keep private notes, review voice notes, look after the community board |
-| **Admin** | Approve counselors, manage accounts, connect students to counselors, see overall numbers |
+| **Student** | Get matched with the right counselor, chat with them, book sessions, use the wellbeing toolkit, games and voice notes |
+| **Counselor** | Apply with their qualifications, reply to students, manage sessions, keep private notes, review voice notes, look after the community board and Gratitude Wall |
+| **Admin** | Check and approve counselors' qualifications, manage accounts, see how matching is working, see overall numbers |
 
 Some parts are **public** (no login needed): the home page, the self-help toolkit, the games and the Mood Portal.
 
@@ -34,6 +34,7 @@ Some parts are **public** (no login needed): the home page, the self-help toolki
 
 ### Students
 
+- **Get matched with the right counselor.** A short "How are you feeling today?" screen asks what's going on (for example exam stress or family problems). The website then picks the approved counselor whose experience fits best. If someone is stressed about exams, they're matched with a counselor who works with academic stress; family issues go to someone experienced with families. This "smart matching" runs on our own server and uses no outside AI service.
 - **Message their counselor** in a private chat that updates live, like WhatsApp.
 - **Write anonymously** if they are shy. The counselor can help without knowing who it is. The student can share their name later if they want.
 - **Track their request:** Sent, Seen, Replied, Resolved.
@@ -42,8 +43,15 @@ Some parts are **public** (no login needed): the home page, the self-help toolki
 - **Community board:** ask other students for advice or share something good, with an optional photo. Posts can be anonymous.
 - **A Voice That Understands:** listen to short voice notes (20 to 60 seconds) recorded by other students for hard moments, like feeling lonely or before an exam. In English and Urdu. Students can record their own. A counselor checks every recording before anyone hears it.
 - **Check in with yourself:** 10 quick questions about exam stress, overthinking, focus, sleep and feeling overwhelmed. The results give simple, practical ideas. It is not a medical test, and the answers are not saved.
-- **Self-help toolkit:** 8 short activities, such as naming a feeling, calming down on a bad day, an exam revision planner and scripts for hard conversations.
-- **The Little Reset Zone:** 5 small games for a break (Smash the Stress, Spin the Fun Wheel, Mystery Box, Doodle & Guess, Guess the Emoji).
+- **Wellbeing toolkit:** six connected tools that save to the student's own private account:
+  - **Daily Reflection Cards:** one thoughtful question a day, with a private journal.
+  - **Behaviour Pattern Tracker:** note habits like sleep, study or putting things off, and see which patterns keep repeating.
+  - **Stress Pattern Analysis:** record what causes stress and how it affects you, and see your recurring stressors over time.
+  - **Academic Pressure Manager:** deadlines, breaking big tasks into steps, an automatic study plan for the week and a study timer.
+  - **Decision-Making Assistant:** work through a hard choice step by step. It never decides for you.
+  - **Gratitude Wall:** share things you appreciate, anonymously if you like. Posts with phone numbers, links or unkind words are checked by a counselor first.
+- **Quick tools:** 8 short activities that work without an account, such as naming a feeling, calming down on a bad day, an exam revision planner and scripts for hard conversations.
+- **The Little Reset Zone:** 7 games for a break, including **Little Paws 3D** (look after your own 3D virtual pet) and **Cozy Room** (a calm, rainy room to decorate), plus Smash the Stress, Spin the Fun Wheel, Mystery Box, Doodle & Guess and Guess the Emoji.
 - **The Mood Portal:** pick a colour that matches your mood. The whole website changes colour and suggests something helpful.
 
 ### Counselors
@@ -52,15 +60,16 @@ Some parts are **public** (no login needed): the home page, the self-help toolki
 - **Private notes** about each case that only they can read.
 - A **schedule** for setting free times and managing bookings.
 - A **list of their students** with each student's history.
-- **Review voice notes** before they go public, and **moderate** the community board and the Doodle Wall.
+- **Apply with a professional profile:** full name, email, phone number, qualifications, years of experience and areas of expertise. Email and phone are required and only the admin can see them.
+- **Review voice notes** before they go public, and **moderate** the community board, the Doodle Wall and the Gratitude Wall.
 - **Announcements** to students.
 - A simple **dashboard** with numbers like how many students are waiting for a reply.
 
 ### Admin
 
-- **Approve or decline** new counselor accounts.
+- **Check and approve** counselor applications. Only approved (verified) counselors are ever matched with students. If a counselor later changes their qualifications or areas of expertise, the admin checks them again.
 - **Manage accounts:** change roles, pause access, reset passwords.
-- **Assign students to counselors.**
+- **See how matching works.** The admin doesn't assign students by hand. The Matching page shows each counselor's areas and number of students, and what kinds of support students needed (totals only).
 - See **overall statistics** only. The admin can never read anyone's messages.
 
 ---
@@ -73,14 +82,15 @@ Privacy was the most important rule while building this.
 - **Admins can't read conversations.** They only see numbers.
 - **Anonymous really means anonymous.** For anonymous messages, the student's name is not stored with the conversation at all.
 - **No email needed.** People sign up with a username and password. This suits students who may not have their own email.
-- **Counselor accounts must be approved** by the admin before they can see anything.
+- **Counselor accounts must be approved** by the admin before they can see anything, and only verified counselors are matched with students.
+- **The wellbeing toolkit is private.** Reflections, habits, stress records, tasks and decisions can only be seen by the student who wrote them, and they can edit or delete them at any time. Not even counselors or the admin can read them unless the student chooses to share.
 - **Login protection:** after too many wrong passwords, logins are blocked for a while.
 - **Photos and voice notes are stored privately.** They are shown through links that stop working after a short time.
 - **Voice notes and community posts are checked.** A counselor reviews every voice note, and anyone can report something unkind.
 - **Safety messages** appear in the right places. For example, if someone writes something worrying in the Mood Portal, emergency contact information appears straight away.
 - **Things that stay on your device:** mood colours, game scores, check-in answers and "letters you won't send" are never uploaded.
 
-There are **69 automatic security tests** that try to break these rules. All of them pass.
+There are **80 automatic security tests** that try to break these rules. All of them pass.
 
 ---
 
@@ -98,6 +108,7 @@ There are **69 automatic security tests** that try to break these rules. All of 
 | File storage | **Supabase Storage** | Keeps photos, voice notes and doodles in private folders |
 | Hosting | **Vercel** | Puts the website on the internet and updates it automatically |
 | Code storage | **GitHub** | Keeps all the code and its history |
+| 3D graphics | **three.js** with **React Three Fiber** | Draws the 3D pets in Little Paws, built entirely in code |
 
 Smaller helpers:
 
@@ -130,6 +141,22 @@ Smaller helpers:
 5. While you are on a chat page, **live updates** push new messages to you straight away.
 6. When you send something (a message, a booking, a voice note), the website checks it first and then saves it in the database.
 
+### How smart matching works
+
+The matching is done by our own code, with no outside AI service, so what students write never leaves the website.
+
+1. The student answers "What's going on with you?", a follow-up question, and can add a few words of their own (English or Roman Urdu).
+2. The website turns this into **areas of need**, for example "academic stress" and a little "anxiety". It recognises everyday words like *exam*, *parents*, *ammi*, *dost* or *overthinking*, and ignores phrases like "not worried".
+3. The database gives every **verified** counselor a score based on:
+   - how well their areas of expertise match (the biggest part),
+   - years of experience,
+   - whether they're available right now (extra important for urgent requests),
+   - how many students they already have, so nobody is overloaded,
+   - a small bonus if they're already the student's counselor, so people keep the same person when it fits.
+4. The highest score wins. The student sees who they were matched with and why, and can write to them straight away.
+
+If the words suggest someone might be in danger, the request is marked urgent and emergency contact information appears immediately.
+
 ---
 
 ## 7. How it was built
@@ -138,7 +165,7 @@ Smaller helpers:
 2. **Database first:** created the tables (accounts, conversations, messages, bookings, posts, voice notes and so on) and the privacy rules on each one.
 3. **Pages for each portal:** built the student, counselor and admin sections, plus the public pages.
 4. **Design:** a clean white base with warm colours, photos inside arch shapes (the "mirror" idea), illustrations and gentle animations. It works on phones, tablets and computers.
-5. **Extra features over time:** anonymous messages, the community board, voice notes, the check-in, the games and the Mood Portal.
+5. **Extra features over time:** anonymous messages, the community board, voice notes, the check-in, the games, the Mood Portal, counselor verification and smart matching, the six-tool wellbeing toolkit, Little Paws 3D and Cozy Room.
 6. **Testing:** automatic security tests, plus browser tests that sign in as each type of user and try every page and feature.
 7. **Publishing:** the code is pushed to GitHub. Vercel notices, builds the website and puts it online. Any database changes are applied automatically during that build.
 

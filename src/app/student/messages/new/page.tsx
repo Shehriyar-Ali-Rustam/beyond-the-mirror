@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { redirect } from "next/navigation";
+import { ArrowLeft, Eye, EyeOff, ShieldCheck, Sparkles } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { getCounselor } from "@/lib/queries";
-import { categorySchema } from "@/lib/validation";
+import { categorySchema, urgencySchema } from "@/lib/validation";
 import { NewRequestForm } from "@/components/student/new-request-form";
 import { Avatar } from "@/components/ui/avatar";
 import { PresenceDot } from "@/components/shared/counselor-card";
@@ -16,6 +17,9 @@ export default async function NewRequestPage({ searchParams }: PageProps<"/stude
   const counselor = await getCounselor(viewer.counselor_id);
   const sp = await searchParams;
   const category = categorySchema.safeParse(sp.category);
+  const urgency = urgencySchema.safeParse(sp.urgency);
+  // Students without a counselor are matched first, so they know who they're writing to.
+  if (!counselor && !sp.skipMatch) redirect("/student/match");
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -28,9 +32,13 @@ export default async function NewRequestPage({ searchParams }: PageProps<"/stude
           <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-ink-2">
             Say as much or as little as you like. Your counselor can always ask follow-up questions.
           </p>
+          <Link href="/student/match" className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+            <Sparkles className="size-4" /> New concern? Check which counselor fits it best
+          </Link>
           <div className="mt-8">
             <NewRequestForm
               initialCategory={category.success ? category.data : undefined}
+              initialUrgency={urgency.success ? urgency.data : undefined}
               whatsapp={counselor?.whatsapp ?? null}
             />
           </div>

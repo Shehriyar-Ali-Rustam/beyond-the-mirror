@@ -50,7 +50,7 @@ const FAQ = [
   },
   {
     q: "What can school administrators see?",
-    a: "Admins manage accounts and assignments and see aggregate numbers: how many requests were opened, typical response times, which topics come up most. They can't open conversations, read messages, or see counselors' private notes.",
+    a: "Admins verify counselors and manage accounts, and see aggregate numbers: how many requests were opened, typical response times, which topics come up most. They can't open conversations, read messages, or see counselors' private notes.",
   },
 ];
 
@@ -184,8 +184,8 @@ export default function LandingPage() {
                 </div>
               </div>
               <p className="mt-6 font-display text-sm text-clay">Step 1</p>
-              <h3 className="mt-1 text-lg font-semibold text-ink">Write it how it comes</h3>
-              <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">Pick a topic, say how soon you need a reply, and write. No perfect words needed.</p>
+              <h3 className="mt-1 text-lg font-semibold text-ink">Say what&apos;s going on</h3>
+              <p className="mt-1.5 text-[15px] leading-relaxed text-ink-2">Answer a few gentle questions and we&apos;ll match you with a verified counselor whose experience fits, like exam stress or family issues. Then write it how it comes.</p>
             </Reveal>
 
             {/* Step 2 */}
@@ -319,12 +319,12 @@ export default function LandingPage() {
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-ink">For school administrators</h3>
               <p className="mt-1 text-[15px] leading-relaxed text-ink-2">
-                Approve counselor accounts, balance caseloads, and see how the service is used: response times, topics,
-                session numbers. All in aggregate. Never a single message.
+                Verify counselors&apos; qualifications before they can help anyone, and see how the service is used: response
+                times, topics, session numbers. Students are matched with counselors automatically. Never a single message is visible.
               </p>
             </div>
             <div className="flex gap-6 text-sm text-ink-2">
-              <span className="flex items-center gap-2"><ClipboardList className="size-4 text-clay" /> Assignments</span>
+              <span className="flex items-center gap-2"><ClipboardList className="size-4 text-clay" /> Verification</span>
               <span className="flex items-center gap-2"><BarChart3 className="size-4 text-clay" /> Insights</span>
             </div>
           </Reveal>
@@ -519,7 +519,7 @@ export default function LandingPage() {
             <h2 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Private by design. Honest about the limits.</h2>
             <p className="mt-5 text-[17px] leading-relaxed text-ink-2">
               Access rules live in the database itself, not just the interface, so a student can only ever see their own
-              conversations, and a counselor only the ones assigned to them.
+              conversations, and a counselor only the ones matched to them.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex gap-3.5 rounded-2xl bg-surface-2 p-5">
@@ -612,7 +612,7 @@ export default function LandingPage() {
       <section className="px-5 pb-20 sm:px-8 sm:pb-28">
         <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-ink px-6 py-16 text-center text-white sm:px-12 sm:py-24">
           <Photo name="friendsLaughing" className="absolute inset-0" sizes="100vw" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#102e2a]/95 via-[#1d5b51]/80 to-[#1d5b51]/40" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#2a1838]/95 via-[#6b4386]/80 to-[#6b4386]/40" />
           <div aria-hidden className="arch absolute -bottom-24 left-1/2 h-72 w-56 -translate-x-1/2 border border-white/10 bg-white/[0.03]">
             <div className="glass-sheen arch absolute inset-0 opacity-30" />
           </div>

@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ListFilters } from "@/components/shared/list-filters";
 import { RoleFilter, UserActions } from "@/components/admin/user-actions";
+import { CounselorReview } from "@/components/admin/counselor-review";
 import { ROLE_LABEL } from "@/components/shell/nav-config";
 
 export const metadata: Metadata = { title: "People" };
@@ -32,7 +33,12 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
   const term = ilikeTerm(q);
   if (term) query = query.or(`full_name.ilike.${term},username.ilike.${term},email.ilike.${term}`);
 
-  const [{ data: users }, { data: all }] = await Promise.all([query, supabase.from("profiles").select("status")]);
+  const [{ data: users }, { data: all }, { data: counselors }] = await Promise.all([
+    query,
+    supabase.from("profiles").select("status"),
+    supabase.rpc("admin_matching_overview"),
+  ]);
+  const toVerify = (counselors ?? []).filter((c) => c.status === "pending" || (c.status === "active" && c.has_details && !c.verified));
   const counts = {
     all: all?.length ?? 0,
     pending: all?.filter((u) => u.status === "pending").length ?? 0,
@@ -42,7 +48,8 @@ export default async function AdminUsers({ searchParams }: PageProps<"/admin/use
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHero illustration="showing-support" tone="rose" title="People" description="Approve counselor accounts, change roles, and pause access when needed." />
+      <PageHero illustration="showing-support" tone="rose" title="People" description="Verify counselor applications, change roles, and pause access when needed." />
+      <CounselorReview rows={toVerify} />
       <Suspense>
         <ListFilters
           tabs={[

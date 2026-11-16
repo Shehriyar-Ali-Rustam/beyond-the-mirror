@@ -41,9 +41,6 @@ export function StaffProfileForm({ profile }: { profile: Profile }) {
               <Input id="whatsapp" name="whatsapp" defaultValue={profile.whatsapp ?? ""} placeholder="With country code, e.g. +1 555 010 0000" inputMode="tel" />
             </Field>
           </div>
-          <Field label="Areas you help with" htmlFor="specialties" optional error={fe?.specialties} hint="Comma-separated, up to 8.">
-            <Input id="specialties" name="specialties" defaultValue={profile.specialties.join(", ")} placeholder="Exam stress, Careers, Friendships" />
-          </Field>
         </>
       )}
       <Button type="submit" loading={pending}>

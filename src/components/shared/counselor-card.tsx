@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CalendarPlus, Clock, MessageSquarePlus } from "lucide-react";
+import { BadgeCheck, Briefcase, CalendarPlus, Clock, GraduationCap, MessageSquarePlus } from "lucide-react";
+import { expertiseLabel } from "@/lib/expertise";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PRESENCE } from "@/lib/constants";
@@ -40,6 +41,11 @@ export function CounselorCard({
         <div className="min-w-0">
           <p className="font-display text-xl leading-tight text-ink">{counselor.full_name}</p>
           {counselor.title && <p className="text-sm text-ink-2">{counselor.title}</p>}
+          {counselor.verified && (
+            <p className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-ok">
+              <BadgeCheck className="size-3.5" /> Verified counselor
+            </p>
+          )}
           <p className="mt-1.5 flex items-center gap-2 text-[13px] text-ink-2">
             <PresenceDot presence={counselor.presence} />
             {PRESENCE[counselor.presence].label}
@@ -58,9 +64,23 @@ export function CounselorCard({
           </span>
         </p>
       )}
-      {variant === "full" && counselor.specialties.length > 0 && (
+      {variant === "full" && (counselor.qualifications || counselor.experience_years != null) && (
+        <div className="mt-4 space-y-1 text-[13px] text-ink-2">
+          {counselor.qualifications && (
+            <p className="flex items-start gap-2">
+              <GraduationCap className="mt-0.5 size-3.5 shrink-0 text-ink-3" /> {counselor.qualifications}
+            </p>
+          )}
+          {counselor.experience_years != null && (
+            <p className="flex items-center gap-2">
+              <Briefcase className="size-3.5 shrink-0 text-ink-3" /> {counselor.experience_years} {counselor.experience_years === 1 ? "year" : "years"} of experience
+            </p>
+          )}
+        </div>
+      )}
+      {variant === "full" && (counselor.expertise.length > 0 || counselor.specialties.length > 0) && (
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {counselor.specialties.map((s) => (
+          {(counselor.expertise.length ? counselor.expertise.map(expertiseLabel) : counselor.specialties).map((s) => (
             <span key={s} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-ink-2">
               {s}
             </span>

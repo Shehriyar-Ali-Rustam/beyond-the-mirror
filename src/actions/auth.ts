@@ -111,7 +111,7 @@ export async function signIn(_: ActionResult | null, formData: FormData): Promis
 
 export async function signUp(_: ActionResult | null, formData: FormData): Promise<ActionResult> {
   if (!isSupabaseConfigured() || !hasServiceKey()) return { ok: false, error: NOT_READY };
-  const parsed = registerSchema.safeParse(Object.fromEntries(formData));
+  const parsed = registerSchema.safeParse({ ...Object.fromEntries(formData), expertise: formData.getAll("expertise") });
   if (!parsed.success) return { ok: false, error: "Please check the form.", fieldErrors: fieldErrors(parsed.error) };
   const v = parsed.data;
 
@@ -130,16 +130,28 @@ export async function signUp(_: ActionResult | null, formData: FormData): Promis
     password: v.password,
     email_confirm: true,
     // role_request is only a *request*: the database trigger decides the real role.
-    user_metadata: {
-      full_name: v.fullName,
-      username: v.username,
-      role_request: v.role,
-      grade: v.grade ?? null,
-      section: v.section ?? null,
-      student_number: v.studentNumber ?? null,
-      title: v.title ?? null,
-      contact_email: v.contactEmail ?? null,
-    },
+    user_metadata:
+      v.role === "student"
+        ? {
+            full_name: v.fullName,
+            username: v.username,
+            role_request: "student",
+            grade: v.grade ?? null,
+            section: v.section ?? null,
+            student_number: v.studentNumber ?? null,
+            contact_email: v.contactEmail ?? null,
+          }
+        : {
+            full_name: v.fullName,
+            username: v.username,
+            role_request: "counselor",
+            title: v.title ?? null,
+            contact_email: v.email,
+            phone: v.phone,
+            qualifications: v.qualifications,
+            experience_years: String(v.experienceYears),
+            expertise: v.expertise,
+          },
   });
   if (error) {
     if (/already/i.test(error.message)) return taken;

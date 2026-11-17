@@ -4,7 +4,7 @@ import { signPrivate } from "@/lib/storage";
 import type { Database } from "@/lib/supabase/database.types";
 
 export const VOICE_BUCKET = "voices";
-export const MAX_AUDIO_BYTES = 3.5 * 1024 * 1024;
+export const MAX_AUDIO_BYTES = 7 * 1024 * 1024;
 
 type Fn = Database["public"]["Functions"];
 export type VoiceNote = Fn["voice_library"]["Returns"][number] & { url: string | null };
@@ -42,12 +42,9 @@ const SIGNATURES: { type: "audio/webm" | "audio/ogg" | "audio/mp4" | "audio/mpeg
   { type: "audio/mpeg", ext: "mp3", test: (b) => String.fromCharCode(...b.slice(0, 3)) === "ID3" || (b[0] === 0xff && (b[1] & 0xe0) === 0xe0) },
 ];
 
-/** Checks the real file contents (not the claimed type) before storing. */
-export async function inspectAudio(file: File) {
-  if (file.size > MAX_AUDIO_BYTES) return { ok: false as const, error: "That recording is too large (max 3.5 MB)." };
-  if (file.size < 2000) return { ok: false as const, error: "That recording seems to be empty." };
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const match = SIGNATURES.find((s) => s.test(bytes));
-  if (!match) return { ok: false as const, error: "Please use a WebM, OGG, M4A or MP3 recording." };
-  return { ok: true as const, bytes, type: match.type, ext: match.ext };
+export const AUDIO_EXT: Record<string, string> = { "audio/webm": "webm", "audio/ogg": "ogg", "audio/mp4": "m4a", "audio/mpeg": "mp3" };
+
+/** Identifies audio from its first bytes (not the claimed type). */
+export function detectAudio(bytes: Uint8Array) {
+  return SIGNATURES.find((s) => s.test(bytes)) ?? null;
 }

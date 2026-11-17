@@ -31,7 +31,7 @@ Built with **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabas
 - Request tracking: *Sent → Seen → Replied → Resolved*, resolve/reopen, and feedback
 - Session booking from the counselor's open slots (in person / online / phone), cancellation, post-session rating
 - Live notifications (bell + toasts) for replies, bookings and status changes
-- **A Voice That Understands:** 20 to 60 second voice notes recorded by students for moments like *feeling lonely*, *before an exam*, *giving up on your day* or *feeling overwhelmed*, in English and Urdu. Record in the browser (or upload a file), stay anonymous if you like, and a counselor reviews every recording before anyone hears it. A "Play me something" button picks a random note
+- **A Voice That Understands:** voice notes of 20 seconds to 2 minutes (up to 7 MB) recorded by students for moments like *feeling lonely*, *before an exam*, *giving up on your day* or *feeling overwhelmed*, in English and Urdu. Record in the browser (or upload a file, which goes straight to private storage through a one-time signed upload link and is checked on the server before it is accepted), stay anonymous if you like, and a counselor reviews every recording before anyone hears it. A "Play me something" button picks a random note
 - **Check in with yourself:** 10 questions on exam pressure, overthinking, concentration, sleep and feeling overwhelmed (*Never / Sometimes / Often / Almost always*), with practical ideas for each area (study timetable, breathing, breaks, sleep habits). Higher stress points to a counselor or trusted adult. Not a diagnosis, and nothing is saved
 - **Wellbeing toolkit** (six connected tools, saved privately to the student's account, editable and deletable, never visible to counselors or admins unless shared):
   - *Daily Reflection Cards*: a thoughtful question each day across seven themes, follow-up questions, a skip option, a private journal and a weekly reflection
@@ -87,7 +87,7 @@ Access control is enforced **in the database**, not just the UI. The browser onl
 - **Security headers:** a strict Content-Security-Policy (scripts only from this site; network and media only from your Supabase project), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy and a locked-down permissions policy (the microphone is allowed only on this site, for recording voice notes).
 - **The Supabase secret (service-role) key stays on the server.** It's used only to create accounts, prepare the admin login and reset passwords, never to read conversations, and never sent to the browser.
 
-`scripts/test-rls.mjs` contains **80 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, voice note review, Doodle Wall answers, counselor contact privacy and verification, verified-only matching, private toolkit records, Gratitude Wall screening, reserved usernames, double booking, pending accounts, …).
+`scripts/test-rls.mjs` contains **81 automated security tests** (cross-student reads, sender spoofing, privilege escalation, admin isolation, anonymity, community masking and moderation, voice note review, Doodle Wall answers, counselor contact privacy and verification, verified-only matching, private toolkit records, Gratitude Wall screening, reserved usernames, double booking, pending accounts, …).
 
 ---
 

@@ -393,7 +393,7 @@ export default function LandingPage() {
               </span>
               <h3 className="mt-5 font-display text-2xl text-ink">A Voice That Understands</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-ink-2">
-                20 to 60 second voice notes recorded by students, for when you feel lonely, before an exam, or when it&apos;s all too much.
+                Voice notes of up to two minutes, recorded by students for when you feel lonely, before an exam, or when it&apos;s all too much.
                 In English and Urdu. Every recording is checked by a counselor first, and speakers can stay anonymous.
               </p>
               <Illustration name="podcast-listener" className="mx-auto mt-6 w-60" />

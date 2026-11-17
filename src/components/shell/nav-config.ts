@@ -27,6 +27,7 @@ export const NAV: Record<Role, { main: NavItem[]; secondary: NavItem[] }> = {
       { href: "/student/messages", label: "Messages", tone: "bg-sky-soft text-sky", icon: MessagesSquare, badgeKey: "unread" },
       { href: "/student/appointments", label: "Sessions", tone: "bg-sun-soft text-[#a26a00]", icon: CalendarDays },
       { href: "/student/community", label: "Community", tone: "bg-coral-soft text-coral", icon: UsersRound },
+      { href: "/student/toolkit/gratitude", label: "Gratitude Wall", tone: "bg-rose-soft text-rose", icon: HandHeart },
       { href: "/student/voices", label: "Voice notes", tone: "bg-lilac-soft text-lilac", icon: AudioLines },
       { href: "/student/play", label: "Reset Zone", tone: "bg-sun-soft text-[#a26a00]", icon: Gamepad2 },
       { href: "/student/toolkit", label: "Toolkit", tone: "bg-grape-soft text-grape", icon: Sparkles },

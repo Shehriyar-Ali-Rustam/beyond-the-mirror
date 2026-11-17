@@ -1,9 +1,10 @@
 "use client";
 
-import { startTransition, useActionState, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Mic, RotateCcw, ShieldCheck, Square, Upload, VenetianMask } from "lucide-react";
-import { submitVoiceNote } from "@/actions/voices";
+import { prepareVoiceUpload, submitVoiceNote } from "@/actions/voices";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import {
@@ -19,9 +20,10 @@ import {
 import { cn } from "@/lib/utils";
 import { VoicePlayer } from "./voice-player";
 
-const MAX_BYTES = 3.5 * 1024 * 1024;
+const MAX_BYTES = 7 * 1024 * 1024;
 const RECORD_TYPES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
 const EXT: Record<string, string> = { "audio/webm": "webm", "audio/mp4": "m4a", "audio/ogg": "ogg", "audio/mpeg": "mp3" };
+const lengthLabel = (s: number) => (s >= 60 && s % 60 === 0 ? `${s / 60} ${s === 60 ? "minute" : "minutes"}` : `${s} seconds`);
 
 const now = () => performance.now();
 
@@ -40,7 +42,8 @@ async function measure(blob: Blob) {
 }
 
 export function Recorder({ firstName, onSubmitted }: { firstName: string; onSubmitted: () => void }) {
-  const [state, action, pending] = useActionState(submitVoiceNote, null);
+  const [pending, startSending] = useTransition();
+  const [stage, setStage] = useState<"upload" | "check" | null>(null);
   const [category, setCategory] = useState<VoiceCategory>("lonely");
   const [language, setLanguage] = useState<VoiceLanguage>("en");
   const [title, setTitle] = useState("");
@@ -69,19 +72,6 @@ export function Recorder({ firstName, onSubmitted }: { firstName: string; onSubm
   };
   useEffect(() => cleanup, []);
   useEffect(() => () => void (take && URL.revokeObjectURL(take.url)), [take]);
-
-  useEffect(() => {
-    if (!state) return;
-    if (state.ok) {
-      toast.success(state.message ?? "Sent for review");
-      /* eslint-disable react-hooks/set-state-in-effect -- reset after a successful submission */
-      setTake(null);
-      setTitle("");
-      setConsent(false);
-      /* eslint-enable react-hooks/set-state-in-effect */
-      onSubmitted();
-    } else toast.error(state.error);
-  }, [state, onSubmitted]);
 
   const start = async () => {
     setError(null);
@@ -152,11 +142,11 @@ export function Recorder({ firstName, onSubmitted }: { firstName: string; onSubm
     setError(null);
     const type = file.type.split(";")[0];
     if (!EXT[type] && !["audio/x-m4a", "audio/mp3"].includes(type)) return setError("Please choose an MP3, M4A, OGG or WebM audio file.");
-    if (file.size > MAX_BYTES) return setError("That file is too big. Voice notes can be up to 3.5 MB.");
+    if (file.size > MAX_BYTES) return setError("That file is too big. Voice notes can be up to 7 MB.");
     try {
       const seconds = Math.round(await measure(file));
       if (seconds < VOICE_MIN_SECONDS || seconds > VOICE_MAX_SECONDS + 2) {
-        return setError(`That recording is ${seconds} seconds. Voice notes need to be between ${VOICE_MIN_SECONDS} and ${VOICE_MAX_SECONDS} seconds.`);
+        return setError(`That recording is ${formatSeconds(seconds)} long. Voice notes need to be between ${lengthLabel(VOICE_MIN_SECONDS)} and ${lengthLabel(VOICE_MAX_SECONDS)}.`);
       }
       const normalized = type === "audio/x-m4a" ? "audio/mp4" : type === "audio/mp3" ? "audio/mpeg" : type;
       setTake({ blob: file, url: URL.createObjectURL(file), seconds: Math.min(seconds, VOICE_MAX_SECONDS), type: normalized });
@@ -176,8 +166,33 @@ export function Recorder({ firstName, onSubmitted }: { firstName: string; onSubm
     else fd.set("speakerName", speaker);
     fd.set("duration", String(take.seconds));
     if (consent) fd.set("consent", "on");
-    fd.set("audio", new File([take.blob], `voice.${EXT[take.type] ?? "webm"}`, { type: take.type }));
-    startTransition(() => action(fd));
+    startSending(async () => {
+      // 1. Upload straight to private storage with a one-time link.
+      setStage("upload");
+      const prep = await prepareVoiceUpload({ type: take.type, size: take.blob.size });
+      if (!prep.ok) {
+        setStage(null);
+        return void toast.error(prep.error);
+      }
+      const { error: uploadError } = await createClient()
+        .storage.from("voices")
+        .uploadToSignedUrl(prep.data!.path, prep.data!.token, take.blob, { contentType: take.type });
+      if (uploadError) {
+        setStage(null);
+        return void toast.error("The upload didn't finish. Check your connection and try again.");
+      }
+      // 2. The server checks the file and sends it for review.
+      setStage("check");
+      fd.set("path", prep.data!.path);
+      const r = await submitVoiceNote(fd);
+      setStage(null);
+      if (!r.ok) return void toast.error(r.error);
+      toast.success(r.message ?? "Sent for review");
+      setTake(null);
+      setTitle("");
+      setConsent(false);
+      onSubmitted();
+    });
   };
 
   const remaining = Math.max(0, VOICE_MAX_SECONDS - elapsed);
@@ -213,7 +228,7 @@ export function Recorder({ firstName, onSubmitted }: { firstName: string; onSubm
 
         <section className="rounded-3xl border border-line bg-surface p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-semibold text-ink">2. Record ({VOICE_MIN_SECONDS} to {VOICE_MAX_SECONDS} seconds)</p>
+            <p className="text-sm font-semibold text-ink">2. Record ({lengthLabel(VOICE_MIN_SECONDS)} to {lengthLabel(VOICE_MAX_SECONDS)})</p>
             <div className="inline-flex rounded-xl bg-surface-2 p-1" role="radiogroup" aria-label="Language">
               {VOICE_LANGUAGES.map((l) => (
                 <button
@@ -334,7 +349,7 @@ export function Recorder({ firstName, onSubmitted }: { firstName: string; onSubm
             has reviewed it. I can delete it at any time.
           </label>
           <Button type="submit" size="lg" loading={pending} disabled={!take || !consent || title.trim().length < 3}>
-            Send for review
+            {stage === "upload" ? "Uploading…" : stage === "check" ? "Checking…" : "Send for review"}
           </Button>
         </section>
       </div>

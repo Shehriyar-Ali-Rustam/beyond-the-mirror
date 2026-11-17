@@ -82,6 +82,6 @@ export const VOICE_LANGUAGES: { id: VoiceLanguage; label: string; native: string
 export const voiceCategory = (id: string) => VOICE_CATEGORIES.find((c) => c.id === id) ?? VOICE_CATEGORIES[0];
 
 export const VOICE_MIN_SECONDS = 20;
-export const VOICE_MAX_SECONDS = 60;
+export const VOICE_MAX_SECONDS = 120;
 
 export const formatSeconds = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;

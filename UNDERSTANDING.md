@@ -41,7 +41,7 @@ Some parts are **public** (no login needed): the home page, the self-help toolki
 - **Book a session** (in person, online or by phone) from the counselor's free times.
 - **Get notifications** when the counselor replies or a session changes.
 - **Community board:** ask other students for advice or share something good, with an optional photo. Posts can be anonymous.
-- **A Voice That Understands:** listen to short voice notes (20 to 60 seconds) recorded by other students for hard moments, like feeling lonely or before an exam. In English and Urdu. Students can record their own. A counselor checks every recording before anyone hears it.
+- **A Voice That Understands:** listen to short voice notes (20 seconds to 2 minutes, up to 7 MB) recorded by other students for hard moments, like feeling lonely or before an exam. In English and Urdu. Students can record their own. A counselor checks every recording before anyone hears it.
 - **Check in with yourself:** 10 quick questions about exam stress, overthinking, focus, sleep and feeling overwhelmed. The results give simple, practical ideas. It is not a medical test, and the answers are not saved.
 - **Wellbeing toolkit:** six connected tools that save to the student's own private account:
   - **Daily Reflection Cards:** one thoughtful question a day, with a private journal.
@@ -90,7 +90,7 @@ Privacy was the most important rule while building this.
 - **Safety messages** appear in the right places. For example, if someone writes something worrying in the Mood Portal, emergency contact information appears straight away.
 - **Things that stay on your device:** mood colours, game scores, check-in answers and "letters you won't send" are never uploaded.
 
-There are **80 automatic security tests** that try to break these rules. All of them pass.
+There are **81 automatic security tests** that try to break these rules. All of them pass.
 
 ---
 

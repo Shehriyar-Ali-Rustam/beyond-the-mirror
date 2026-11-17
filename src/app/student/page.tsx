@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, AudioLines, CalendarDays, ClipboardCheck, Gamepad2, MapPin, MessageSquarePlus, Palette, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, AudioLines, CalendarDays, ClipboardCheck, Gamepad2, HandHeart, MapPin, MessageSquarePlus, Palette, Sparkles } from "lucide-react";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getCounselor, isUnreadFor, sentLastBy } from "@/lib/queries";
@@ -244,7 +244,7 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
         </div>
       </section>
 
-      <section className="mt-5 grid gap-4 md:grid-cols-3" aria-label="Feel-good corner">
+      <section className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Feel-good corner">
         {[
           {
             href: "/student/voices",
@@ -263,6 +263,15 @@ export default async function StudentHome({ searchParams }: PageProps<"/student"
             art: "gaming" as const,
             tone: "from-sun-soft to-coral-soft",
             chip: "bg-sun-soft text-[#a26a00]",
+          },
+          {
+            href: "/student/toolkit/gratitude",
+            title: "Gratitude Wall",
+            body: "Read what other students appreciate, and share a small win or a kind moment, anonymously if you like.",
+            icon: HandHeart,
+            art: "showing-support" as const,
+            tone: "from-rose-soft to-sun-soft",
+            chip: "bg-rose-soft text-rose",
           },
           {
             href: "/student/mood",

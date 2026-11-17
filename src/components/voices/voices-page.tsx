@@ -290,7 +290,7 @@ export function VoicesPage({
                 description={
                   library.length
                     ? "No voice notes match these filters yet. Try another category or language, or record one yourself."
-                    : "No voice notes have been shared yet. Record 20 to 60 seconds of encouragement and a counselor will review it."
+                    : "No voice notes have been shared yet. Record 20 seconds to 2 minutes of encouragement and a counselor will review it."
                 }
                 action={
                   <Button onClick={() => setTab("record")} className="rounded-full">

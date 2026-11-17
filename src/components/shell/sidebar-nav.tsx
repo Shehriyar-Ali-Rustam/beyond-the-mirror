@@ -20,9 +20,12 @@ export function SidebarNav({
 }) {
   const pathname = usePathname();
   const { main, secondary } = NAV[role];
+  // Only the most specific match is highlighted (e.g. the Gratitude Wall inside the toolkit).
+  const matches = (item: (typeof main)[number]) => (item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`));
+  const current = [...main, ...secondary].filter(matches).sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   const renderItem = (item: (typeof main)[number]) => {
-    const active = item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+    const active = item.href === current;
     const count = item.badgeKey ? badges[item.badgeKey] ?? 0 : 0;
     return (
       <li key={item.href}>

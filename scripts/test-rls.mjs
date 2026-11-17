@@ -365,6 +365,13 @@ await test("anyone signed in can submit a voice note; it starts pending", async 
   const { data: mine } = await zara.c.rpc("my_voice_notes");
   assert.equal(mine.find((v) => v.id === voiceId).status, "pending");
 });
+await test("voice notes can be up to two minutes, and no longer", async () => {
+  const args = { p_category: "hope", p_language: "en", p_title: "Length check", p_speaker_name: "", p_anonymous: true, p_mime: "audio/webm" };
+  assert.ok((await omar.c.rpc("submit_voice_note", { ...args, p_audio_path: fakePath(), p_duration: 130 })).error, "over two minutes must be refused");
+  const { data: id, error } = await omar.c.rpc("submit_voice_note", { ...args, p_audio_path: fakePath(), p_duration: 118 });
+  assert.ifError(error);
+  assert.ifError((await omar.c.rpc("delete_voice_note", { p_id: id })).error);
+});
 await test("pending voice notes are not in the library", async () => {
   const { data } = await omar.c.rpc("voice_library", {});
   assert.ok(!data.some((v) => v.id === voiceId));

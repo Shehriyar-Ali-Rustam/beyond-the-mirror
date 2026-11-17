@@ -37,7 +37,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: {
-    // Community photos are compressed in the browser and voice notes are capped at 3.5 MB.
+    // Community photos are compressed in the browser. Voice notes upload straight to storage.
     serverActions: { bodySizeLimit: "4mb" },
   },
   turbopack: {
